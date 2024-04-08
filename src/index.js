@@ -1016,6 +1016,7 @@ client.on(
   async (newAutoModerationRule, oldAutoModerationRule) => {
     const data = await Audit_Log.findOne({
       Guild: oldAutoModerationRule.guild.id,
+      Guild: newAutoModerationRule.guild.id,
     });
     let logID;
     if (data) {
