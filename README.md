@@ -7,6 +7,5 @@ If you wish to help with this feel free to open prs.
 
 # dependencies
 discord.js
-axios
 dotenv
 mongoose
