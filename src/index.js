@@ -17,6 +17,7 @@ const {
   ChannelType,
   StringSelectMenuBuilder,
   MessageType,
+  AutoModerationRule,
 } = require(`discord.js`);
 const fs = require("fs");
 const client = new Client({
@@ -1002,7 +1003,7 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
       value: `<@${autoModerationRule.creatorId}>`,
       inline: false,
     },
-    { name: "Rulename:", value: autoModerationRule.name },
+    { name: "Rulename:", value: autoModerationRule.name, inline: false },
     {
       name: "Actions:",
       value: `${autoModerationRule.actions}`,
@@ -1013,6 +1014,44 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
 });
 client.on(
   Events.AutoModerationRuleUpdate,
+  // 1st param is "param or null" and reads null ????
+  async (oldAutoModerationRule, newAutoModerationRule) => {
+    const data = await Audit_Log.findOne({
+      Guild: newAutoModerationRule.guild.id,
+    });
+    let logID;
+    if (data) {
+      logID = data.Channel;
+    } else {
+      return;
+    }
+
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" });
+
+    const auditChannel = client.channels.cache.get(logID);
+
+    auditEmbed.setTitle("Automod Rule Updated").addFields(
+      {
+        name: "New Rulename:",
+        value: `${newAutoModerationRule.name}`,
+        inline: false,
+      },
+      {
+        name: "New Actions:",
+        // value: `${newAutoModerationRule.actions}`,
+        value: `this doesn't work lol, fix it dumbass`,
+        inline: false,
+      }
+    );
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+);
+client.on(
+  Events.AutoModerationRuleUpdate,
+  // 1st param is "param or null" and reads null ????
   async (newAutoModerationRule, oldAutoModerationRule) => {
     const data = await Audit_Log.findOne({
       Guild: oldAutoModerationRule.guild.id,
@@ -1039,17 +1078,8 @@ client.on(
       },
       {
         name: "Old Actions:",
-        value: `${oldAutoModerationRule.actions}`,
-        inline: false,
-      },
-      {
-        name: "New Rulename:",
-        value: `${newAutoModerationRule.name}`,
-        inline: false,
-      },
-      {
-        name: "New Actions:",
-        value: `${newAutoModerationRule.actions}`,
+        // value: `${oldAutoModerationRule.actions}`,
+        value: `this doesn't work lol, fix it dumbass`,
         inline: false,
       }
     );
