@@ -12,7 +12,8 @@ module.exports = {
     if (!mongodbURL) return;
 
     await mongoose.connect(mongodbURL || ``, {
-      keepAlive: true,
+      // keepAlive: true,
+      // deprecated, idk what to use instead?
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

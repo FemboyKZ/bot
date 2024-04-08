@@ -611,7 +611,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction) return;
   if (!interaction.isChatInputCommand()) return;
   else {
-    const channel = await client.channels.cache.get("1104053484069859440");
+    const channel = await client.channels.cache.get(process.env.logchatID);
     const server = interaction.guild.name;
     const serverID = interaction.guild.id;
     const user = interaction.user.username;
@@ -649,7 +649,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // bot join/leave logger, useless feature
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.GuildCreate, async (guild) => {
-  const channel = await client.channels.cache.get("1104053484069859440");
+  const channel = await client.channels.cache.get(process.env.logchatID);
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -684,7 +684,7 @@ client.on(Events.GuildCreate, async (guild) => {
   await channel.send({ embeds: [embed] });
 });
 client.on(Events.GuildDelete, async (guild) => {
-  const channel = await client.channels.cache.get("1104053484069859440");
+  const channel = await client.channels.cache.get(process.env.logchatID);
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -1107,8 +1107,8 @@ client.on(Events.ThreadDelete, async (thread) => {
 
 client.on(Events.GuildMemberAdd, async (member) => {
   const data = await autorole.findOne({ Guild: member.guild.id });
-  const rol = "1179790531254042655";
-  const rol2 = "1179792807280513074";
+  const rol = process.env.autoroleID1;
+  const rol2 = process.env.autoroleID2;
   if (!data) return;
   else {
     try {
