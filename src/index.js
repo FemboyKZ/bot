@@ -612,7 +612,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction) return;
   if (!interaction.isChatInputCommand()) return;
   else {
-    const channel = await client.channels.cache.get(process.env.logchatID);
+    const channel = await client.channels.cache.get(
+      `${process.env.logschatID}`
+    );
     const server = interaction.guild.name;
     const serverID = interaction.guild.id;
     const user = interaction.user.username;
@@ -650,7 +652,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // bot join/leave logger, useless feature
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.GuildCreate, async (guild) => {
-  const channel = await client.channels.cache.get(process.env.logchatID);
+  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -685,7 +687,7 @@ client.on(Events.GuildCreate, async (guild) => {
   await channel.send({ embeds: [embed] });
 });
 client.on(Events.GuildDelete, async (guild) => {
-  const channel = await client.channels.cache.get(process.env.logchatID);
+  const channel = await client.channels.cache.get(`${process.env.logchatID}`);
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
