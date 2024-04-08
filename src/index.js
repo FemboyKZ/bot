@@ -687,7 +687,7 @@ client.on(Events.GuildCreate, async (guild) => {
   await channel.send({ embeds: [embed] });
 });
 client.on(Events.GuildDelete, async (guild) => {
-  const channel = await client.channels.cache.get(`${process.env.logchatID}`);
+  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
