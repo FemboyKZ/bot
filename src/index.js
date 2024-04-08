@@ -1013,9 +1013,9 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
 });
 client.on(
   Events.AutoModerationRuleUpdate,
-  async (newAutoModerationRule, oldAutoModerationRule, autoModerationRule) => {
+  async (newAutoModerationRule, oldAutoModerationRule) => {
     const data = await Audit_Log.findOne({
-      Guild: autoModerationRule.guild.id,
+      Guild: oldAutoModerationRule.guild.id,
     });
     let logID;
     if (data) {
