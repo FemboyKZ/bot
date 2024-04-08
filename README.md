@@ -1,6 +1,5 @@
 # fkz-bot
 FemboyKZ Discord Bot
-https://femboy.kz/
 https://discord.gg/fkz
 
 # dependencies
