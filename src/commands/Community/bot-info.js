@@ -12,7 +12,7 @@ module.exports = {
     .setDescription("Displays current bot status and info"),
 
   async execute(interaction, client) {
-    const name = 'Femboy KZ#7476';
+    const name = "Femboy KZ#7476";
     const icon = `${client.user.displayAvatarURL()}`;
     let servercount = await client.guilds.cache.reduce(
       (a, b) => a + b.memberCount,
@@ -35,7 +35,7 @@ module.exports = {
       new ButtonBuilder()
         .setLabel("Femboy KZ Discord")
         .setStyle(ButtonStyle.Link)
-        .setURL("https://discord.gg/BVwG5zdgpD/"),
+        .setURL("https://discord.gg/fkz/"),
 
       new ButtonBuilder()
         .setLabel("Femboy KZ Steam Group")

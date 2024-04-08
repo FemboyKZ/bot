@@ -1,8 +1,8 @@
-const { model, Schema, } = require('mongoose');
+const { model, Schema } = require("mongoose");
 
 let mcWhitelistSchema = new Schema({
-    Guild: String,
-    Channel: String,
+  Guild: String,
+  Channel: String,
 });
 
-module.exports = model('mcWhitelistSchema', mcWhitelistSchema);
+module.exports = model("mcWhitelistSchema", mcWhitelistSchema);

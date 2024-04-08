@@ -32,12 +32,12 @@ module.exports = {
 
     const embed1 = new EmbedBuilder()
       .setTitle("**Welcome to FemboyKZ! <3**")
-      .setImage("https://media.discordapp.net/attachments/856607026255626240/1164994172063846562/tehe.png")
-      .setColor("#ff00b3")
+      .setImage("https://femboy.kz/images/tehe.png")
+      .setColor("#ff00b3");
 
     const embed2 = new EmbedBuilder()
       .setTitle("**FemboyKZ Info**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "This is a Discord server for the Femboy KZ CS:GO servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers."
@@ -57,7 +57,7 @@ module.exports = {
 
     const embed3 = new EmbedBuilder()
       .setTitle("**FemboyKZ Rules**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "Not following these rules can result in certain punishments."
@@ -76,12 +76,11 @@ module.exports = {
         {
           name: "** **",
           value:
-          " **3.** NSFW content is allowed only on specific channels marked as NSFW. Posting actual pornography, gore or vore is not allowed. NSFW content of minors is not allowed to any extent and will result in a permanent ban.\n **3.1** NSFW channels require the <@&1179794850627997706> Role. Lying about your age for this is a punishable offense.",
+            " **3.** NSFW content is allowed only on specific channels marked as NSFW. Posting actual pornography, gore or vore is not allowed. NSFW content of minors is not allowed to any extent and will result in a permanent ban.\n **3.1** NSFW channels require the <@&1179794850627997706> Role. Lying about your age for this is a punishable offense.",
         },
         {
           name: "** **",
-          value:
-            ` **4.** No discussion or posts on sensitive topics, such as politics, war, religion, mental health (selfharm, disorders), sexuality and gender. This includes memes, videos, links, songs and emoji.`,
+          value: ` **4.** No discussion or posts on sensitive topics, such as politics, war, religion, mental health (selfharm, disorders), sexuality and gender. This includes memes, videos, links, songs and emoji.`,
         },
         {
           name: "** **",
@@ -99,11 +98,13 @@ module.exports = {
         },
         {
           name: "** **",
-          value: " **8.** Keep in mind this is a public server, do not post confidential information or images of others or of yourself.",
+          value:
+            " **8.** Keep in mind this is a public server, do not post confidential information or images of others or of yourself.",
         },
         {
           name: "** **",
-          value: " **9.** Keep discussions and content in their respective channels, and avoid interrupting others.",
+          value:
+            " **9.** Keep discussions and content in their respective channels, and avoid interrupting others.",
         },
         {
           name: "** **",

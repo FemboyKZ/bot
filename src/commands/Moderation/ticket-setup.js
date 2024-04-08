@@ -60,7 +60,7 @@ module.exports = {
 
       const embed1 = new EmbedBuilder()
         .setTitle("**FKZ Whitelist**")
-        .setImage("https://i.stack.imgur.com/Fzh0w.png")
+        .setImage("https://femboy.kz/images/wide.png")
         .setColor("#ff00b3")
         .setDescription(
           "**What is the whitelist and how to get whitelisted?**\nThe whitelist is a list of people that can join *our* private servers."
@@ -79,7 +79,7 @@ module.exports = {
         ]);
       const embed2 = new EmbedBuilder()
         .setTitle("**FKZ Bans/Un-Bans**")
-        .setImage("https://i.stack.imgur.com/Fzh0w.png")
+        .setImage("https://femboy.kz/images/wide.png")
         .setColor("#ff00b3")
         .setDescription(
           "If you were banned from one of the servers, you can request for an unban by using the command **/unban-request** in any of this servers channels."
@@ -93,7 +93,7 @@ module.exports = {
         ]);
       const embed3 = new EmbedBuilder()
         .setTitle("**FKZ VIP / Donations**")
-        .setImage("https://i.stack.imgur.com/Fzh0w.png")
+        .setImage("https://femboy.kz/images/wide.png")
         .setColor("#ff00b3")
         .setDescription(
           "By choosing to **Donate** to the server you may be able to get VIP perks on the servers and here on Discord"
@@ -108,7 +108,7 @@ module.exports = {
       const embed4 = new EmbedBuilder()
         .setColor("#ff00b3")
         .setTitle(`FKZ Support`)
-        .setImage("https://i.stack.imgur.com/Fzh0w.png")
+        .setImage("https://femboy.kz/images/wide.png")
         .addFields([
           {
             name: "Reports / Suggestions",

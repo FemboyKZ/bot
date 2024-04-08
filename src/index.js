@@ -201,7 +201,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             ])
             .setFooter({ text: `${interaction.guild.name} Tickets` })
             .setTimestamp()
-            .setImage("https://i.stack.imgur.com/Fzh0w.png");
+            .setImage("https://femboy.kz/images/wide.png");
 
           const buttonClose = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -267,7 +267,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed8 = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("New Whitelist Request")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
       )
@@ -321,7 +321,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("New Whitelist Request")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
       )
@@ -376,7 +376,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("New Unban Request")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
       )
@@ -428,7 +428,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor("Red")
       .setTitle("New Report/Suggestion Request")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
       )
@@ -540,7 +540,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setDescription(
       `${member.user.tag} joined the server using an unknown invite. This could mean they used a vanity invite link if the server has one.`
     )
-    .setImage("https://i.stack.imgur.com/Fzh0w.png")
+    .setImage("https://femboy.kz/images/wide.png")
     .setTimestamp();
 
   if (!invite) return await channel.send({ embeds: [embed1] });
@@ -553,7 +553,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setDescription(
       `${member.user.tag} Joined the server using the invite: ${invite.code} Which was created by: ${inviter.tag}.\nThe invite has been used ${invite.uses} times since it was created.`
     )
-    .setImage("https://i.stack.imgur.com/Fzh0w.png")
+    .setImage("https://femboy.kz/images/wide.png")
     .setTimestamp();
 
   const embed3 = new EmbedBuilder()
@@ -562,7 +562,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setDescription(
       `${member} Joined the server, but the invite used cannot be found. `
     )
-    .setImage("https://i.stack.imgur.com/Fzh0w.png")
+    .setImage("https://femboy.kz/images/wide.png")
     .setTimestamp();
 
   inviter

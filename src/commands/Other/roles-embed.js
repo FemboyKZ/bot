@@ -32,17 +32,17 @@ module.exports = {
     const embed1 = new EmbedBuilder()
       .setTitle("**FKZ Roles**")
       .setColor("#ff00b3")
-      .setImage("https://media.discordapp.net/attachments/856607026255626240/1182105915332235264/rolls.png")
+      .setImage("https://femboy.kz/images/rolls.png");
     const embed12 = new EmbedBuilder()
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
         "All the roles that affect the members on the Discord server and what they do. (*Excluding self-roles!*)\n\nRoles marked with [*AutoRole*] are the default roles given to members automatically by bots once they have accepted the server rules.\n\nCheck out our self-roles, these are roles which can be removed/added by members themselves below, by reacting to the messages with the predetermined reacts.\n\nSome members have also been granted personal roles which are not listed here, do not ask for one."
       );
     const embed2 = new EmbedBuilder()
       .setTitle("**Staff Roles**")
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .addFields([
         {
           name: "The Owner(s) of the Servers",
@@ -68,7 +68,7 @@ module.exports = {
     const embed3 = new EmbedBuilder()
       .setTitle("**Supporter Roles**")
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .addFields([
         {
           name: "Server Booster",
@@ -84,7 +84,7 @@ module.exports = {
     const embed4 = new EmbedBuilder()
       .setTitle("**Member Roles**")
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .addFields([
         {
           name: "Whitelisted members",
@@ -100,7 +100,7 @@ module.exports = {
     const embed5 = new EmbedBuilder()
       .setTitle("**Special Roles**")
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .addFields([
         {
           name: "Cool people & Friends",
@@ -116,7 +116,7 @@ module.exports = {
     const embed6 = new EmbedBuilder()
       .setTitle("**Old & Removed Roles**")
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .addFields([
         {
           name: "Members that were on the old whitelist(s)",

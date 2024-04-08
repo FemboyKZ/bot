@@ -32,21 +32,19 @@ module.exports = {
 
     const embed1 = new EmbedBuilder()
       .setTitle("**FKZ Self-Roles**")
-      .setImage(
-        "https://media.discordapp.net/attachments/856607026255626240/1182101090859233280/selfrols.png"
-      )
+      .setImage("https://femboy.kz/images/selfrols.png")
       .setColor("#ff00b3");
 
     const embed12 = new EmbedBuilder()
       .setDescription(
         "> FemboyKZ has a lot of roles to choose from to customize your experience on the server.\n> **Choose your own by reacting to the messages below**:"
       )
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3");
 
     const embed2 = new EmbedBuilder()
       .setTitle("**Ping Roles**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> These Roles are for if you want to get pinged for events, news or more. <#858419058172887074>"
@@ -60,7 +58,7 @@ module.exports = {
       ]);
     const embed3 = new EmbedBuilder()
       .setTitle("**Region Roles**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> Roles for showing off your current region.\n> The amounts on these will help us choose server locations!"
@@ -74,7 +72,7 @@ module.exports = {
       ]);
     const embed4 = new EmbedBuilder()
       .setTitle("**Game Roles**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> Roles for showing off what games you play, and to get pinged for anything related to them."
@@ -88,7 +86,7 @@ module.exports = {
       ]);
     const embed5 = new EmbedBuilder()
       .setTitle("**Interest Roles**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription("> Roles for showing off your interests.")
       .addFields([
@@ -100,7 +98,7 @@ module.exports = {
       ]);
     const embed6 = new EmbedBuilder()
       .setTitle("**Age Roles**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> Roles for showing off which age group you belong in.\n> **`18+ Role will be required to see the NSFW Channels!`**"

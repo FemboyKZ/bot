@@ -1,7 +1,7 @@
-const { model, Schema } = require('mongoose');
+const { model, Schema } = require("mongoose");
 
 let ghostSchema = new Schema({
-    Guild: String,
+  Guild: String,
 });
 
 module.exports = model("ghost", ghostSchema);

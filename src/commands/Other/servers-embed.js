@@ -32,14 +32,12 @@ module.exports = {
     const embed1 = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
       .setColor("#ff00b3")
-      .setImage(
-        "https://media.discordapp.net/attachments/856607026255626240/1182105904011804702/serverrs.png"
-      );
+      .setImage("https://femboy.kz/images/serverrs.png");
 
     const embed2 = new EmbedBuilder()
       .setTitle("**CS:GO Servers**")
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .addFields([
         {
           name: "Whitelist Servers",
@@ -91,7 +89,7 @@ module.exports = {
     const embed3 = new EmbedBuilder()
       .setTitle("**CS2 Servers**")
       .setColor("#ff00b3")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .addFields([
         {
           name: "Public Servers",

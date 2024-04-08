@@ -32,15 +32,15 @@ module.exports = {
 
     const embed1 = new EmbedBuilder()
       .setTitle("**FKZ Minecraft Info**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> FemboyKZ has its own Minecraft server! Its mainly a survival server to build cool stuff as a community, but we could do other things on it in the future."
-      )
+      );
 
     const embed2 = new EmbedBuilder()
       .setTitle("**FKZ Minecraft Whitelist**")
-      .setImage("https://i.stack.imgur.com/Fzh0w.png")
+      .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> The Server has a separate whitelist from the CS servers. To connect to the servers you must be whitelisted."
