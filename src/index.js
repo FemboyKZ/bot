@@ -1016,7 +1016,6 @@ client.on(
   async (newAutoModerationRule, oldAutoModerationRule) => {
     const data = await Audit_Log.findOne({
       Guild: oldAutoModerationRule.guild.id,
-      Guild: newAutoModerationRule.guild.id,
     });
     let logID;
     if (data) {
@@ -1045,10 +1044,14 @@ client.on(
       },
       {
         name: "New Rulename:",
-        value: newAutoModerationRule.name,
+        value: `${newAutoModerationRule.name}`,
         inline: false,
       },
-      { name: "New Actions:", value: newAutoModerationRule.actions }
+      {
+        name: "New Actions:",
+        value: `${newAutoModerationRule.actions}`,
+        inline: false,
+      }
     );
     await auditChannel.send({ embeds: [auditEmbed] });
   }
