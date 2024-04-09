@@ -72,38 +72,30 @@ process.on("unhandledRejection", (reason, promise) => {
   client.login(process.env.token);
 })();
 
-// schemas
-const whitelistSchema = require("./Schemas.js/whitelistSchema");
-const unbanSchema = require("./Schemas.js/unbanSchema");
-const reportSchema = require("./Schemas.js/reportSchema");
-const ticketSchema = require("./Schemas.js/ticketSchema");
-const linkSchema = require("./Schemas.js/linkSchema");
-const inviteSchema = require("./Schemas.js/inviteSchema");
 const ghostSchema = require("./Schemas.js/ghostpingSchema");
 const numSchema = require("./Schemas.js/ghostnumSchema");
-const mcWhitelistSchema = require("./Schemas.js/mcWhitelistSchema");
-const welcomeschema = require("./Schemas.js/welcome");
-const reactions = require("./Schemas.js/reactionrs");
-const autorole = require("./Schemas.js/autorole");
 
-// ticket systems modal create
+// Ticket system
+const ticketSchema = require("./Schemas.js/ticketSchema");
+
+// ticket modal create
 client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isButton()) return;
   if (interaction.isChatInputCommand()) return;
 
-  const modal4 = new ModalBuilder()
+  const modalTicket = new ModalBuilder()
     .setTitle("Provide us with more information")
-    .setCustomId("modal4");
+    .setCustomId("modalTicket");
 
-  const topic4 = new TextInputBuilder()
-    .setCustomId("topic4")
+  const topicTicket = new TextInputBuilder()
+    .setCustomId("topicTicket")
     .setRequired(true)
     .setLabel("What is the topic of your ticket?")
     .setPlaceholder("Server connection issue? Server crashed. Etc.")
     .setStyle(TextInputStyle.Short);
 
-  const info4 = new TextInputBuilder()
-    .setCustomId("info4")
+  const infoTicket = new TextInputBuilder()
+    .setCustomId("infoTicket")
     .setRequired(true)
     .setLabel("Specify the issue, in detail.")
     .setPlaceholder(
@@ -111,18 +103,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
     )
     .setStyle(TextInputStyle.Paragraph);
 
-  const additional4 = new TextInputBuilder()
-    .setCustomId("additional4")
+  const additionalTicket = new TextInputBuilder()
+    .setCustomId("additionalTicket")
     .setRequired(true)
     .setLabel("Anything to add? Links/Clips/Screenshots/etc.")
     .setPlaceholder("Links to Clips/Screenshots. Server IP/Name.")
     .setStyle(TextInputStyle.Paragraph);
 
-  const firstActionRow = new ActionRowBuilder().addComponents(topic4);
-  const secondActionRow = new ActionRowBuilder().addComponents(info4);
-  const thirdActionRow = new ActionRowBuilder().addComponents(additional4);
+  const firstActionRow = new ActionRowBuilder().addComponents(topicTicket);
+  const secondActionRow = new ActionRowBuilder().addComponents(infoTicket);
+  const thirdActionRow = new ActionRowBuilder().addComponents(additionalTicket);
 
-  modal4.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+  modalTicket.addComponents(firstActionRow, secondActionRow, thirdActionRow);
 
   let choices;
   if (interaction.isStringSelectMenu()) {
@@ -144,7 +136,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     });
 
     if (!interaction.isModalSubmit()) {
-      interaction.showModal(modal4);
+      interaction.showModal(modalTicket);
     }
   }
 });
@@ -152,14 +144,22 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // ticket creation
 client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isModalSubmit()) {
-    if (interaction.customId === "modal4") {
+    if (interaction.customId === "modalTicket") {
       ticketSchema.findOne(
         { Guild: interaction.guild.id },
         async (err, data) => {
-          const topicInput = interaction.fields.getTextInputValue("topic4");
-          const infoInput = interaction.fields.getTextInputValue("info4");
+          const topicInput =
+            interaction.fields.getTextInputValue("topicTicket");
+          const infoInput = interaction.fields.getTextInputValue("infoTicket");
           const additionalInput =
-            interaction.fields.getTextInputValue("additional4");
+            interaction.fields.getTextInputValue("additionalTicket");
+
+          if (infoInput.length > 500 || additionalInput.length > 500) {
+            return await interaction.reply({
+              content: `You have entered too much text, please shorten it and try again.`,
+              ephemeral: true,
+            });
+          }
 
           const posChannel = await interaction.guild.channels.cache.find(
             (c) => c.name === `ticket-${interaction.user.id}`
@@ -251,21 +251,33 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-// whitelist request command
+// CS:GO & Mc whitelist request commands, unban request command, report command
+const whitelistSchema = require("./Schemas.js/whitelistSchema");
+const mcWhitelistSchema = require("./Schemas.js/mcWhitelistSchema");
+const unbanSchema = require("./Schemas.js/unbanSchema");
+const reportSchema = require("./Schemas.js/reportSchema");
+
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isModalSubmit()) return;
 
-  if (interaction.customId === "modal6") {
-    const uuid = interaction.fields.getTextInputValue("uuid1");
-    const reason = interaction.fields.getTextInputValue("reason6");
-    const request = interaction.fields.getTextInputValue("request6");
+  if (interaction.customId === "modalMc") {
+    const uuid = interaction.fields.getTextInputValue("uuidMc");
+    const reason = interaction.fields.getTextInputValue("reasonMc");
+    const request = interaction.fields.getTextInputValue("requestMc");
 
     const member = interaction.user.id;
     const tag = interaction.user.tag;
     const server = interaction.guild.name;
     const serverId = interaction.guild.id;
 
-    const embed8 = new EmbedBuilder()
+    if (reason.length > 500 || request.length > 500) {
+      return await interaction.reply({
+        content: `You have entered too much text, please shorten it and try again.`,
+        ephemeral: true,
+      });
+    }
+
+    const embedMc = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("New Whitelist Request")
       .setImage("https://femboy.kz/images/wide.png")
@@ -298,7 +310,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           const channelID = data.Channel;
           const channel = interaction.guild.channels.cache.get(channelID);
 
-          channel.send({ embeds: [embed8] });
+          channel.send({ embeds: [embedMc] });
 
           await interaction.reply({
             content: "Your request has been submitted.",
@@ -309,22 +321,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
     );
   }
 
-  if (interaction.customId === "modal1") {
-    const steam = interaction.fields.getTextInputValue("steam1");
-    const reason = interaction.fields.getTextInputValue("reason1");
-    const request = interaction.fields.getTextInputValue("request1");
+  if (interaction.customId === "modalWhitelist") {
+    const steam = interaction.fields.getTextInputValue("steamWhitelist");
+    const reason = interaction.fields.getTextInputValue("reasonWhitelist");
+    const request = interaction.fields.getTextInputValue("requestWhitelist");
 
     const member = interaction.user.id;
     const tag = interaction.user.tag;
-    const server = interaction.guild.name;
-    const serverId = interaction.guild.id;
+    const guild = interaction.guild.name;
+    const guildId = interaction.guild.id;
 
-    const embed = new EmbedBuilder()
+    if (reason.length > 500 || request.length > 500) {
+      return await interaction.reply({
+        content: `You have entered too much text, please shorten it and try again.`,
+        ephemeral: true,
+      });
+    }
+
+    const embedWhitelist = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("New Whitelist Request")
       .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
-        `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
+        `Requesting member: ${tag} (${member})\nIn Server: ${guild} (${guildId})`
       )
       .addFields({
         name: "SteamID / Profile URL",
@@ -352,7 +371,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           const channelID = data.Channel;
           const channel = interaction.guild.channels.cache.get(channelID);
 
-          channel.send({ embeds: [embed] });
+          channel.send({ embeds: [embedWhitelist] });
 
           await interaction.reply({
             content: "Your request has been submitted.",
@@ -364,22 +383,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   // unban request command
-  if (interaction.customId === "modal2") {
-    const steam = interaction.fields.getTextInputValue("steam2");
-    const reason = interaction.fields.getTextInputValue("reason2");
-    const csServer = interaction.fields.getTextInputValue("server2");
+  if (interaction.customId === "modalUnban") {
+    const steam = interaction.fields.getTextInputValue("steamUnban");
+    const reason = interaction.fields.getTextInputValue("reasonUnban");
+    const server = interaction.fields.getTextInputValue("serverUnban");
 
     const member = interaction.user.id;
     const tag = interaction.user.tag;
-    const server = interaction.guild.name;
-    const serverId = interaction.guild.id;
+    const guild = interaction.guild.name;
+    const guildId = interaction.guild.id;
 
-    const embed = new EmbedBuilder()
+    if (reason.length > 500) {
+      return await interaction.reply({
+        content: `You have entered too much text, please shorten it and try again.`,
+        ephemeral: true,
+      });
+    }
+
+    const embedUnban = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("New Unban Request")
       .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
-        `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
+        `Requesting member: ${tag} (${member})\nIn Server: ${guild} (${guildId})`
       )
       .addFields({
         name: "SteamID / Profile URL",
@@ -393,7 +419,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .addFields({
         name: "Server IP/Name",
-        value: `${csServer}`,
+        value: `${server}`,
         inline: false,
       })
       .setTimestamp();
@@ -405,7 +431,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const channelID = data.Channel;
         const channel = interaction.guild.channels.cache.get(channelID);
 
-        channel.send({ embeds: [embed] });
+        channel.send({ embeds: [embedUnban] });
 
         await interaction.reply({
           content: "Your request has been submitted.",
@@ -416,22 +442,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   // report/suggestion command
-  if (interaction.customId === "modal3") {
-    const issue = interaction.fields.getTextInputValue("issue3");
-    const info = interaction.fields.getTextInputValue("info3");
-    const more = interaction.fields.getTextInputValue("more3");
+  if (interaction.customId === "modalReport") {
+    const issue = interaction.fields.getTextInputValue("issueReport");
+    const info = interaction.fields.getTextInputValue("infoReport");
+    const more = interaction.fields.getTextInputValue("moreReport");
 
     const member = interaction.user.id;
     const tag = interaction.user.tag;
-    const server = interaction.guild.name;
-    const serverId = interaction.guild.id;
+    const guild = interaction.guild.name;
+    const guildId = interaction.guild.id;
 
-    const embed = new EmbedBuilder()
+    if (info.length > 500 || more.length > 500) {
+      return await interaction.reply({
+        content: `You have entered too much text, please shorten it and try again.`,
+        ephemeral: true,
+      });
+    }
+
+    const embedReport = new EmbedBuilder()
       .setColor("Red")
       .setTitle("New Report/Suggestion Request")
       .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
-        `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
+        `Requesting member: ${tag} (${member})\nIn Server: ${guild} (${guildId})`
       )
       .addFields({
         name: "Reported issue / Suggestion",
@@ -457,7 +490,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const channelID = data.Channel;
         const channel = interaction.guild.channels.cache.get(channelID);
 
-        channel.send({ embeds: [embed] });
+        channel.send({ embeds: [embedReport] });
 
         await interaction.reply({
           content: "Your report/suggestion has been submitted.",
@@ -469,6 +502,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // antilink system
+const linkSchema = require("./Schemas.js/linkSchema");
+
 client.on(Events.MessageCreate, async (message) => {
   if (
     message.content.startsWith("http") ||
@@ -500,6 +535,8 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 // invite logger
+const inviteSchema = require("./Schemas.js/inviteSchema");
+
 const invites = new Collection();
 const wait = require("timers/promises").setTimeout;
 
@@ -535,7 +572,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
   const invite = newInvites.find((i) => i.uses > oldInvites.get(i.code));
 
-  const embed1 = new EmbedBuilder()
+  const embedVanity = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTitle(`${member.user.tag} Has Joined the Server!`)
     .setDescription(
@@ -544,11 +581,11 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setImage("https://femboy.kz/images/wide.png")
     .setTimestamp();
 
-  if (!invite) return await channel.send({ embeds: [embed1] });
+  if (!invite) return await channel.send({ embeds: [embedVanity] });
 
   const inviter = await client.users.fetch(invite.inviter.id);
 
-  const embed2 = new EmbedBuilder()
+  const embedInvite = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTitle(`${member.user.tag} Has Joined the Server!`)
     .setDescription(
@@ -557,7 +594,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setImage("https://femboy.kz/images/wide.png")
     .setTimestamp();
 
-  const embed3 = new EmbedBuilder()
+  const embedNoInvite = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTitle(`${member.user.tag} Has Joined the Server!`)
     .setDescription(
@@ -567,11 +604,12 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setTimestamp();
 
   inviter
-    ? channel.send({ embeds: [embed2] })
-    : channel.send({ embeds: [embed3] });
+    ? channel.send({ embeds: [embedInvite] })
+    : channel.send({ embeds: [embedNoInvite] });
 });
 
 // Leave Message //
+const welcomeschema = require("./Schemas.js/welcome");
 
 client.on(Events.GuildMemberRemove, async (member, err) => {
   const leavedata = await welcomeschema.findOne({ Guild: member.guild.id });
@@ -594,7 +632,7 @@ client.on(Events.GuildMemberRemove, async (member, err) => {
   }
 });
 
-// Welcome Message //
+// Welcome Message // not being used
 
 client.on(Events.GuildMemberAdd, async (member, err) => {
   const welcomedata = await welcomeschema.findOne({ Guild: member.guild.id });
@@ -724,6 +762,7 @@ client.on(Events.GuildDelete, async (guild) => {
 
 // AUDIT LOG //
 const Audit_Log = require("./Schemas.js/auditlog");
+
 client.on(Events.GuildBanAdd, async (guild, user) => {
   const data = await Audit_Log.findOne({
     Guild: guild.id,
@@ -1016,7 +1055,7 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
 });
 client.on(
   Events.AutoModerationRuleUpdate,
-  // 1st param is "param or null" and reads null ????
+  // 1st param is "param or null" and reads null ???? #1
   async (oldAutoModerationRule, newAutoModerationRule) => {
     const data = await Audit_Log.findOne({
       Guild: newAutoModerationRule.guild.id,
@@ -1043,7 +1082,7 @@ client.on(
       },
       {
         name: "New Actions:",
-        // value: `${newAutoModerationRule.actions}`,
+        // value: `${newAutoModerationRule.actions}`, #1
         value: `this doesn't work lol, fix it dumbass`,
         inline: false,
       }
@@ -1053,7 +1092,7 @@ client.on(
 );
 client.on(
   Events.AutoModerationRuleUpdate,
-  // 1st param is "param or null" and reads null ????
+  // 1st param is "param or null" and reads null ???? #1
   async (newAutoModerationRule, oldAutoModerationRule) => {
     const data = await Audit_Log.findOne({
       Guild: oldAutoModerationRule.guild.id,
@@ -1080,7 +1119,7 @@ client.on(
       },
       {
         name: "Old Actions:",
-        // value: `${oldAutoModerationRule.actions}`,
+        // value: `${oldAutoModerationRule.actions}`, #1
         value: `this doesn't work lol, fix it dumbass`,
         inline: false,
       }
@@ -1140,8 +1179,10 @@ client.on(Events.ThreadDelete, async (thread) => {
 });
 
 // AUTOROLE //
+const autorole = require("./Schemas.js/autorole");
 
 client.on(Events.GuildMemberAdd, async (member) => {
+  // only supports 1 role through command lol, added extra ones here lol #3
   const data = await autorole.findOne({ Guild: member.guild.id });
   const rol = process.env.autoroleID1;
   const rol2 = process.env.autoroleID2;
@@ -1158,6 +1199,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 });
 
 // REACTION ROLES //
+const reactions = require("./Schemas.js/reactionrs");
 
 // reaction add
 client.on(Events.MessageReactionAdd, async (reaction, user) => {

@@ -1,8 +1,5 @@
 const {
   SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  ChannelType,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -34,19 +31,19 @@ module.exports = {
         }
 
         if (data) {
-          const modal6 = new ModalBuilder()
+          const modalMc = new ModalBuilder()
             .setTitle("Minecraft Whitelist Request form")
-            .setCustomId("modal6");
+            .setCustomId("modalMc");
 
-          const uuid1 = new TextInputBuilder()
-            .setCustomId("uuid1")
+          const uuidMc = new TextInputBuilder()
+            .setCustomId("uuidMc")
             .setRequired(true)
             .setLabel("What is your Minecraft name or UUID?")
             .setPlaceholder("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
             .setStyle(TextInputStyle.Short);
 
-          const reason6 = new TextInputBuilder()
-            .setCustomId("reason6")
+          const reasonMc = new TextInputBuilder()
+            .setCustomId("reasonMc")
             .setRequired(true)
             .setLabel("Why should you get whitelisted?")
             .setPlaceholder(
@@ -54,20 +51,28 @@ module.exports = {
             )
             .setStyle(TextInputStyle.Paragraph);
 
-          const request6 = new TextInputBuilder()
-            .setCustomId("request6")
+          const requestMc = new TextInputBuilder()
+            .setCustomId("requestMc")
             .setRequired(true)
             .setLabel("What would you do on the Minecraft server?")
             .setPlaceholder("build cool shit or ... ?")
             .setStyle(TextInputStyle.Paragraph);
 
-          const firstActionRow = new ActionRowBuilder().addComponents(uuid1);
-          const secondActionRow = new ActionRowBuilder().addComponents(reason6);
-          const thirdActionRow = new ActionRowBuilder().addComponents(request6);
+          const firstActionRow = new ActionRowBuilder().addComponents(uuidMc);
+          const secondActionRow = new ActionRowBuilder().addComponents(
+            reasonMc
+          );
+          const thirdActionRow = new ActionRowBuilder().addComponents(
+            requestMc
+          );
 
-          modal6.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+          modalMc.addComponents(
+            firstActionRow,
+            secondActionRow,
+            thirdActionRow
+          );
 
-          interaction.showModal(modal6);
+          interaction.showModal(modalMc);
         }
       }
     );

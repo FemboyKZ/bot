@@ -1,8 +1,5 @@
 const {
   SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  ChannelType,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -32,19 +29,19 @@ module.exports = {
       }
 
       if (data) {
-        const modal3 = new ModalBuilder()
+        const modalReport = new ModalBuilder()
           .setTitle("Report/Suggestion form")
-          .setCustomId("modal3");
+          .setCustomId("modalReport");
 
-        const issue3 = new TextInputBuilder()
-          .setCustomId("issue3")
+        const issueReport = new TextInputBuilder()
+          .setCustomId("issueReport")
           .setRequired(true)
           .setLabel("What do you want to report/suggest")
           .setPlaceholder("A cheater? New server? Etc.")
           .setStyle(TextInputStyle.Short);
 
-        const info3 = new TextInputBuilder()
-          .setCustomId("info3")
+        const infoReport = new TextInputBuilder()
+          .setCustomId("infoReport")
           .setRequired(true)
           .setLabel("Explain what/who you're suggesting/reporting.")
           .setPlaceholder(
@@ -52,20 +49,28 @@ module.exports = {
           )
           .setStyle(TextInputStyle.Paragraph);
 
-        const more3 = new TextInputBuilder()
-          .setCustomId("more3")
+        const moreReport = new TextInputBuilder()
+          .setCustomId("moreReport")
           .setRequired(true)
           .setLabel("Anything to add?")
           .setPlaceholder("Links to images/videos for proof/concepts? Etc.")
           .setStyle(TextInputStyle.Paragraph);
 
-        const firstActionRow = new ActionRowBuilder().addComponents(issue3);
-        const secondActionRow = new ActionRowBuilder().addComponents(info3);
-        const thirdActionRow = new ActionRowBuilder().addComponents(more3);
+        const firstActionRow = new ActionRowBuilder().addComponents(
+          issueReport
+        );
+        const secondActionRow = new ActionRowBuilder().addComponents(
+          infoReport
+        );
+        const thirdActionRow = new ActionRowBuilder().addComponents(moreReport);
 
-        modal3.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+        modalReport.addComponents(
+          firstActionRow,
+          secondActionRow,
+          thirdActionRow
+        );
 
-        interaction.showModal(modal3);
+        interaction.showModal(modalReport);
       }
     });
 

@@ -1,8 +1,5 @@
 const {
   SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  ChannelType,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -34,19 +31,19 @@ module.exports = {
         }
 
         if (data) {
-          const modal1 = new ModalBuilder()
+          const modalWhitelist = new ModalBuilder()
             .setTitle("Whitelist Request form")
-            .setCustomId("modal1");
+            .setCustomId("modalWhitelist");
 
-          const steam1 = new TextInputBuilder()
-            .setCustomId("steam1")
+          const steamWhitelist = new TextInputBuilder()
+            .setCustomId("steamWhitelist")
             .setRequired(true)
             .setLabel("What is your SteamID, or Steam Profile URL")
             .setPlaceholder("STEAM_1:0:XXX, replace X with your ID")
             .setStyle(TextInputStyle.Short);
 
-          const reason1 = new TextInputBuilder()
-            .setCustomId("reason1")
+          const reasonWhitelist = new TextInputBuilder()
+            .setCustomId("reasonWhitelist")
             .setRequired(true)
             .setLabel("Why should you get whitelisted")
             .setPlaceholder(
@@ -54,20 +51,30 @@ module.exports = {
             )
             .setStyle(TextInputStyle.Paragraph);
 
-          const request1 = new TextInputBuilder()
-            .setCustomId("request1")
+          const requestWhitelist = new TextInputBuilder()
+            .setCustomId("requestWhitelist")
             .setRequired(true)
             .setLabel("Have you requested to join the WL SteamGroup?")
             .setPlaceholder("Yes/No")
             .setStyle(TextInputStyle.Short);
 
-          const firstActionRow = new ActionRowBuilder().addComponents(steam1);
-          const secondActionRow = new ActionRowBuilder().addComponents(reason1);
-          const thirdActionRow = new ActionRowBuilder().addComponents(request1);
+          const firstActionRow = new ActionRowBuilder().addComponents(
+            steamWhitelist
+          );
+          const secondActionRow = new ActionRowBuilder().addComponents(
+            reasonWhitelist
+          );
+          const thirdActionRow = new ActionRowBuilder().addComponents(
+            requestWhitelist
+          );
 
-          modal1.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+          modalWhitelist.addComponents(
+            firstActionRow,
+            secondActionRow,
+            thirdActionRow
+          );
 
-          interaction.showModal(modal1);
+          interaction.showModal(modalWhitelist);
         }
       }
     );

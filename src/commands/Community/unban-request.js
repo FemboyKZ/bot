@@ -1,8 +1,5 @@
 const {
   SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  ChannelType,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -32,19 +29,19 @@ module.exports = {
       }
 
       if (data) {
-        const modal2 = new ModalBuilder()
+        const modalUnban = new ModalBuilder()
           .setTitle("Unban Request form")
-          .setCustomId("modal2");
+          .setCustomId("modalUnban");
 
-        const steam2 = new TextInputBuilder()
-          .setCustomId("steam2")
+        const steamUnban = new TextInputBuilder()
+          .setCustomId("steamUnban")
           .setRequired(true)
           .setLabel("What is your SteamID, or Steam Profile URL")
           .setPlaceholder("STEAM_1:0:XXX, replace X with your ID")
           .setStyle(TextInputStyle.Short);
 
-        const reason2 = new TextInputBuilder()
-          .setCustomId("reason2")
+        const reasonUnban = new TextInputBuilder()
+          .setCustomId("reasonUnban")
           .setRequired(true)
           .setLabel("Why should you get unbanned?")
           .setPlaceholder(
@@ -52,20 +49,28 @@ module.exports = {
           )
           .setStyle(TextInputStyle.Paragraph);
 
-        const csServer2 = new TextInputBuilder()
-          .setCustomId("server2")
+        const serverUnban = new TextInputBuilder()
+          .setCustomId("serverUnban")
           .setRequired(true)
           .setLabel("Which server were you banned from?")
           .setPlaceholder("IP or name of the server")
           .setStyle(TextInputStyle.Short);
 
-        const firstActionRow = new ActionRowBuilder().addComponents(steam2);
-        const secondActionRow = new ActionRowBuilder().addComponents(reason2);
-        const thirdActionRow = new ActionRowBuilder().addComponents(csServer2);
+        const firstActionRow = new ActionRowBuilder().addComponents(steamUnban);
+        const secondActionRow = new ActionRowBuilder().addComponents(
+          reasonUnban
+        );
+        const thirdActionRow = new ActionRowBuilder().addComponents(
+          serverUnban
+        );
 
-        modal2.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+        modalUnban.addComponents(
+          firstActionRow,
+          secondActionRow,
+          thirdActionRow
+        );
 
-        interaction.showModal(modal2);
+        interaction.showModal(modalUnban);
       }
     });
 
