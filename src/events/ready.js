@@ -9,15 +9,15 @@ module.exports = {
   async execute(client) {
     console.log("Ready!");
 
-    if (!mongodbURL) return;
+    if (!mongodbURL) return console.log("Setup mongodbURL in .env");
 
-    await mongoose.createConnection(mongodbURL || ``, {
+    await mongoose.connect(mongodbURL || ``, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
       // keepAlive: true, deprecated
     });
 
-    if (mongoose.createConnection) {
+    if (mongoose.connect) {
       console.log("The MongoDB Database is running.");
     }
   },
