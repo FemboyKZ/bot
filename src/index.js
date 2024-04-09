@@ -58,7 +58,6 @@ const commandFolders = fs.readdirSync("./src/commands");
 
 // anticrash
 const process = require("node:process");
-
 process.on("unhandledRejection", (reason, promise) => {
   console.log("Unhandled Rejection at:", promise, "reason:", reason);
 });
@@ -72,6 +71,7 @@ process.on("unhandledRejection", (reason, promise) => {
   client.login(process.env.token);
 })();
 
+// anti-ghostping, not used
 const ghostSchema = require("./Schemas.js/ghostpingSchema");
 const numSchema = require("./Schemas.js/ghostnumSchema");
 
@@ -981,6 +981,51 @@ client.on(Events.MessageDelete, async (message) => {
         { name: "Author:", value: `${message.author}`, inline: false },
         { name: "Message:", value: `${message.content}`, inline: false },
         { name: "Message ID:", value: `${message.id}` }
+      );
+    await auditChannel.send({ embeds: [auditEmbed] });
+  } catch (err) {
+    return;
+  }
+});
+client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+  const data = await Audit_Log.findOne({
+    Guild: newMessage.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+
+  const changes = [];
+
+  if (oldMessage.content !== newMessage.content) {
+    changes.push(
+      `Topic: \`${oldMessage.content || "None"}\` → \`${
+        newMessage.content || "None"
+      }\``
+    );
+  }
+
+  if (changes.length === 0) return;
+
+  const changesText = changes.join("\n");
+
+  try {
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" });
+
+    const auditChannel = client.channels.cache.get(logID);
+
+    auditEmbed
+      .setTitle("Message Edited")
+      .addFields(
+        { name: "Author:", value: `${newMessage.author}`, inline: false },
+        { name: "Message changes:", value: `${changesText}`, inline: false },
+        { name: "Message ID:", value: `${newMessage.id}` }
       );
     await auditChannel.send({ embeds: [auditEmbed] });
   } catch (err) {
