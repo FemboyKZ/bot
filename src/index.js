@@ -3,9 +3,6 @@ const {
   GatewayIntentBits,
   EmbedBuilder,
   PermissionsBitField,
-  Permissions,
-  MessageManager,
-  Embed,
   Collection,
   Events,
   ActionRowBuilder,
@@ -15,9 +12,6 @@ const {
   TextInputBuilder,
   TextInputStyle,
   ChannelType,
-  StringSelectMenuBuilder,
-  MessageType,
-  AutoModerationRule,
 } = require(`discord.js`);
 const fs = require("fs");
 const client = new Client({

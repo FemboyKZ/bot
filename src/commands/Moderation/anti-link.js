@@ -2,7 +2,6 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-  ChannelType,
 } = require("discord.js");
 const linkSchema = require("../../Schemas.js/linkSchema");
 

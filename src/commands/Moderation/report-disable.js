@@ -2,7 +2,6 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-  ChannelType,
 } = require("discord.js");
 const reportSchema = require("../../Schemas.js/reportSchema");
 
@@ -21,8 +20,7 @@ module.exports = {
         ephemeral: true,
       });
 
-    const { channel, guildId, options } = interaction;
-    const reportChannel = options.getChannel("channel");
+    const { guildId } = interaction;
 
     const embed = new EmbedBuilder();
 

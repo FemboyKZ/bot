@@ -1,12 +1,4 @@
-const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionsBitField,
-  ChannelType,
-  ActionRowBuilder,
-  SelectMenuBuilder,
-  TextChannel,
-} = require("discord.js");
+const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 const ticketSchema = require("../../Schemas.js/ticketSchema");
 
 module.exports = {

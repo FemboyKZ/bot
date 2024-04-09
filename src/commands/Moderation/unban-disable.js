@@ -2,7 +2,6 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-  ChannelType,
 } = require("discord.js");
 const unbanSchema = require("../../Schemas.js/unbanSchema");
 
@@ -21,8 +20,7 @@ module.exports = {
         ephemeral: true,
       });
 
-    const { channel, guildId, options } = interaction;
-    const unbanChannel = options.getChannel("channel");
+    const { guildId } = interaction;
 
     const embed = new EmbedBuilder();
 

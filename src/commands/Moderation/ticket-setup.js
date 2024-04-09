@@ -4,9 +4,7 @@ const {
   PermissionsBitField,
   ChannelType,
   ActionRowBuilder,
-  SelectMenuBuilder,
   StringSelectMenuBuilder,
-  TextChannel,
 } = require("discord.js");
 const ticketSchema = require("../../Schemas.js/ticketSchema");
 

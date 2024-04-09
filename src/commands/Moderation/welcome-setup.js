@@ -1,5 +1,8 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
-const { EmbedBuilder, PermissionsBitField } = require("discord.js");
+const {
+  EmbedBuilder,
+  SlashCommandBuilder,
+  PermissionsBitField,
+} = require("discord.js");
 const weschema = require("../../Schemas.js/welcome");
 
 module.exports = {

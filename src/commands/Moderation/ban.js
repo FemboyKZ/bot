@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  PermissionsBitField,
+} = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,7 +18,11 @@ module.exports = {
         .setRequired(false)
     ),
   async execute(interaction) {
-    if (!interaction.member.roles.cache.has(process.env.banRoleID)) {
+    if (
+      !interaction.member.permissions.has(
+        PermissionsBitField.Flags.Administrator
+      )
+    ) {
       const noPermissionEmbed = new EmbedBuilder()
         .setColor("#ff00b3")
         .setTimestamp()

@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
 const {
   EmbedBuilder,
+  SlashCommandBuilder,
   PermissionsBitField,
   ChannelType,
 } = require("discord.js");
