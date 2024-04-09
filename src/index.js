@@ -979,6 +979,7 @@ client.on(Events.MessageDelete, async (message) => {
       .setTitle("Message Deleted")
       .addFields(
         { name: "Author:", value: `${message.author}`, inline: false },
+        { name: "Channel:", value: `${message.channel}`, inline: false },
         { name: "Message:", value: `${message.content}`, inline: false },
         { name: "Message ID:", value: `${message.id}` }
       );
@@ -988,6 +989,7 @@ client.on(Events.MessageDelete, async (message) => {
   }
 });
 client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+  if (oldMessage.author.id === client.user.id) return;
   const data = await Audit_Log.findOne({
     Guild: newMessage.guild.id,
   });
@@ -998,20 +1000,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     return;
   }
 
-  const changes = [];
-
-  if (oldMessage.content !== newMessage.content) {
-    changes.push(
-      `Topic: \`${oldMessage.content || "None"}\` → \`${
-        newMessage.content || "None"
-      }\``
-    );
-  }
-
-  if (changes.length === 0) return;
-
-  const changesText = changes.join("\n");
-
   try {
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -1020,10 +1008,25 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
     const auditChannel = client.channels.cache.get(logID);
 
+    const changes = [];
+
+    if (oldMessage.content !== newMessage.content) {
+      changes.push(
+        `Topic: \`${oldMessage.content || "None"}\` → \`${
+          newMessage.content || "None"
+        }\``
+      );
+    }
+
+    if (changes.length === 0) return;
+
+    const changesText = changes.join("\n");
+
     auditEmbed
       .setTitle("Message Edited")
       .addFields(
         { name: "Author:", value: `${newMessage.author}`, inline: false },
+        { name: "Channel:", value: `${newMessage.channel}`, inline: false },
         { name: "Message changes:", value: `${changesText}`, inline: false },
         { name: "Message ID:", value: `${newMessage.id}` }
       );
