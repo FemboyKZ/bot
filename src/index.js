@@ -1363,7 +1363,19 @@ client.on(
     const auditChannel = client.channels.cache.get(logID);
     const changes = [];
 
-    if (oldAutoModerationRule === null) return console.log("NULL"); // avoid crash cuz of #1
+    const nullEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Automod Rule Updated")
+      .addFields({
+        name: "Changes:",
+        value: `"null"`,
+      });
+
+    if (oldAutoModerationRule === null) {
+      return await auditChannel.send({ embeds: [nullEmbed] }); // avoid crash cuz of #1
+    }
 
     if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
       changes.push(
