@@ -1644,13 +1644,13 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
   if (oldMember.roles.cache.size > newMember.roles.cache.size) {
     oldMember.roles.cache.forEach((role) => {
       if (!newMember.roles.cache.has(role.id)) {
-        auditEmbed.addField("Role Removed: ", role);
+        auditEmbed.addFields({ name: "Role Removed: ", value: role });
       }
     });
   } else if (oldMember.roles.cache.size < newMember.roles.cache.size) {
     newMember.roles.cache.forEach((role) => {
       if (!oldMember.roles.cache.has(role.id)) {
-        auditEmbed.addField("Role Added: ", role);
+        auditEmbed.addFields({ name: "Role Added: ", value: role });
       }
     });
   }
