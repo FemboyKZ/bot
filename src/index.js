@@ -1716,10 +1716,17 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
       }\` → \`${newMember.displayName || newMember.nickname || "none"}\``
     );
     const changesNameText = changesName.join("\n");
-    auditEmbed.addFields({
-      value: changesNameText,
-      inline: false,
-    });
+    auditEmbed.addFields(
+      { name: "User:", value: `${newMember.user.username}`, inline: false },
+      { name: "UserID:", value: newMember.id, inline: false },
+      {
+        name: `Nickname or Displayname Updated`,
+        value: `${changesNameText}`,
+        inline: false,
+      }
+    );
+    if (changesName.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
   }
 
   if (oldMember.avatar !== newMember.avatar) {
@@ -1730,10 +1737,17 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     );
     const changesPfpText = changesPfp.join("\n");
     const pfp = newMember.avatarURL({ size: 64 });
-    auditEmbed.setImage(pfp).addFields({
-      value: changesPfpText,
-      inline: false,
-    });
+    auditEmbed.setImage(`${pfp}`).addFields(
+      { name: "User:", value: `${newMember.user.username}`, inline: false },
+      { name: "UserID:", value: newMember.id, inline: false },
+      {
+        name: `Profile picture updated`,
+        value: `${changesPfpText}`,
+        inline: false,
+      }
+    );
+    if (changesPfp.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
   }
 
   if (oldMember.roles.cache.size > newMember.roles.cache.size) {
@@ -1745,10 +1759,15 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
             value: `${role}`,
             inline: false,
           },
-          { name: "ID:", value: newMember.id, inline: false }
+          { name: "User:", value: `${newMember.user.username}`, inline: false },
+          {
+            name: "User Name:",
+            value: `${newMember.displayName}`,
+            inline: false,
+          },
+          { name: "UserID:", value: `${newMember.id}`, inline: false }
         );
         auditChannel.send({ embeds: [auditEmbed] });
-        return;
       }
     });
   }
@@ -1757,18 +1776,18 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
       if (!oldMember.roles.cache.has(role.id)) {
         auditEmbed.addFields(
           { name: "Role Added: ", value: `${role}`, inline: false },
-          { name: "ID:", value: newMember.id, inline: false }
+          { name: "User:", value: `${newMember.user.username}`, inline: false },
+          {
+            name: "User Name:",
+            value: `${newMember.displayName}`,
+            inline: false,
+          },
+          { name: "UserID:", value: newMember.id, inline: false }
         );
         auditChannel.send({ embeds: [auditEmbed] });
-        return;
       }
     });
   }
-
-  if (changesName.length || changesPfp.length === 0) return;
-
-  auditEmbed.addFields({ name: "ID:", value: newMember.id, inline: false });
-  await auditChannel.send({ embeds: [auditEmbed] });
 });
 
 // ------------------------------------------------------------------------ AUTOROLE
