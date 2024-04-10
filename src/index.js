@@ -1363,6 +1363,8 @@ client.on(
     const auditChannel = client.channels.cache.get(logID);
     const changes = [];
 
+    if (oldAutoModerationRule === null) return console.log("NULL");
+
     if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
       changes.push(
         `Name: \`${oldAutoModerationRule.name}\` → \`${newAutoModerationRule.name}\``
