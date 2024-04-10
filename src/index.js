@@ -1363,7 +1363,7 @@ client.on(
     const auditChannel = client.channels.cache.get(logID);
     const changes = [];
 
-    if (oldAutoModerationRule === null) return console.log("NULL");
+    if (oldAutoModerationRule === null) return console.log("NULL"); // avoid crash cuz of #1
 
     if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
       changes.push(
@@ -1515,6 +1515,13 @@ client.on(Events.GuildMemberAdd, async (member) => {
     Guild: member.guild.id,
   });
 
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+
   const newInvites = await member.guild.invites.fetch();
   const oldInvites = invites.get(member.guild.id);
 
@@ -1528,13 +1535,6 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setAuthor({ name: `Member Joined` })
     .setImage("https://femboy.kz/images/wide.png")
     .setFooter({ text: "FKZ Log System" });
-
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
 
   if (!invite) {
     auditEmbed.setDescription(
