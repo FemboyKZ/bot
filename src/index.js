@@ -1375,8 +1375,8 @@ client.on(
 
     if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
       changes.push(
-        `Actions: \`${oldAutoModerationRule.actions || "None"}\` → \`${
-          newAutoModerationRule.actions || "None"
+        `Actions: \`${oldAutoModerationRule.actions.push || "None"}\` → \`${
+          newAutoModerationRule.actions.push || "None"
         }\``
       );
     }
