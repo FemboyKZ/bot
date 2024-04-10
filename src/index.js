@@ -1370,7 +1370,7 @@ client.on(
       .setTitle("Automod Rule Updated")
       .addFields({
         name: "Changes:",
-        value: `"null"`,
+        value: `NULL`,
       });
 
     if (oldAutoModerationRule === null) {
@@ -1387,8 +1387,8 @@ client.on(
 
     if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
       changes.push(
-        `Actions: \`${oldAutoModerationRule.actions.push || "None"}\` → \`${
-          newAutoModerationRule.actions.push || "None"
+        `Actions: \`${oldAutoModerationRule.actions.map || "None"}\` → \`${
+          newAutoModerationRule.actions.map || "None"
         }\``
       );
     }
