@@ -1367,7 +1367,9 @@ client.on(
 
     if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
       changes.push(
-        `Name: \`${oldAutoModerationRule.name}\` → \`${newAutoModerationRule.name}\``
+        `Name: \`${oldAutoModerationRule.name || "None"}\` → \`${
+          newAutoModerationRule.name || "None"
+        }\``
       );
     }
 
