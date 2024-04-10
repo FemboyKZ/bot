@@ -1218,6 +1218,9 @@ client.on(Events.MessageDelete, async (message) => {
   } else {
     return;
   }
+  if (!message.author) return;
+  if (message.author.bot) return;
+  if (!message.author.id === client.user.id) return;
 
   try {
     const auditChannel = client.channels.cache.get(logID);
@@ -1285,6 +1288,9 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   } else {
     return;
   }
+  if (!message.author) return;
+  if (message.author.bot) return;
+  if (!message.author.id === client.user.id) return;
 
   try {
     const auditChannel = client.channels.cache.get(logID);
