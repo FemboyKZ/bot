@@ -1300,7 +1300,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
-        .setAuthor("Too Long Message Edited (characters >= 2048)")
+        .setAuthor({ name: "Too Long Message Edited (characters >= 2048)" })
         .addFields(
           { name: "Author:", value: `${message.author}`, inline: false },
           { name: "Channel:", value: `${message.channel}`, inline: false },
@@ -1330,7 +1330,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
-        .setAuthor("Long Message Edited (characters >= 612)")
+        .setAuthor({ name: "Long Message Edited (characters >= 612)" })
         .setTitle("Message:")
         .setDescription(message.content)
         .addFields(
