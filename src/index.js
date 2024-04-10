@@ -1288,9 +1288,9 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   } else {
     return;
   }
-  if (!message.author) return;
-  if (message.author.bot) return;
-  if (!message.author.id === client.user.id) return;
+  if (!oldMessage.author) return;
+  if (oldMessage.author.bot) return;
+  if (!oldMessage.author.id === client.user.id) return;
 
   try {
     const auditChannel = client.channels.cache.get(logID);
