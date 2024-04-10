@@ -1505,7 +1505,9 @@ client.on(Events.ThreadCreate, async (thread) => {
     .setTitle("Thread Created")
     .addFields(
       { name: "Name:", value: thread.name, inline: false },
-      { name: "Tag:", value: `<#${thread.id}>`, inline: false },
+      { name: "Creator:", value: thread.ownerId, inline: false },
+      { name: "Channel:", value: thread.parent, inline: false },
+      { name: "Link:", value: `<#${thread.id}>`, inline: false },
       { name: "ID:", value: thread.id, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
@@ -1529,7 +1531,9 @@ client.on(Events.ThreadDelete, async (thread) => {
     .setTitle("Thread Deleted")
     .addFields(
       { name: "Name:", value: thread.name, inline: false },
-      { name: "Tag:", value: `<#${thread.id}>`, inline: false },
+      { name: "Creator:", value: thread.ownerId, inline: false },
+      { name: "Channel:", value: thread.parent, inline: false },
+      { name: "Link:", value: `<#${thread.id}>`, inline: false },
       { name: "ID:", value: thread.id, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
@@ -1574,6 +1578,9 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
     .setColor("#ff00b3")
     .setTimestamp()
     .addFields(
+      { name: "Creator:", value: newThread.ownerId, inline: false },
+      { name: "Channel:", value: newThread.parent, inline: false },
+      { name: "Link:", value: `<#${newThread.id}>`, inline: false },
       { name: "Changes:", value: changesText, inline: false },
       { name: "ID:", value: newThread.id, inline: false }
     )
@@ -1717,7 +1724,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     );
     const changesNameText = changesName.join("\n");
     auditEmbed.addFields(
-      { name: "User:", value: `${newMember.user.username}`, inline: false },
+      { name: "User:", value: `${newMember.user}`, inline: false },
       { name: "UserID:", value: newMember.id, inline: false },
       {
         name: `Nickname or Displayname Updated`,
@@ -1738,7 +1745,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     const changesPfpText = changesPfp.join("\n");
     const pfp = newMember.avatarURL({ size: 64 });
     auditEmbed.setImage(`${pfp}`).addFields(
-      { name: "User:", value: `${newMember.user.username}`, inline: false },
+      { name: "User:", value: `${newMember.user}`, inline: false },
       { name: "UserID:", value: newMember.id, inline: false },
       {
         name: `Profile picture updated`,
@@ -1787,6 +1794,137 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         auditChannel.send({ embeds: [auditEmbed] });
       }
     });
+  }
+});
+client.on(Events.UserUpdate, async (oldUser, newUser) => {
+  const data = await Audit_Log.findOne({
+    Guild: oldUser.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("User Updated");
+  const auditChannel = client.channels.cache.get(logID);
+
+  if (oldUser.bot || newUser.bot) return;
+  if (oldUser.system || newUser.system) return;
+
+  const changesDisplayName = [];
+  const changesName = [];
+  const changesDiscrim = [];
+  const changesPfp = [];
+  const changesBanner = [];
+
+  if (oldUser.displayName !== newUser.displayName) {
+    changesDisplayName.push(
+      `DisplayName: \`${oldUser.displayName || "none"}\` → \`${
+        newUser.displayName || "none"
+      }\``
+    );
+    const changesDisplayNameText = changesDisplayName.join("\n");
+    auditEmbed.addFields(
+      { name: "User:", value: `${newUser}`, inline: false },
+      { name: "UserID:", value: newUser.id, inline: false },
+      {
+        name: `Nickname or Displayname Updated`,
+        value: `${changesDisplayNameText}`,
+        inline: false,
+      }
+    );
+    if (changesName.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldUser.discriminator !== newUser.discriminator) {
+    changesDiscrim.push(
+      `Discriminator: \`${oldUser.discriminator || "none"}\` → \`${
+        newUser.discriminator || "none"
+      }\``
+    );
+    const changesDiscrimText = changesDiscrim.join("\n");
+    auditEmbed.addFields(
+      { name: "User:", value: `${newUser}`, inline: false },
+      { name: "UserID:", value: newUser.id, inline: false },
+      {
+        name: `Discriminator Updated`,
+        value: `${changesDiscrimText}`,
+        inline: false,
+      }
+    );
+    if (changesName.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldUser.username !== newUser.usernamee) {
+    changesName.push(
+      `Name: \`${oldUser.username || "none"}\` → \`${
+        newUser.username || "none"
+      }\``
+    );
+    const changesNameText = changesName.join("\n");
+    auditEmbed.addFields(
+      { name: "User:", value: `${newUser}`, inline: false },
+      { name: "UserID:", value: newUser.id, inline: false },
+      {
+        name: `Username Updated`,
+        value: `${changesNameText}`,
+        inline: false,
+      }
+    );
+    if (changesName.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldUser.avatar !== newUser.avatar) {
+    changesPfp.push(
+      `Profile Picture: \`[Old Pfp](<${oldUser.avatarURL({
+        size: 512,
+      })}>)\` → \`[New Pfp](<${newUser.avatarURL({ size: 512 })}>)\``
+    );
+    const changesPfpText = changesPfp.join("\n");
+    const pfp = newUser.avatarURL({ size: 64 });
+    auditEmbed.setImage(`${pfp}`).addFields(
+      { name: "User:", value: `${newUser}`, inline: false },
+      { name: "UserID:", value: newMember.id, inline: false },
+      {
+        name: `Profile picture updated`,
+        value: `${changesPfpText}`,
+        inline: false,
+      }
+    );
+    if (changesPfp.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldUser.banner !== newUser.banner) {
+    changesBanner.push(
+      `Banner Picture: \`[Old Banner](<${oldUser.bannerURL({
+        size: 512,
+      })}>)\` → \`[New Banner](<${newUser.bannerURL({ size: 512 })}>)\``
+    );
+    const changesBannerText = changesBanner.join("\n");
+    const banner = newUser.bannerURL({ size: 256 });
+    auditEmbed
+      .setImage(`${banner}` || `https://femboy.kz/images/wide.png`)
+      .addFields(
+        { name: "User:", value: `${newUser}`, inline: false },
+        { name: "UserID:", value: newUser.id, inline: false },
+        {
+          name: `Banner picture updated`,
+          value: `${changesBannerText}`,
+          inline: false,
+        }
+      );
+    if (changesPfp.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
   }
 });
 
