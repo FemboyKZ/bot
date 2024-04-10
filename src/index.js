@@ -1388,7 +1388,7 @@ client.on(
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Automod Rule Updated")
       .addFields({
-        value: `${changesText}`,
+        value: `${changesText || "null"}`,
       });
     await auditChannel.send({ embeds: [auditEmbed] });
   }
