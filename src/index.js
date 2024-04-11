@@ -1295,47 +1295,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   try {
     const auditChannel = client.channels.cache.get(logID);
     const changes = [];
-    if (
-      oldMessage.content.length ||
-      (newMessage.content.length >= 2048 &&
-        oldMessage.content !== newMessage.content)
-    ) {
-      const tooLongEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setAuthor({ name: "Very Long Message Edited (characters >= 2048)" })
-        .setTitle("Message Before Edit:")
-        .setDescription(oldMessage.content)
-        .addFields(
-          { name: "Author:", value: `${newMessage.author}`, inline: false },
-          { name: "Channel:", value: `${newMessage.channel}`, inline: false },
-          { name: "MessageID:", value: `${newMessage.id}` }
-        );
-      await auditChannel.send({ embeds: [tooLongEmbed] });
-      return;
-    }
-
-    if (
-      oldMessage.content.length ||
-      (newMessage.content.length >= 612 &&
-        oldMessage.content !== newMessage.content)
-    ) {
-      const longEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setAuthor({ name: "Long Message Edited (characters >= 612)" })
-        .setTitle("Message Before Edit:")
-        .setDescription(oldMessage.content)
-        .addFields(
-          { name: "Author:", value: `${newMessage.author}`, inline: false },
-          { name: "Channel:", value: `${newMessage.channel}`, inline: false },
-          { name: "MessageID:", value: `${newMessage.id}` }
-        );
-      await auditChannel.send({ embeds: [longEmbed] });
-      return;
-    }
 
     if (oldMessage.content !== newMessage.content) {
       changes.push(
@@ -1344,6 +1303,8 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         }\``
       );
     }
+    if (oldMessage.content.length >= 1024) return;
+    if (newMessage.content.length >= 1024) return;
     if (changes.length === 0) return;
     const changesText = changes.join("\n");
 
