@@ -1229,7 +1229,7 @@ client.on(Events.MessageDelete, async (message) => {
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
-        .setAuthor("Too Long Message Deleted (characters >= 4096)")
+        .setAuthor({ name: "Too Long Message Deleted (characters >= 4096)" })
         .addFields(
           { name: "Author:", value: `${message.author}`, inline: false },
           { name: "Channel:", value: `${message.channel}`, inline: false },
@@ -1249,7 +1249,7 @@ client.on(Events.MessageDelete, async (message) => {
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
-        .setAuthor("Long Message Deleted (characters >= 1024)")
+        .setAuthor({ name: "Long Message Deleted (characters >= 1024)" })
         .setTitle("Message:")
         .setDescription(message.content)
         .addFields(
@@ -1638,7 +1638,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
   if (!invite) {
     auditEmbed.setDescription(
-      `${member.user.tag} joined the server using an unknown invite. This could mean they used a vanity invite link if the server has one.`
+      `<@${member.user.id}> joined the server using an \`unknown invite\`. This could mean they used a vanity invite link if the server has one.`
     );
     return await auditChannel.send({ embeds: [auditEmbed] });
   }
@@ -1650,7 +1650,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setTimestamp()
     .setTitle(`${member.user.username} Has Joined the Server!`)
     .setDescription(
-      `${member.user.tag} Joined the server using the invite: ${invite.code} Which was created by: ${inviter.tag}.\nThe invite has been used ${invite.uses} times since it was created.`
+      `<@${member.user.id}> Joined the server using the invite: \`${invite.code}\` Which was created by: ${inviter.tag}.\nThe invite has been used \`${invite.uses}\` times since it was created.`
     )
     .setAuthor({ name: `Member Joined` })
     .setImage("https://femboy.kz/images/wide.png")
@@ -1661,7 +1661,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setTimestamp()
     .setTitle(`${member.user.username} Has Joined the Server!`)
     .setDescription(
-      `${member} Joined the server, but the invite used cannot be found. `
+      `<@${member.user.id}> Joined the server, but the invite used cannot be found. `
     )
     .setAuthor({ name: `Member Joined` })
     .setImage("https://femboy.kz/images/wide.png")
@@ -1724,8 +1724,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     );
     const changesNameText = changesName.join("\n");
     auditEmbed.addFields(
-      { name: "User:", value: `${newMember.user}`, inline: false },
-      { name: "UserID:", value: newMember.id, inline: false },
+      {
+        name: "User:",
+        value: `<@${newMember.user.id}> - ${newMember.username}`,
+        inline: false,
+      },
       {
         name: `Nickname or Displayname Updated`,
         value: `${changesNameText}`,
@@ -1745,8 +1748,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     const changesPfpText = changesPfp.join("\n");
     const pfp = newMember.avatarURL({ size: 64 });
     auditEmbed.setImage(`${pfp}`).addFields(
-      { name: "User:", value: `${newMember.user}`, inline: false },
-      { name: "UserID:", value: newMember.id, inline: false },
+      {
+        name: "User:",
+        value: `<@${newMember.user.id}> - ${newMember.username}`,
+        inline: false,
+      },
       {
         name: `Profile picture updated`,
         value: `${changesPfpText}`,
@@ -1766,13 +1772,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
             value: `${role}`,
             inline: false,
           },
-          { name: "User:", value: `${newMember.user.username}`, inline: false },
           {
-            name: "User Name:",
-            value: `${newMember.displayName}`,
+            name: "User:",
+            value: `<@${newMember.user.id}> - ${newMember.username}`,
             inline: false,
-          },
-          { name: "UserID:", value: `${newMember.id}`, inline: false }
+          }
         );
         auditChannel.send({ embeds: [auditEmbed] });
       }
@@ -1783,13 +1787,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
       if (!oldMember.roles.cache.has(role.id)) {
         auditEmbed.addFields(
           { name: "Role Added: ", value: `${role}`, inline: false },
-          { name: "User:", value: `${newMember.user.username}`, inline: false },
           {
-            name: "User Name:",
-            value: `${newMember.displayName}`,
+            name: "User:",
+            value: `<@${newMember.user.id}> - ${newMember.username}`,
             inline: false,
-          },
-          { name: "UserID:", value: newMember.id, inline: false }
+          }
         );
         auditChannel.send({ embeds: [auditEmbed] });
       }
