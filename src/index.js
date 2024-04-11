@@ -1417,39 +1417,61 @@ client.on(
         value: `NULL`,
       });
 
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Automod Rule Updated");
+
     if (oldAutoModerationRule === null) {
       return await auditChannel.send({ embeds: [nullEmbed] }); // avoid crash cuz of #1
     }
 
     if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
       changes.push(
-        `Name: \`${oldAutoModerationRule.name || "None"}\` → \`${
+        `Name: \`${oldAutoModerationRule.name || "None"}\`  →  \`${
           newAutoModerationRule.name || "None"
         }\``
       );
+      const changesText = changes.join("\n");
+      auditEmbed.addFields({
+        name: "Name Updated.",
+        value: `${changesText || "null"}`,
+      });
+      if (changes.length === 0) return;
+      await auditChannel.send({ embeds: [auditEmbed] });
     }
 
     if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
-      changes.push(
-        `Actions: \`${oldAutoModerationRule.actions.map || "None"}\` → \`${
-          newAutoModerationRule.actions.map || "None"
-        }\``
+      auditEmbed.addFields(
+        {
+          name: "Old Rules:",
+          value: oldAutoModerationRule.actions.toString() || "none",
+          inline: false,
+        },
+        {
+          name: "New Rules:",
+          value: newAutoModerationRule.actions.toString() || "none",
+          inline: false,
+        }
       );
+      if (oldAutoModerationRule.actions === null) return;
+      if (newAutoModerationRule.actions === null) return;
+      await auditChannel.send({ embeds: [auditEmbed] });
     }
 
-    if (changes.length === 0) return;
-    const changesText = changes.join("\n");
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Automod Rule Updated")
-      .addFields({
-        name: "Changes:",
-        value: `${changesText || "null"}`,
+    if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
+      auditEmbed.addFields({
+        name: "Enabled?:",
+        value: `\`${oldAutoModerationRule.enabled || "Unknown"}\`  →  \`${
+          newAutoModerationRule.enabled || "Unknown"
+        }\``,
+        inline: false,
       });
-    await auditChannel.send({ embeds: [auditEmbed] });
+      if (oldAutoModerationRule.enabled === null) return;
+      if (newAutoModerationRule.enabled === null) return;
+      await auditChannel.send({ embeds: [auditEmbed] });
+    }
   }
 );
 // ------------------------------------------------------------------------ Thread logs
@@ -1676,6 +1698,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
   const auditChannel = client.channels.cache.get(logID);
   const changesNickName = [];
+  const changesDisplayName = [];
   const changesName = [];
   const changesPfp = [];
   const changesUserPfp = [];
@@ -1684,14 +1707,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
   if (oldMember.user.bot || newMember.user.bot) return;
   if (oldMember.user.system || newMember.user.system) return;
 
-  if (
-    oldMember.displayName !== newMember.displayName ||
-    oldMember.nickname !== newMember.nickname
-  ) {
+  if (oldMember.nickname !== newMember.nickname) {
     changesNickName.push(
-      `DisplayName: \`${
-        oldMember.displayName || oldMember.nickname || "none"
-      }\` → \`${newMember.displayName || newMember.nickname || "none"}\``
+      `DisplayName: \`${oldMember.nickname || "none"}\`  →  \`${
+        newMember.nickname || "none"
+      }\``
     );
     const changesNickNameText = changesNickName.join("\n");
     auditEmbed.addFields(
@@ -1701,8 +1721,31 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         inline: false,
       },
       {
-        name: `Nickname or Displayname Updated`,
+        name: `Nickname Updated`,
         value: `${changesNickNameText}`,
+        inline: false,
+      }
+    );
+    if (changesNickName.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldMember.displayName !== newMember.displayName) {
+    changesNickName.push(
+      `DisplayName: \`${oldMember.displayName || "none"}\`  →  \`${
+        newMember.displayName || "none"
+      }\``
+    );
+    const changesDisplayNameText = changesDisplayName.join("\n");
+    auditEmbed.addFields(
+      {
+        name: "User:",
+        value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+        inline: false,
+      },
+      {
+        name: `Nickname or Displayname Updated`,
+        value: `${changesDisplayNameText}`,
         inline: false,
       }
     );
@@ -1712,7 +1755,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
   if (oldMember.user.username !== newMember.user.username) {
     changesName.push(
-      `Name: \`${oldMember.user.username || "none"}\` → \`${
+      `Name: \`${oldMember.user.username || "none"}\`  →  \`${
         newMember.user.username || "none"
       }\``
     );
@@ -1737,7 +1780,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     changesPfp.push(
       `[Old Pfp](<${oldMember.avatarURL({
         size: 512,
-      })}>) → [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`
+      })}>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`
     );
     const changesPfpText = changesPfp.join("\n");
     const pfp = newMember.avatarURL({ size: 64 });
@@ -1762,7 +1805,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     changesUserPfp.push(
       `[Old Pfp](<${oldMember.user.avatarURL({
         size: 512,
-      })}>) → [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`
+      })}>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`
     );
     const changesUserPfpText = changesUserPfp.join("\n");
     const UserPfp = newMember.avatarURL({ size: 64 });
