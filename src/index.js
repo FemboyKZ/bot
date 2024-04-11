@@ -1726,7 +1726,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     auditEmbed.addFields(
       {
         name: "User:",
-        value: `<@${newMember.user.id}> - ${newMember.username}`,
+        value: `<@${newMember.user.id}> - ${newMember.user.username}`,
         inline: false,
       },
       {
@@ -1750,7 +1750,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     auditEmbed.setImage(`${pfp}`).addFields(
       {
         name: "User:",
-        value: `<@${newMember.user.id}> - ${newMember.username}`,
+        value: `<@${newMember.user.id}> - ${newMember.user.username}`,
         inline: false,
       },
       {
@@ -1774,7 +1774,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           },
           {
             name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.username}`,
+            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
             inline: false,
           }
         );
@@ -1789,7 +1789,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           { name: "Role Added: ", value: `${role}`, inline: false },
           {
             name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.username}`,
+            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
             inline: false,
           }
         );
