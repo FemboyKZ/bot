@@ -1295,52 +1295,57 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   try {
     const auditChannel = client.channels.cache.get(logID);
     const changes = [];
-    if (oldMessage.content.length || newMessage.content.length >= 2048) {
+    if (
+      oldMessage.content.length ||
+      (newMessage.content.length >= 2048 &&
+        oldMessage.content !== newMessage.content)
+    ) {
       const tooLongEmbed = new EmbedBuilder()
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
-        .setAuthor({ name: "Too Long Message Edited (characters >= 2048)" })
+        .setAuthor({ name: "Very Long Message Edited (characters >= 2048)" })
+        .setTitle("Message Before Edit:")
+        .setDescription(oldMessage.content)
         .addFields(
-          { name: "Author:", value: `${message.author}`, inline: false },
-          { name: "Channel:", value: `${message.channel}`, inline: false },
-          {
-            name: "Message:",
-            value: "`Message too long to embed.`",
-            inline: false,
-          },
-          { name: "MessageID:", value: `${message.id}` }
+          { name: "Author:", value: `${newMessage.author}`, inline: false },
+          { name: "Channel:", value: `${newMessage.channel}`, inline: false },
+          { name: "MessageID:", value: `${newMessage.id}` }
         );
       await auditChannel.send({ embeds: [tooLongEmbed] });
       return;
     }
 
+    if (
+      oldMessage.content.length ||
+      (newMessage.content.length >= 612 &&
+        oldMessage.content !== newMessage.content)
+    ) {
+      const longEmbed = new EmbedBuilder()
+        .setColor("#ff00b3")
+        .setTimestamp()
+        .setFooter({ text: "FKZ Log System" })
+        .setAuthor({ name: "Long Message Edited (characters >= 612)" })
+        .setTitle("Message Before Edit:")
+        .setDescription(oldMessage.content)
+        .addFields(
+          { name: "Author:", value: `${newMessage.author}`, inline: false },
+          { name: "Channel:", value: `${newMessage.channel}`, inline: false },
+          { name: "MessageID:", value: `${newMessage.id}` }
+        );
+      await auditChannel.send({ embeds: [longEmbed] });
+      return;
+    }
+
     if (oldMessage.content !== newMessage.content) {
       changes.push(
-        `Topic: \`${oldMessage.content || "None"}\` → \`${
+        `Message: \`${oldMessage.content || "None"}\` → \`${
           newMessage.content || "None"
         }\``
       );
     }
     if (changes.length === 0) return;
     const changesText = changes.join("\n");
-
-    if (oldMessage.content.length || newMessage.content.length >= 612) {
-      const longEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setAuthor({ name: "Long Message Edited (characters >= 612)" })
-        .setTitle("Message:")
-        .setDescription(message.content)
-        .addFields(
-          { name: "Author:", value: `${message.author}`, inline: false },
-          { name: "Channel:", value: `${message.channel}`, inline: false },
-          { name: "MessageID:", value: `${message.id}` }
-        );
-      await auditChannel.send({ embeds: [longEmbed] });
-      return;
-    }
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
