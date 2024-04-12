@@ -1224,52 +1224,19 @@ client.on(Events.MessageDelete, async (message) => {
 
   try {
     const auditChannel = client.channels.cache.get(logID);
-    if (message.content.length >= 4096) {
-      const tooLongEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setAuthor({ name: "Too Long Message Deleted (characters >= 4096)" })
-        .addFields(
-          { name: "Author:", value: `${message.author}`, inline: false },
-          { name: "Channel:", value: `${message.channel}`, inline: false },
-          {
-            name: "Message:",
-            value: "`Message too long to embed.`",
-            inline: false,
-          },
-          { name: "MessageID:", value: `${message.id}` }
-        );
-      await auditChannel.send({ embeds: [tooLongEmbed] });
-      return;
-    }
 
-    if (message.content.length >= 1024) {
-      const longEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setAuthor({ name: "Long Message Deleted (characters >= 1024)" })
-        .setTitle("Message:")
-        .setDescription(message.content)
-        .addFields(
-          { name: "Author:", value: `${message.author}`, inline: false },
-          { name: "Channel:", value: `${message.channel}`, inline: false },
-          { name: "MessageID:", value: `${message.id}` }
-        );
-      await auditChannel.send({ embeds: [longEmbed] });
-      return;
-    }
+    if (message.content.length >= 3072) return;
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Message Deleted")
+      .setAuthor({ name: "Message:" })
+      .setDescription(`${message.content}`)
       .addFields(
         { name: "Author:", value: `${message.author}`, inline: false },
         { name: "Channel:", value: `${message.channel}`, inline: false },
-        { name: "Message:", value: `${message.content}`, inline: false },
         { name: "MessageID:", value: `${message.id}` }
       );
     await auditChannel.send({ embeds: [auditEmbed] });
@@ -1303,8 +1270,8 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         }\``
       );
     }
-    if (oldMessage.content.length >= 1024) return;
-    if (newMessage.content.length >= 1024) return;
+    if (oldMessage.content.length >= 1536) return;
+    if (newMessage.content.length >= 1536) return;
     if (changes.length === 0) return;
     const changesText = changes.join("\n");
 
@@ -1313,10 +1280,11 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
       .setTimestamp()
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Message Edited")
+      .setAuthor({ name: "Edit:" })
+      .setDescription(`${changesText}`)
       .addFields(
         { name: "Author:", value: `${newMessage.author}`, inline: false },
         { name: "Channel:", value: `${newMessage.channel}`, inline: false },
-        { name: "Edit:", value: `${changesText}`, inline: false },
         { name: "MessageID:", value: `${newMessage.id}` }
       );
     await auditChannel.send({ embeds: [auditEmbed] });
