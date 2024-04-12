@@ -1443,15 +1443,17 @@ client.on(
     }
 
     if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
+      let oldActions = oldAutoModerationRule.actions.toString();
+      let newActions = newAutoModerationRule.actions.toString();
       auditEmbed.addFields(
         {
           name: "Old Rules:",
-          value: oldAutoModerationRule.actions.toString() || "none",
+          value: oldActions || "none",
           inline: false,
         },
         {
           name: "New Rules:",
-          value: newAutoModerationRule.actions.toString() || "none",
+          value: newActions || "none",
           inline: false,
         }
       );
