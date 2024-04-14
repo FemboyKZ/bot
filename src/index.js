@@ -846,7 +846,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     .setTitle("Channel Updated")
     .addFields(
       { name: "Changes:", value: changesText },
-      { name: "ID:", value: channel.id, inline: false }
+      { name: "ID:", value: newChannel.id, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -869,14 +869,6 @@ client.on(Events.InviteCreate, async (invite) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Invite Created")
     .addFields(
-      { name: "Author:", value: invite.inviter, inline: false },
-      { name: "Max uses:", value: invite.maxUses, inline: false },
-      {
-        name: "Expires:",
-        value: `${invite.expiresTimestamp} / ${invite.expiresAt}`,
-        inline: false,
-      },
-      { name: "Channel:", value: invite.channel, inline: false },
       { name: "Invite:", value: invite.code, inline: false },
       { name: "Url:", value: invite.url, inline: false }
     );
@@ -900,13 +892,13 @@ client.on(Events.InviteDelete, async (invite) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Invite Deleted")
     .addFields(
-      { name: "Author:", value: invite.inviter, inline: false },
+      { name: "Author:", value: invite.inviter || "unknown", inline: false },
       {
         name: "Uses / Max Uses:",
-        value: `${invite.uses} / ${invite.maxUses}`,
+        value: `${invite.uses || "unknown"} / ${invite.maxUses || "unknown"}`,
         inline: false,
       },
-      { name: "Channel:", value: invite.channel, inline: false },
+      { name: "Channel:", value: invite.channel || "unknown", inline: false },
       { name: "Invite:", value: invite.code, inline: false },
       { name: "Url:", value: invite.url, inline: false }
     );
