@@ -1206,8 +1206,8 @@ client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
 
   if (oldRole.color !== newRole.color) {
     changes.push(
-      `Color: \`${oldRole.color + " " + oldRole.hexColor || "None"}\` → \`${
-        newRole.color + " " + newRole.hexColor || "None"
+      `Color: \`${oldRole.color + " - " + oldRole.hexColor || "None"}\` → \`${
+        newRole.color + " - " + newRole.hexColor || "None"
       }\``
     );
   }
@@ -1275,40 +1275,47 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   }
   if (!oldMessage.author) return;
   if (oldMessage.author.bot) return;
+  if (oldMessage.partial) console.log("oldMessage = partial");
 
   try {
     const auditChannel = client.channels.cache.get(logID);
     const changes = [];
 
     if (oldMessage.content !== newMessage.content) {
-      changes.push(
-        `Message: \`${oldMessage.content || "None"}\` → \`${
-          newMessage.content || "None"
-        }\``
-      );
-    }
-    if (oldMessage.content.length >= 1536) return;
-    if (newMessage.content.length >= 1536) return;
-    if (changes.length === 0) return;
-    const changesText = changes.join("\n");
+      oldMessage.fetch().then((fullOldMessage) => {
+        const fullOldMessageText = fullOldMessage.content;
+        const oldMessageText = oldMessage.content;
+        const fullOldAuthor = fullOldMessage.author;
+        changes.push(
+          `Message: \`${fullOldMessageText || oldMessageText || "None"}\` → \`${
+            newMessage.content || "None"
+          }\``
+        );
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Message Edited")
-      .setAuthor({ name: "Edit:" })
-      .setDescription(`${changesText}`)
-      .addFields(
-        {
-          name: "Author:",
-          value: `${newMessage.author || "unknown"}`,
-          inline: false,
-        },
-        { name: "Channel:", value: `${newMessage.channel}`, inline: false },
-        { name: "MessageID:", value: `${newMessage.id}` }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
+        if (fullOldMessageText || oldMessageText >= 1536) return;
+        if (newMessage.content.length >= 1536) return;
+        if (changes.length === 0) return;
+        const changesText = changes.join("\n");
+
+        const auditEmbed = new EmbedBuilder()
+          .setColor("#ff00b3")
+          .setTimestamp()
+          .setFooter({ text: "FKZ Log System" })
+          .setTitle("Message Edited")
+          .setAuthor({ name: "Edit:" })
+          .setDescription(`${changesText}`)
+          .addFields(
+            {
+              name: "Author:",
+              value: `${fullOldAuthor || oldMessage.author || "unknown"}`,
+              inline: false,
+            },
+            { name: "Channel:", value: `${newMessage.channel}`, inline: false },
+            { name: "MessageID:", value: `${newMessage.id}` }
+          );
+        auditChannel.send({ embeds: [auditEmbed] });
+      });
+    }
   } catch (err) {
     return console.log(err);
   }
