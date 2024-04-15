@@ -41,10 +41,10 @@ const client = new Client({
     Partials.Channel,
     Partials.GuildMember,
     Partials.GuildScheduledEvent,
-    Partials.Message,
+    //Partials.Message,
     Partials.Reaction,
     Partials.ThreadMember,
-    Partials.User,
+    //Partials.User,
   ],
 });
 
@@ -1273,7 +1273,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   } else {
     return;
   }
-  if (!oldMessage.author) return;
   if (oldMessage.author.bot) return;
 
   try {
