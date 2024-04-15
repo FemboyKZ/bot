@@ -41,10 +41,10 @@ const client = new Client({
     Partials.Channel,
     Partials.GuildMember,
     Partials.GuildScheduledEvent,
-    //Partials.Message,
+    Partials.Message,
     Partials.Reaction,
     Partials.ThreadMember,
-    //Partials.User,
+    Partials.User,
   ],
 });
 
@@ -1274,43 +1274,39 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     return;
   }
   if (oldMessage.author.bot) return;
+  const auditChannel = client.channels.cache.get(logID);
 
-  try {
-    const auditChannel = client.channels.cache.get(logID);
-    const changes = [];
+  const changes = [];
 
-    if (oldMessage.content !== newMessage.content) {
-      changes.push(
-        `Message: \`${oldMessage.content || "None"}\` → \`${
-          newMessage.content || "None"
-        }\``
-      );
-    }
-    if (oldMessage.content.length >= 1536) return;
-    if (newMessage.content.length >= 1536) return;
-    if (changes.length === 0) return;
-    const changesText = changes.join("\n");
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Message Edited")
-      .setAuthor({ name: "Edit:" })
-      .setDescription(`${changesText}`)
-      .addFields(
-        {
-          name: "Author:",
-          value: `${newMessage.author || "unknown"}`,
-          inline: false,
-        },
-        { name: "Channel:", value: `${newMessage.channel}`, inline: false },
-        { name: "MessageID:", value: `${newMessage.id}` }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
-  } catch (err) {
-    return console.log(err);
+  if (oldMessage.content !== newMessage.content) {
+    changes.push(
+      `Message: \`${oldMessage.content || "None"}\` → \`${
+        newMessage.content || "None"
+      }\``
+    );
   }
+  if (oldMessage.content.length >= 1536) return;
+  if (newMessage.content.length >= 1536) return;
+  if (changes.length === 0) return;
+  const changesText = changes.join("\n");
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Message Edited")
+    .setAuthor({ name: "Edit:" })
+    .setDescription(`${changesText}`)
+    .addFields(
+      {
+        name: "Author:",
+        value: `${newMessage.author || "unknown"}`,
+        inline: false,
+      },
+      { name: "Channel:", value: `${newMessage.channel}`, inline: false },
+      { name: "MessageID:", value: `${newMessage.id}` }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
 });
 // ------------------------------------------------------------------------ Automod logs
 client.on(Events.AutoModerationRuleCreate, async (autoModerationRule) => {
