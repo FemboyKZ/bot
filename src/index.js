@@ -1719,6 +1719,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
       .setTitle("Member Updated");
 
     const auditChannel = client.channels.cache.get(logID);
+
     const changesNickName = [];
     const changesDisplayName = [];
     const changesName = [];
@@ -1729,7 +1730,6 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     if (oldMember.nickname !== newMember.nickname) {
       oldMember.fetch().then((fullOldMember) => {
         const fullOldNickName = fullOldMember.nickname;
-
         changesNickName.push(
           `DisplayName: \`${
             fullOldNickName || oldMember.nickname || "none"
@@ -1749,14 +1749,17 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           }
         );
         if (changesNickName.length === 0) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("Nickname", err);
+        }
       });
     }
 
     if (oldMember.displayName !== newMember.displayName) {
       oldMember.fetch().then((fullOldMember) => {
         const fullOldDisplayName = fullOldMember.displayName;
-
         changesNickName.push(
           `DisplayName: \`${
             fullOldDisplayName || oldMember.displayName || "none"
@@ -1776,7 +1779,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           }
         );
         if (changesNickName.length === 0) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("DisplayName", err);
+        }
       });
     }
 
@@ -1802,7 +1809,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           }
         );
         if (changesName.length === 0) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("MemUsername", err);
+        }
       });
     }
 
@@ -1832,7 +1843,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (changesPfp.length === 0) return;
         if (newMember.avatar === null) return;
         if (fullOldPfp && oldPfp === null) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("MemPfp", err);
+        }
       });
     }
 
@@ -1862,7 +1877,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (changesUserPfp.length === 0) return;
         if (newMember.user.avatar === null) return;
         if (fullOldUserPfp && oldUserPfp === null) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("MemUserPfp", err);
+        }
       });
     }
 
@@ -1893,7 +1912,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (changesBanner.length === 0) return;
         if (newMember.user.banner === null) return;
         if (fullOldBanner && oldBanner === null) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("MemBanner", err);
+        }
       });
     }
 
@@ -1946,23 +1969,23 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
     return;
   }
 
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
-    .setTitle("User Updated");
-
-  const changesName = [];
-  const changesUserPfp = [];
-  const changesBanner = [];
-
-  const auditChannel = client.channels.cache.get(logID);
-
   if (oldUser.bot || newUser.bot) return;
   if (oldUser.system || newUser.system) return;
   if (oldUser.partial) console.log("oldUser = partial");
 
   try {
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("User Updated");
+
+    const changesName = [];
+    const changesUserPfp = [];
+    const changesBanner = [];
+
+    const auditChannel = client.channels.cache.get(logID);
+
     if (oldUser.username !== newUser.username) {
       oldUser.fetch().then((fullOldUser) => {
         const fullOldUsername = fullOldUser.username;
@@ -1985,7 +2008,11 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
           }
         );
         if (changesName.length === 0) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("Username", err);
+        }
       });
     }
 
@@ -2015,7 +2042,11 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
         if (changesUserPfp.length === 0) return;
         if (newUser.avatar === null) return;
         if (fullOldPfp && oldPfp === null) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("userPfp", err);
+        }
       });
     }
 
@@ -2046,7 +2077,11 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
         if (changesBanner.length === 0) return;
         if (newUser.banner === null) return;
         if (fullOldBanner && oldBanner === null) return;
-        auditChannel.send({ embeds: [auditEmbed] });
+        try {
+          auditChannel.send({ embeds: [auditEmbed] });
+        } catch (err) {
+          console.log("Banner", err);
+        }
       });
     }
   } catch (err) {
