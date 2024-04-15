@@ -1264,7 +1264,6 @@ client.on(Events.MessageDelete, async (message) => {
   }
 });
 client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
-  if (oldMessage.author.id === client.user.id) return;
   const data = await Audit_Log.findOne({
     Guild: newMessage.guild.id,
   });
@@ -1276,7 +1275,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   }
   if (!oldMessage.author) return;
   if (oldMessage.author.bot) return;
-  if (!oldMessage.author.id === client.user.id) return;
 
   try {
     const auditChannel = client.channels.cache.get(logID);
