@@ -1711,244 +1711,240 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
   if (oldMember.user.bot || newMember.user.bot) return;
   if (oldMember.user.system || newMember.user.system) return;
 
-  try {
-    if (oldMember.nickname !== newMember.nickname) {
-      changesNickName.push(
-        `DisplayName: \`${oldMember.nickname || "none"}\`  →  \`${
-          newMember.nickname || "none"
-        }\``
-      );
-      const changesNickNameText = changesNickName.join("\n");
-      if (changesNickName.length === 0) return;
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Member Updated")
-        .addFields(
-          {
-            name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-            inline: false,
-          },
-          {
-            name: `Nickname Updated`,
-            value: `${changesNickNameText}`,
-            inline: false,
-          }
-        );
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
-
-    if (oldMember.displayName !== newMember.displayName) {
-      changesNickName.push(
-        `DisplayName: \`${oldMember.displayName || "none"}\`  →  \`${
-          newMember.displayName || "none"
-        }\``
-      );
-      const changesDisplayNameText = changesDisplayName.join("\n");
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Member Updated")
-        .addFields(
-          {
-            name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-            inline: false,
-          },
-          {
-            name: `Nickname or Displayname Updated`,
-            value: `${changesDisplayNameText}`,
-            inline: false,
-          }
-        );
-      if (changesNickName.length === 0) return;
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
-
-    if (oldMember.user.username !== newMember.user.username) {
-      changesName.push(
-        `Name: \`${oldMember.user.username || "none"}\`  →  \`${
-          newMember.user.username || "none"
-        }\``
-      );
-      const changesNameText = changesName.join("\n");
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Member Updated")
-        .addFields(
-          {
-            name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-            inline: false,
-          },
-          {
-            name: `Username Updated`,
-            value: `${changesNameText}`,
-            inline: false,
-          }
-        );
-      if (changesName.length === 0) return;
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
-
-    if (oldMember.avatar !== newMember.avatar) {
-      changesPfp.push(
-        `[Old Pfp](<${oldMember.avatarURL({
-          size: 512,
-        })}>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`
-      );
-      const changesPfpText = changesPfp.join("\n");
-      const pfp = newMember.avatarURL({ size: 64 });
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Member Updated")
-        .setImage(`${pfp}`)
-        .addFields(
-          {
-            name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-            inline: false,
-          },
-          {
-            name: `Profile picture updated`,
-            value: `${changesPfpText}`,
-            inline: false,
-          }
-        );
-      if (changesPfp.length === 0) return;
-      if (oldMember.avatar || newMember.avatar === null) return;
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
-
-    if (oldMember.user.avatar !== newMember.user.avatar) {
-      changesUserPfp.push(
-        `[Old Pfp](<${oldMember.user.avatarURL({
-          size: 512,
-        })}>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`
-      );
-      const changesUserPfpText = changesUserPfp.join("\n");
-      const UserPfp = newMember.avatarURL({ size: 64 });
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Member Updated")
-        .setImage(`${UserPfp}`)
-        .addFields(
-          {
-            name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-            inline: false,
-          },
-          {
-            name: `Profile picture updated`,
-            value: `${changesUserPfpText}`,
-            inline: false,
-          }
-        );
-      if (changesUserPfp.length === 0) return;
-      if (oldMember.user.avatar || newMember.user.avatar === null) return;
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
-
-    if (oldMember.user.banner !== newMember.user.banner) {
-      if (oldMember.user.banner === undefined) {
-        changesBanner.push(
-          `None  →  [New Banner](<${newMember.user.bannerURL({ size: 512 })}>)`
-        );
-      }
-      if (newMember.user.banner === undefined) {
-        changesBanner.push(
-          `[Old Banner](<${oldMember.user.bannerURL({
-            size: 512,
-          })}>)  →  None`
-        );
-      } else {
-        changesBanner.push(
-          `[Old Banner](<${oldMember.user.bannerURL({
-            size: 512,
-          })}>)  →  [New Banner](<${newMember.user.bannerURL({ size: 512 })}>)`
-        );
-      }
-
-      const changesBannerText = changesBanner.join("\n");
-      const Banner = newMember.user.bannerURL({ size: 64 });
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Member Updated")
-        .setImage(`${Banner}`)
-        .addFields(
-          {
-            name: "User:",
-            value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-            inline: false,
-          },
-          {
-            name: `Banner updated`,
-            value: `${changesBannerText}`,
-            inline: false,
-          }
-        );
-      if (changesBanner.length === 0) return;
-      if (oldMember.user.banner || newMember.user.banner === null) return;
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
-
-    if (oldMember.roles.cache.size > newMember.roles.cache.size) {
-      oldMember.roles.cache.forEach((role) => {
-        if (!newMember.roles.cache.has(role.id)) {
-          const auditEmbed = new EmbedBuilder()
-            .setColor("#ff00b3")
-            .setTimestamp()
-            .setFooter({ text: "FKZ Log System" })
-            .setTitle("Member Updated")
-            .addFields(
-              {
-                name: "Role Removed: ",
-                value: `${role}`,
-                inline: false,
-              },
-              {
-                name: "User:",
-                value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-                inline: false,
-              }
-            );
-          auditChannel.send({ embeds: [auditEmbed] });
+  if (oldMember.nickname !== newMember.nickname) {
+    changesNickName.push(
+      `DisplayName: \`${oldMember.nickname || "none"}\`  →  \`${
+        newMember.nickname || "none"
+      }\``
+    );
+    const changesNickNameText = changesNickName.join("\n");
+    if (changesNickName.length === 0) return;
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated")
+      .addFields(
+        {
+          name: "User:",
+          value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+          inline: false,
+        },
+        {
+          name: `Nickname Updated`,
+          value: `${changesNickNameText}`,
+          inline: false,
         }
-      });
-    }
-    if (oldMember.roles.cache.size < newMember.roles.cache.size) {
-      newMember.roles.cache.forEach((role) => {
-        if (!oldMember.roles.cache.has(role.id)) {
-          const auditEmbed = new EmbedBuilder()
-            .setColor("#ff00b3")
-            .setTimestamp()
-            .setFooter({ text: "FKZ Log System" })
-            .setTitle("Member Updated")
-            .addFields(
-              { name: "Role Added: ", value: `${role}`, inline: false },
-              {
-                name: "User:",
-                value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-                inline: false,
-              }
-            );
-          auditChannel.send({ embeds: [auditEmbed] });
+      );
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldMember.displayName !== newMember.displayName) {
+    changesNickName.push(
+      `DisplayName: \`${oldMember.displayName || "none"}\`  →  \`${
+        newMember.displayName || "none"
+      }\``
+    );
+    const changesDisplayNameText = changesDisplayName.join("\n");
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated")
+      .addFields(
+        {
+          name: "User:",
+          value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+          inline: false,
+        },
+        {
+          name: `Nickname or Displayname Updated`,
+          value: `${changesDisplayNameText}`,
+          inline: false,
         }
-      });
+      );
+    if (changesNickName.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldMember.user.username !== newMember.user.username) {
+    changesName.push(
+      `Name: \`${oldMember.user.username || "none"}\`  →  \`${
+        newMember.user.username || "none"
+      }\``
+    );
+    const changesNameText = changesName.join("\n");
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated")
+      .addFields(
+        {
+          name: "User:",
+          value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+          inline: false,
+        },
+        {
+          name: `Username Updated`,
+          value: `${changesNameText}`,
+          inline: false,
+        }
+      );
+    if (changesName.length === 0) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldMember.avatar !== newMember.avatar) {
+    changesPfp.push(
+      `[Old Pfp](<${oldMember.avatarURL({
+        size: 512,
+      })}>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`
+    );
+    const changesPfpText = changesPfp.join("\n");
+    const pfp = newMember.avatarURL({ size: 64 });
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated")
+      .setImage(`${pfp}`)
+      .addFields(
+        {
+          name: "User:",
+          value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+          inline: false,
+        },
+        {
+          name: `Profile picture updated`,
+          value: `${changesPfpText}`,
+          inline: false,
+        }
+      );
+    if (changesPfp.length === 0) return;
+    if (oldMember.avatar || newMember.avatar === null) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldMember.user.avatar !== newMember.user.avatar) {
+    changesUserPfp.push(
+      `[Old Pfp](<${oldMember.user.avatarURL({
+        size: 512,
+      })}>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`
+    );
+    const changesUserPfpText = changesUserPfp.join("\n");
+    const UserPfp = newMember.avatarURL({ size: 64 });
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated")
+      .setImage(`${UserPfp}`)
+      .addFields(
+        {
+          name: "User:",
+          value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+          inline: false,
+        },
+        {
+          name: `Profile picture updated`,
+          value: `${changesUserPfpText}`,
+          inline: false,
+        }
+      );
+    if (changesUserPfp.length === 0) return;
+    if (oldMember.user.avatar || newMember.user.avatar === null) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldMember.user.banner !== newMember.user.banner) {
+    if (oldMember.user.banner === undefined) {
+      changesBanner.push(
+        `None  →  [New Banner](<${newMember.user.bannerURL({ size: 512 })}>)`
+      );
     }
-  } catch (err) {
-    console.log("my balls", err);
+    if (newMember.user.banner === undefined) {
+      changesBanner.push(
+        `[Old Banner](<${oldMember.user.bannerURL({
+          size: 512,
+        })}>)  →  None`
+      );
+    } else {
+      changesBanner.push(
+        `[Old Banner](<${oldMember.user.bannerURL({
+          size: 512,
+        })}>)  →  [New Banner](<${newMember.user.bannerURL({ size: 512 })}>)`
+      );
+    }
+
+    const changesBannerText = changesBanner.join("\n");
+    const Banner = newMember.user.bannerURL({ size: 64 });
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated")
+      .setImage(`${Banner}`)
+      .addFields(
+        {
+          name: "User:",
+          value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+          inline: false,
+        },
+        {
+          name: `Banner updated`,
+          value: `${changesBannerText}`,
+          inline: false,
+        }
+      );
+    if (changesBanner.length === 0) return;
+    if (oldMember.user.banner || newMember.user.banner === null) return;
+    await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  if (oldMember.roles.cache.size > newMember.roles.cache.size) {
+    oldMember.roles.cache.forEach((role) => {
+      if (!newMember.roles.cache.has(role.id)) {
+        const auditEmbed = new EmbedBuilder()
+          .setColor("#ff00b3")
+          .setTimestamp()
+          .setFooter({ text: "FKZ Log System" })
+          .setTitle("Member Updated")
+          .addFields(
+            {
+              name: "Role Removed: ",
+              value: `${role}`,
+              inline: false,
+            },
+            {
+              name: "User:",
+              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              inline: false,
+            }
+          );
+        auditChannel.send({ embeds: [auditEmbed] });
+      }
+    });
+  }
+  if (oldMember.roles.cache.size < newMember.roles.cache.size) {
+    newMember.roles.cache.forEach((role) => {
+      if (!oldMember.roles.cache.has(role.id)) {
+        const auditEmbed = new EmbedBuilder()
+          .setColor("#ff00b3")
+          .setTimestamp()
+          .setFooter({ text: "FKZ Log System" })
+          .setTitle("Member Updated")
+          .addFields(
+            { name: "Role Added: ", value: `${role}`, inline: false },
+            {
+              name: "User:",
+              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              inline: false,
+            }
+          );
+        auditChannel.send({ embeds: [auditEmbed] });
+      }
+    });
   }
 });
 
