@@ -1719,6 +1719,8 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
       .setTitle("Member Updated");
 
     const auditChannel = client.channels.cache.get(logID);
+    if (auditChannel === undefined) console.log("undefined?");
+    const auditChannel2 = process.env.logschatID;
 
     const changesNickName = [];
     const changesDisplayName = [];
@@ -1749,11 +1751,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           }
         );
         if (changesNickName.length === 0) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("Nickname", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -1779,11 +1777,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           }
         );
         if (changesNickName.length === 0) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("DisplayName", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -1809,11 +1803,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
           }
         );
         if (changesName.length === 0) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("MemUsername", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -1843,11 +1833,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (changesPfp.length === 0) return;
         if (newMember.avatar === null) return;
         if (fullOldPfp && oldPfp === null) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("MemPfp", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -1877,11 +1863,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (changesUserPfp.length === 0) return;
         if (newMember.user.avatar === null) return;
         if (fullOldUserPfp && oldUserPfp === null) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("MemUserPfp", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -1912,11 +1894,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
         if (changesBanner.length === 0) return;
         if (newMember.user.banner === null) return;
         if (fullOldBanner && oldBanner === null) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("MemBanner", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -1984,7 +1962,9 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
     const changesUserPfp = [];
     const changesBanner = [];
 
-    const auditChannel = client.channels.cache.get(logID);
+    const auditChannel = client.channels.fetch(logID);
+    if (auditChannel === undefined) console.log("undefined?");
+    const auditChannel2 = process.env.logschatID;
 
     if (oldUser.username !== newUser.username) {
       oldUser.fetch().then((fullOldUser) => {
@@ -2008,11 +1988,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
           }
         );
         if (changesName.length === 0) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("Username", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -2042,11 +2018,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
         if (changesUserPfp.length === 0) return;
         if (newUser.avatar === null) return;
         if (fullOldPfp && oldPfp === null) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("userPfp", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
 
@@ -2077,11 +2049,7 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
         if (changesBanner.length === 0) return;
         if (newUser.banner === null) return;
         if (fullOldBanner && oldBanner === null) return;
-        try {
-          auditChannel.send({ embeds: [auditEmbed] });
-        } catch (err) {
-          console.log("Banner", err);
-        }
+        auditChannel2.send({ embeds: [auditEmbed] });
       });
     }
   } catch (err) {
