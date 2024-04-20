@@ -731,11 +731,22 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Ban Added")
     .addFields(
-      { name: "Banned Member:", value: `${user.tag}`, inline: false },
-      { name: "Executor:", value: `${executor.tag}`, inline: false },
-      { name: "Reason:", value: `${reason}`, inline: false }
+      {
+        name: "Banned Member:",
+        value: `${user.tag || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Executor:",
+        value: `${executor.tag || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Reason:",
+        value: `${reason || "none"}`,
+        inline: false,
+      }
     );
-
   await auditChannel.send({ embeds: [auditEmbed] });
 });
 client.on(Events.GuildBanRemove, async (user) => {
@@ -748,15 +759,33 @@ client.on(Events.GuildBanRemove, async (user) => {
   } else {
     return;
   }
+  const banInfo = await user.guild.fetchBan(user);
+  if (!banInfo) return;
+
+  const { executor } = banInfo;
+
   const auditChannel = client.channels.cache.get(logID);
 
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
-    .setTitle("Ban Removed")
-    .addFields({ name: "Member:", value: `${user}`, inline: false });
-  await auditChannel.send({ embeds: [auditEmbed] });
+  user.fetch().then(async (fullUser) => {
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Ban Removed")
+      .addFields(
+        {
+          name: "Member:",
+          value: `${fullUser.user || user.user || "unknown"}`,
+          inline: false,
+        },
+        {
+          name: "Admin:",
+          value: `${executor || "unknown"}`,
+          inline: false,
+        }
+      );
+    await auditChannel.send({ embeds: [auditEmbed] });
+  });
 });
 // ------------------------------------------------------------------------ channel logs
 client.on(Events.ChannelCreate, async (channel) => {
@@ -777,14 +806,26 @@ client.on(Events.ChannelCreate, async (channel) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Channel Created")
     .addFields(
-      { name: "Name:", value: `${channel.name || "?"}`, inline: false },
-      { name: "Type:", value: `${channel.type}`, inline: false },
+      {
+        name: "Name:",
+        value: `${channel.name || "?"}`,
+        inline: false,
+      },
+      {
+        name: "Type:",
+        value: `${channel.type}`,
+        inline: false,
+      },
       {
         name: "Category:",
         value: `${channel.parent || "No Category"}`,
         inline: false,
       },
-      { name: "ID:", value: `${channel.id}`, inline: false }
+      {
+        name: "ID:",
+        value: `${channel.id}`,
+        inline: false,
+      }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -806,14 +847,26 @@ client.on(Events.ChannelDelete, async (channel) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Channel Deleted")
     .addFields(
-      { name: "Name:", value: `${channel.name || "?"}`, inline: false },
-      { name: "Type:", value: `${channel.type}`, inline: false },
+      {
+        name: "Name:",
+        value: `${channel.name || "?"}`,
+        inline: false,
+      },
+      {
+        name: "Type:",
+        value: `${channel.type}`,
+        inline: false,
+      },
       {
         name: "Category:",
         value: `${channel.parent || "No Category"}`,
         inline: false,
       },
-      { name: "ID:", value: `${channel.id}`, inline: false }
+      {
+        name: "ID:",
+        value: `${channel.id}`,
+        inline: false,
+      }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -861,7 +914,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Channel Updated")
     .addFields(
-      { name: "Changes:", value: `${changesText}` },
+      { name: "Changes:", value: `${changesText}`, inline: false },
       { name: "ID:", value: `${newChannel.id}`, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
@@ -885,8 +938,16 @@ client.on(Events.InviteCreate, async (invite) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Invite Created")
     .addFields(
-      { name: "Invite:", value: `${invite.code}`, inline: false },
-      { name: "Url:", value: `${invite.url}`, inline: false }
+      {
+        name: "Creator:",
+        value: `${invite.inviterId || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Url:",
+        value: `${invite.url}`,
+        inline: false,
+      }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -923,8 +984,16 @@ client.on(Events.InviteDelete, async (invite) => {
         value: `${invite.channel || "unknown"}`,
         inline: false,
       },
-      { name: "Invite:", value: `${invite.code}`, inline: false },
-      { name: "Url:", value: `${invite.url}`, inline: false }
+      {
+        name: "Invite:",
+        value: `${invite.code}`,
+        inline: false,
+      },
+      {
+        name: "Url:",
+        value: `${invite.url}`,
+        inline: false,
+      }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -1040,14 +1109,26 @@ client.on(Events.GuildStickerCreate, async (sticker) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Sticker Added")
     .addFields(
-      { name: "Name:", value: `${sticker.name}`, inline: false },
+      {
+        name: "Name:",
+        value: `${sticker.name}`,
+        inline: false,
+      },
       {
         name: "Description:",
         value: `${sticker.description || "none"}`,
         inline: false,
       },
-      { name: "Format:", value: `${sticker.format || "none"}`, inline: false },
-      { name: "ID:", value: `${sticker.id}`, inline: false }
+      {
+        name: "Format:",
+        value: `${sticker.format || "none"}`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${sticker.id}`,
+        inline: false,
+      }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -1256,7 +1337,7 @@ client.on(Events.MessageDelete, async (message) => {
       .addFields(
         { name: "Author:", value: `${message.author}`, inline: false },
         { name: "Channel:", value: `${message.channel}`, inline: false },
-        { name: "MessageID:", value: `${message.id}` }
+        { name: "MessageID:", value: `${message.id}`, inline: false }
       );
     await auditChannel.send({ embeds: [auditEmbed] });
   } catch (err) {
@@ -1310,8 +1391,15 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
               value: `${fullOldAuthor || oldMessage.author || "unknown"}`,
               inline: false,
             },
-            { name: "Channel:", value: `${newMessage.channel}`, inline: false },
-            { name: "MessageID:", value: `${newMessage.id}` }
+            {
+              name: "Channel:",
+              value: `${newMessage.channel}`,
+              inline: false,
+            },
+            {
+              name: "MessageID:",
+              value: `${newMessage.id}`,
+            }
           );
         auditChannel.send({ embeds: [auditEmbed] });
       });
@@ -1346,7 +1434,11 @@ client.on(Events.AutoModerationRuleCreate, async (autoModerationRule) => {
         value: `<@${autoModerationRule.creatorId}>`,
         inline: false,
       },
-      { name: "Name:", value: `${autoModerationRule.name}`, inline: false },
+      {
+        name: "Name:",
+        value: `${autoModerationRule.name}`,
+        inline: false,
+      },
       {
         name: "Actions:",
         value: `${actions}`,
@@ -1379,7 +1471,11 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
         value: `<@${autoModerationRule.creatorId}>`,
         inline: false,
       },
-      { name: "Name:", value: `${autoModerationRule.name}`, inline: false },
+      {
+        name: "Name:",
+        value: `${autoModerationRule.name}`,
+        inline: false,
+      },
       {
         name: "Actions:",
         value: `${actions}`,
@@ -1492,15 +1588,31 @@ client.on(Events.ThreadCreate, async (thread) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Thread Created")
     .addFields(
-      { name: "Name:", value: `${thread.name}`, inline: false },
+      {
+        name: "Name:",
+        value: `${thread.name}`,
+        inline: false,
+      },
       {
         name: "Creator:",
         value: `${thread.ownerId || "unknown"}`,
         inline: false,
       },
-      { name: "Channel:", value: `${thread.parent || "none"}`, inline: false },
-      { name: "Link:", value: `<#${thread.id}>`, inline: false },
-      { name: "ID:", value: `${thread.id}`, inline: false }
+      {
+        name: "Channel:",
+        value: `${thread.parent || "none"}`,
+        inline: false,
+      },
+      {
+        name: "Link:",
+        value: `<#${thread.id}>`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${thread.id}`,
+        inline: false,
+      }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -1522,15 +1634,31 @@ client.on(Events.ThreadDelete, async (thread) => {
     .setFooter({ text: "FKZ Log System" })
     .setTitle("Thread Deleted")
     .addFields(
-      { name: "Name:", value: `${thread.name}`, inline: false },
+      {
+        name: "Name:",
+        value: `${thread.name}`,
+        inline: false,
+      },
       {
         name: "Creator:",
         value: `${thread.ownerId || "unknown"}`,
         inline: false,
       },
-      { name: "Channel:", value: `${thread.parent || "none"}`, inline: false },
-      { name: "Link:", value: `<#${thread.id}>`, inline: false },
-      { name: "ID:", value: `${thread.id}`, inline: false }
+      {
+        name: "Channel:",
+        value: `${thread.parent || "none"}`,
+        inline: false,
+      },
+      {
+        name: "Link:",
+        value: `<#${thread.id}>`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${thread.id}`,
+        inline: false,
+      }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
@@ -1584,9 +1712,21 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
         value: `${newThread.parent || "unknown"}`,
         inline: false,
       },
-      { name: "Link:", value: `<#${newThread.id}>`, inline: false },
-      { name: "Changes:", value: `${changesText}`, inline: false },
-      { name: "ID:", value: `${newThread.id}`, inline: false }
+      {
+        name: "Link:",
+        value: `<#${newThread.id}>`,
+        inline: false,
+      },
+      {
+        name: "Changes:",
+        value: `${changesText}`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${newThread.id}`,
+        inline: false,
+      }
     )
     .setTitle("Thread Edited")
     .setFooter({ text: "FKZ Log System" });
@@ -1626,9 +1766,6 @@ client.on("ready", async () => {
     }
 
     const logschatID = await client.channels.fetch(process.env.logschatID);
-    const logGuild = await client.guilds.fetch(process.env.guildID);
-
-    let logGuildChat = logGuild.Channel;
 
     if (oldMember.user.bot || newMember.user.bot) return;
     if (oldMember.user.system || newMember.user.system) return;
@@ -1991,7 +2128,11 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
       newMember.roles.cache.forEach((role) => {
         if (!oldMember.roles.cache.has(role.id)) {
           auditEmbed.addFields(
-            { name: "Role Added: ", value: `${role}`, inline: false },
+            {
+              name: "Role Added: ",
+              value: `${role}`,
+              inline: false,
+            },
             {
               name: "User:",
               value: `<@${newMember.user.id}> - ${newMember.user.username}`,
