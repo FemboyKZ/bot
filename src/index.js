@@ -1321,25 +1321,41 @@ client.on(Events.MessageDelete, async (message) => {
   if (!message.author) return;
   if (message.author.bot) return;
   if (!message.author.id === client.user.id) return;
+  if (message.partial) console.log("deleted msg is partial");
 
   try {
-    const auditChannel = client.channels.cache.get(logID);
+    message.fetch().then(async (fullMessage) => {
+      const auditChannel = client.channels.cache.get(logID);
 
-    if (message.content.length >= 3072) return;
+      if (message.content.length >= 3072) return;
+      if (fullMessage.content.length >= 3072) return;
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Message Deleted")
-      .setAuthor({ name: "Message:" })
-      .setDescription(`${message.content}`)
-      .addFields(
-        { name: "Author:", value: `${message.author}`, inline: false },
-        { name: "Channel:", value: `${message.channel}`, inline: false },
-        { name: "MessageID:", value: `${message.id}`, inline: false }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
+      const auditEmbed = new EmbedBuilder()
+        .setColor("#ff00b3")
+        .setTimestamp()
+        .setFooter({ text: "FKZ Log System" })
+        .setTitle("Message Deleted")
+        .setAuthor({ name: "Message:" })
+        .setDescription(`${fullMessage.content || message.content || "none"}`)
+        .addFields(
+          {
+            name: "Author:",
+            value: `${fullMessage.author || message.author}`,
+            inline: false,
+          },
+          {
+            name: "Channel:",
+            value: `${fullMessage.channel || message.channel}`,
+            inline: false,
+          },
+          {
+            name: "MessageID:",
+            value: `${fullMessage.id || message.id}`,
+            inline: false,
+          }
+        );
+      await auditChannel.send({ embeds: [auditEmbed] });
+    });
   } catch (err) {
     return console.log(err);
   }
@@ -2150,6 +2166,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
 // ------------------------------------------------------------------------ AUTOROLE
 const autorole = require("./Schemas.js/autorole");
+const { escape } = require("querystring");
 
 client.on(Events.GuildMemberAdd, async (member) => {
   // only supports 1 role through command lol, added extra ones here lol #3
