@@ -46,7 +46,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **128t GLOBAL**",
-          value: "[*euwl.femboy.kz:27959*](<https://femboy.kz/csgo/wlEU>)",
+          value: "[*euwl.femboy.kz:27025*](<https://femboy.kz/csgo/wlEU>)",
           inline: true,
         },
         {
@@ -66,7 +66,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **64t AutoBH**",
-          value: "[*eu64.femboy.kz:27138*](<https://femboy.kz/csgo/64tEU>)",
+          value: "[*eu64.femboy.kz:27035*](<https://femboy.kz/csgo/64tEU>)",
           inline: true,
         },
         {
@@ -82,7 +82,7 @@ module.exports = {
         {
           name: ":flag_eu:  **64t AutoBH\n- de_nuke only**",
           value:
-            "[*eunu.femboy.kz:28729*](<https://femboy.kz/csgo/64tEU-nuke>)",
+            "[*eunu.femboy.kz:27045*](<https://femboy.kz/csgo/64tEU-nuke>)",
           inline: true,
         },
       ]);
@@ -98,7 +98,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **64t Movement**",
-          value: "[*eu1.femboy.kz:26237*](<https://femboy.kz/cs2/EU1>)",
+          value: "[*eu1.femboy.kz:27015*](<https://femboy.kz/cs2/EU1>)",
           inline: true,
         },
         {
@@ -113,7 +113,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **64t Movement 2**",
-          value: "[*eu2.femboy.kz:26803*](<https://femboy.kz/cs2/EU2>)",
+          value: "[*eu2.femboy.kz:27016*](<https://femboy.kz/cs2/EU2>)",
           inline: true,
         },
         {
