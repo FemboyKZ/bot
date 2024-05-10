@@ -61,7 +61,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **128t GLOBAL**",
-          value: `[*${csgoWLeu}*](<https://csgo.femboy.kz/connect=?ip=${csgoWLeu}>)`,
+          value: `[*${csgoWLeu}*](<https://csgo.femboy.kz/connect?ip=${csgoWLeu}>)`,
           inline: true,
         },
         {
@@ -71,7 +71,7 @@ module.exports = {
         },
         {
           name: ":flag_us:  **128t GLOBAL**",
-          value: `[*${csgoWLna}*](<https://csgo.femboy.kz/connect=?ip=${csgoWLna}>)`,
+          value: `[*${csgoWLna}*](<https://csgo.femboy.kz/connect?ip=${csgoWLna}>)`,
           inline: true,
         },
         {
@@ -81,7 +81,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **64t AutoBH**",
-          value: `[*${csgo64eu}*](<https://csgo.femboy.kz/connect=?ip=${csgo64eu}>)`,
+          value: `[*${csgo64eu}*](<https://csgo.femboy.kz/connect?ip=${csgo64eu}>)`,
           inline: true,
         },
         {
@@ -91,12 +91,12 @@ module.exports = {
         },
         {
           name: ":flag_us:  **64t AutoBH**",
-          value: `[*${csgo64na}*](<https://csgo.femboy.kz/connect=?ip=${csgo64na}>)`,
+          value: `[*${csgo64na}*](<https://csgo.femboy.kz/connect?ip=${csgo64na}>)`,
           inline: true,
         },
         {
           name: ":flag_eu:  **64t AutoBH\n- de_nuke only**",
-          value: `[*${csgoNUeu}*](<https://csgo.femboy.kz/connect=?ip=${csgoNUeu}>)`,
+          value: `[*${csgoNUeu}*](<https://csgo.femboy.kz/connect?ip=${csgoNUeu}>)`,
           inline: true,
         },
       ]);
@@ -112,7 +112,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **KZ**",
-          value: `[*${cs2WLeu}*](<https://cs2.femboy.kz/connect=?ip=${cs2WLeu}:27015>)`,
+          value: `[*${cs2WLeu}*](<https://cs2.femboy.kz/connect?ip=${cs2WLeu}:27015>)`,
           inline: true,
         },
         {
@@ -122,7 +122,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **KZ**",
-          value: `[*${cs2KZeu}*](<https://cs2.femboy.kz/connect=?ip=${cs2KZeu}>)`,
+          value: `[*${cs2KZeu}*](<https://cs2.femboy.kz/connect?ip=${cs2KZeu}>)`,
           inline: true,
         },
         {
@@ -132,12 +132,12 @@ module.exports = {
         },
         {
           name: ":flag_us:  **KZ**",
-          value: `[*${cs2KZna}*](<https://cs2.femboy.kz/connect=?ip=${cs2KZna}>)`,
+          value: `[*${cs2KZna}*](<https://cs2.femboy.kz/connect?ip=${cs2KZna}>)`,
           inline: true,
         },
         {
           name: ":flag_eu:  **Movement**",
-          value: `[*${cs2MVeu}*](<https://cs2.femboy.kz/connect=?ip=${cs2MVeu}>)`,
+          value: `[*${cs2MVeu}*](<https://cs2.femboy.kz/connect?ip=${cs2MVeu}>)`,
           inline: true,
         },
         {
@@ -147,12 +147,12 @@ module.exports = {
         },
         {
           name: ":flag_us:  **Movement**",
-          value: `[*${cs2MVna}*](<https://cs2.femboy.kz/connect=?ip=${cs2MVna}>)`,
+          value: `[*${cs2MVna}*](<https://cs2.femboy.kz/connect?ip=${cs2MVna}>)`,
           inline: true,
         },
         {
           name: ":flag_eu:  **HNS**",
-          value: `[*${cs2HNSeu}*](<https://cs2.femboy.kz/connect=?ip=${cs2HNSeu}>)`,
+          value: `[*${cs2HNSeu}*](<https://cs2.femboy.kz/connect?ip=${cs2HNSeu}>)`,
           inline: true,
         },
       ]);
