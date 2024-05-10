@@ -122,7 +122,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **KZ**",
-          value: `[*${cs2KZeu}>*](<https://cs2.femboy.kz/connect=?ip=${cs2KZeu}>)`,
+          value: `[*${cs2KZeu}*](<https://cs2.femboy.kz/connect=?ip=${cs2KZeu}>)`,
           inline: true,
         },
         {
@@ -132,7 +132,7 @@ module.exports = {
         },
         {
           name: ":flag_us:  **KZ**",
-          value: `[*${cs2KZna}>*](<https://cs2.femboy.kz/connect=?ip=${cs2KZna}>>)`,
+          value: `[*${cs2KZna}*](<https://cs2.femboy.kz/connect=?ip=${cs2KZna}>)`,
           inline: true,
         },
         {
