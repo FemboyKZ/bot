@@ -56,7 +56,7 @@ module.exports = {
         return;
       }
 
-      const embed1 = new EmbedBuilder()
+      const embedWhitelist = new EmbedBuilder()
         .setTitle("**FKZ Whitelist**")
         .setImage("https://femboy.kz/images/wide.png")
         .setColor("#ff00b3")
@@ -75,7 +75,7 @@ module.exports = {
               "To get Whitelisted, you have to be someone I or someone else on the whitelist knows well, such as a friend or acquaintance.\n \nYou can request to join the Whitelist by using the command **/whitelist-request** in any of this servers channls.\nYou can also request to join the Steam group: **<https://steamcommunity.com/groups/FemWL>**",
           },
         ]);
-      const embed2 = new EmbedBuilder()
+      const embedBans = new EmbedBuilder()
         .setTitle("**FKZ Bans/Un-Bans**")
         .setImage("https://femboy.kz/images/wide.png")
         .setColor("#ff00b3")
@@ -89,7 +89,7 @@ module.exports = {
               "If you haven't received a response to your request *within a few days*, feel free to remind me (<@289767921956290580>) via direct message or by pinging me to check the requests.",
           },
         ]);
-      const embed3 = new EmbedBuilder()
+      const embedVip = new EmbedBuilder()
         .setTitle("**FKZ VIP / Donations**")
         .setImage("https://femboy.kz/images/wide.png")
         .setColor("#ff00b3")
@@ -103,11 +103,22 @@ module.exports = {
               "If you wish to purchase VIP or VIP+, you can do so here:\n\n**<https://femboy.kz/shop>**\n\nAll the needed info can be found there.",
           },
         ]);
-      const embed4 = new EmbedBuilder()
+      const embedClassic = new EmbedBuilder()
+        .setTitle("FKZ ClassicCounter")
+        .setImage("https://femboy.kz/images/wide.png")
+        .setColor("#ff00b3")
+        .setDescription(
+          "To be able to play on the **ClassicCounter** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter)."
+        );
+      const embedSupport = new EmbedBuilder()
         .setColor("#ff00b3")
         .setTitle(`FKZ Support`)
         .setImage("https://femboy.kz/images/wide.png")
         .addFields([
+          {
+            name: "Docs / Guides",
+            value: `Check out our **[Docs](https://docs.femboy.kz/)** for more info on how to use the servers.`,
+          },
           {
             name: "Reports / Suggestions",
             value: `If you have anything to report or something to suggest as improvement, feel free to do so by using the command **/report-or-suggest** in any of this servers channls.\nIf you have something that doesn't fit the form of this command, or needs direct contact with staff, please open a ticket`,
@@ -142,7 +153,13 @@ module.exports = {
       );
 
       await channel.send({
-        embeds: [embed1, embed2, embed3, embed4],
+        embeds: [
+          embedWhitelist,
+          embedClassic,
+          embedBans,
+          embedVip,
+          embedSupport,
+        ],
         components: [menu],
       });
       await interaction.reply({
