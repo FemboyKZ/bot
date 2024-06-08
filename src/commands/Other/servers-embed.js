@@ -29,12 +29,31 @@ module.exports = {
       });
     const channel = interaction.options.getChannel("channel");
 
-    const embed1 = new EmbedBuilder()
+    const csgoWLeu = "euwl.femboy.kz:27025";
+    const csgo64eu = "eu64.femboy.kz:27035";
+    const csgoNUeu = "eunu.femboy.kz:27045";
+
+    const csgoWLna = "nawl.femboy.kz:28455";
+    const csgo64na = "na64.femboy.kz:27945";
+
+    const cscl128eu = "classic.femboy.kz:27099";
+    const cscl64eu = "classic.femboy.kz:27093";
+
+    const cs2WLeu = "euwl.femboy.kz";
+    const cs2KZeu = "eu1.femboy.kz:27016";
+    const cs2MVeu = "eu2.femboy.kz:27017";
+    const cs2HNSeu = "eu3.femboy.kz:27018";
+
+    const cs2KZna = "na1.femboy.kz:26578";
+    const cs2MVna = "na2.femboy.kz:26212";
+    const cs2HNSna = "na3.femboy.kz:26582";
+
+    const embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/serverrs.png");
 
-    const embed2 = new EmbedBuilder()
+    const embedCSGO = new EmbedBuilder()
       .setTitle("**CS:GO Servers**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
@@ -46,7 +65,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **128t GLOBAL**",
-          value: "[*euwl.femboy.kz:27959*](<https://femboy.kz/csgo/wlEU>)",
+          value: `[*${csgoWLeu}*](<https://csgo.femboy.kz/connect?ip=${csgoWLeu}>)`,
           inline: true,
         },
         {
@@ -56,7 +75,7 @@ module.exports = {
         },
         {
           name: ":flag_us:  **128t GLOBAL**",
-          value: "[*nawl.femboy.kz:28455*](<https://femboy.kz/csgo/wlNA>)",
+          value: `[*${csgoWLna}*](<https://csgo.femboy.kz/connect?ip=${csgoWLna}>)`,
           inline: true,
         },
         {
@@ -66,7 +85,7 @@ module.exports = {
         },
         {
           name: ":flag_eu:  **64t AutoBH**",
-          value: "[*eu64.femboy.kz:27138*](<https://femboy.kz/csgo/64tEU>)",
+          value: `[*${csgo64eu}*](<https://csgo.femboy.kz/connect?ip=${csgo64eu}>)`,
           inline: true,
         },
         {
@@ -76,29 +95,66 @@ module.exports = {
         },
         {
           name: ":flag_us:  **64t AutoBH**",
-          value: "[*na64.femboy.kz:27945*](<https://femboy.kz/csgo/64tNA>)",
+          value: `[*${csgo64na}*](<https://csgo.femboy.kz/connect?ip=${csgo64na}>)`,
           inline: true,
         },
         {
           name: ":flag_eu:  **64t AutoBH\n- de_nuke only**",
-          value:
-            "[*eunu.femboy.kz:28729*](<https://femboy.kz/csgo/64tEU-nuke>)",
+          value: `[*${csgoNUeu}*](<https://csgo.femboy.kz/connect?ip=${csgoNUeu}>)`,
           inline: true,
         },
       ]);
-    const embed3 = new EmbedBuilder()
+
+    const embedCSCL = new EmbedBuilder()
+      .setTitle("**ClassicCounter Servers**")
+      .setColor("#ff00b3")
+      .setImage("https://femboy.kz/images/wide.png")
+      .addFields([
+        {
+          name: "CC Whitelist Servers",
+          value: "** **",
+          inline: false,
+        },
+        {
+          name: ":flag_eu:  **128t VNL**",
+          value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128eu}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **64t VNL**",
+          value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64eu}>)`,
+          inline: true,
+        },
+      ]);
+
+    const embedCS2 = new EmbedBuilder()
       .setTitle("**CS2 Servers**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
       .addFields([
+        {
+          name: "Whitelist Servers",
+          value: "** **",
+          inline: false,
+        },
+        {
+          name: ":flag_eu:  **KZ**",
+          value: `[*${cs2WLeu}*](<https://cs2.femboy.kz/connect?ip=${cs2WLeu}:27015>)`,
+          inline: true,
+        },
         {
           name: "Public Servers",
           value: "** **",
           inline: false,
         },
         {
-          name: ":flag_eu:  **64t Movement**",
-          value: "[*eu1.femboy.kz:26237*](<https://femboy.kz/cs2/EU1>)",
+          name: ":flag_eu:  **KZ**",
+          value: `[*${cs2KZeu}*](<https://cs2.femboy.kz/connect?ip=${cs2KZeu}>)`,
           inline: true,
         },
         {
@@ -107,13 +163,13 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **64t Movement**",
-          value: "[*na1.femboy.kz:26578*](<https://femboy.kz/cs2/NA1>)",
+          name: ":flag_us:  **KZ**",
+          value: `[*${cs2KZna}*](<https://cs2.femboy.kz/connect?ip=${cs2KZna}>)`,
           inline: true,
         },
         {
-          name: ":flag_eu:  **64t Movement 2**",
-          value: "[*eu2.femboy.kz:26803*](<https://femboy.kz/cs2/EU2>)",
+          name: ":flag_eu:  **Movement**",
+          value: `[*${cs2MVeu}*](<https://cs2.femboy.kz/connect?ip=${cs2MVeu}>)`,
           inline: true,
         },
         {
@@ -122,13 +178,29 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **64t Movement 2**",
-          value: "[*na2.femboy.kz:26212*](<https://femboy.kz/cs2/NA2>)",
+          name: ":flag_us:  **Movement**",
+          value: `[*${cs2MVna}*](<https://cs2.femboy.kz/connect?ip=${cs2MVna}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **HNS**",
+          value: `[*${cs2HNSeu}*](<https://cs2.femboy.kz/connect?ip=${cs2HNSeu}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **HNS**",
+          value: `[*${cs2HNSna}*](<https://cs2.femboy.kz/connect?ip=${cs2HNSna}>)`,
           inline: true,
         },
       ]);
+
     await channel.send({
-      embeds: [embed1, embed2, embed3],
+      embeds: [embedHeader, embedCSGO, embedCSCL, embedCS2],
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,

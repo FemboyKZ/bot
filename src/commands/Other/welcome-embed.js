@@ -30,23 +30,23 @@ module.exports = {
 
     const channel = interaction.options.getChannel("channel");
 
-    const embed1 = new EmbedBuilder()
+    const embedBanner = new EmbedBuilder()
       .setTitle("**Welcome to FemboyKZ! <3**")
       .setImage("https://femboy.kz/images/tehe.png")
       .setColor("#ff00b3");
 
-    const embed2 = new EmbedBuilder()
+    const embedInfo = new EmbedBuilder()
       .setTitle("**FemboyKZ Info**")
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "This is a Discord server for the Femboy KZ CS:GO servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers."
+        "This is a Discord server for the Femboy KZ CS:GO and CS2 servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers."
       )
       .addFields([
         {
           name: "** **",
           value:
-            "We are a small community consisting of mostly CS:GO VNL/Movement players. The purpose of this community is to provide players with a place to play and experience VNL in all the possible ways, different tickrates, with autobhop and more!\nAlthough we may dip into other games such as Minecraft whenever theres demand.",
+            "We are a small community consisting of mostly CS:GO/CS2 VNL/Movement players. The purpose of this community is to provide players with a place to play and experience VNL in all the possible ways, different tickrates, with autobhop and more!\nAlthough we may dip into other games such as Minecraft whenever theres demand.",
         },
         {
           name: "** **",
@@ -55,7 +55,7 @@ module.exports = {
         },
       ]);
 
-    const embed3 = new EmbedBuilder()
+    const embedRules = new EmbedBuilder()
       .setTitle("**FemboyKZ Rules**")
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
@@ -119,7 +119,7 @@ module.exports = {
       ]);
 
     await channel.send({
-      embeds: [embed1, embed2, embed3],
+      embeds: [embedBanner, embedInfo, embedRules],
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,

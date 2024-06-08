@@ -1,6 +1,7 @@
 const {
   Client,
   GatewayIntentBits,
+  Partials,
   EmbedBuilder,
   PermissionsBitField,
   Collection,
@@ -35,6 +36,15 @@ const client = new Client({
     GatewayIntentBits.GuildWebhooks,
     GatewayIntentBits.Guilds,
     GatewayIntentBits.MessageContent,
+  ],
+  partials: [
+    Partials.Channel,
+    Partials.GuildMember,
+    Partials.GuildScheduledEvent,
+    Partials.Message,
+    Partials.Reaction,
+    Partials.ThreadMember,
+    Partials.User,
   ],
 });
 
@@ -528,117 +538,7 @@ client.on(Events.MessageCreate, async (message) => {
   }
 });
 
-// invite logger
-const inviteSchema = require("./Schemas.js/inviteSchema");
-
-const invites = new Collection();
-const wait = require("timers/promises").setTimeout;
-
-client.on("ready", async () => {
-  await wait(2000);
-
-  client.guilds.cache.forEach(async (guild) => {
-    const clientMember = guild.members.cache.get(client.user.id);
-
-    if (!clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return;
-
-    const firstInvites = await guild.invites.fetch().catch((err) => {
-      console.log(err);
-    });
-
-    invites.set(
-      guild.id,
-      new Collection(firstInvites.map((invite) => [invite.code, invite.uses]))
-    );
-  });
-});
-
-client.on(Events.GuildMemberAdd, async (member) => {
-  const Data = await inviteSchema.findOne({ Guild: member.guild.id });
-  if (!Data) return;
-
-  const channelID = Data.Channel;
-  const channel = await member.guild.channels.cache.get(channelID);
-
-  const newInvites = await member.guild.invites.fetch();
-  const oldInvites = invites.get(member.guild.id);
-
-  const invite = newInvites.find((i) => i.uses > oldInvites.get(i.code));
-
-  const embedVanity = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTitle(`${member.user.tag} Has Joined the Server!`)
-    .setDescription(
-      `${member.user.tag} joined the server using an unknown invite. This could mean they used a vanity invite link if the server has one.`
-    )
-    .setImage("https://femboy.kz/images/wide.png")
-    .setTimestamp();
-
-  if (!invite) return await channel.send({ embeds: [embedVanity] });
-
-  const inviter = await client.users.fetch(invite.inviter.id);
-
-  const embedInvite = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTitle(`${member.user.tag} Has Joined the Server!`)
-    .setDescription(
-      `${member.user.tag} Joined the server using the invite: ${invite.code} Which was created by: ${inviter.tag}.\nThe invite has been used ${invite.uses} times since it was created.`
-    )
-    .setImage("https://femboy.kz/images/wide.png")
-    .setTimestamp();
-
-  const embedNoInvite = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTitle(`${member.user.tag} Has Joined the Server!`)
-    .setDescription(
-      `${member} Joined the server, but the invite used cannot be found. `
-    )
-    .setImage("https://femboy.kz/images/wide.png")
-    .setTimestamp();
-
-  inviter
-    ? channel.send({ embeds: [embedInvite] })
-    : channel.send({ embeds: [embedNoInvite] });
-});
-
-// Leave Message //
-const welcomeschema = require("./Schemas.js/welcome");
-
-client.on(Events.GuildMemberRemove, async (member, err) => {
-  const leavedata = await welcomeschema.findOne({ Guild: member.guild.id });
-
-  if (!leavedata) return;
-  else {
-    const channelID = leavedata.Channel;
-    const channelwelcome = member.guild.channels.cache.get(channelID);
-
-    const embedleave = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTitle(`${member.user.username} has left`)
-      .setDescription(`> ${member} has left the Server`)
-      .setTimestamp()
-      .setAuthor({ name: `Member Left` });
-
-    const welmsg = await channelwelcome
-      .send({ embeds: [embedleave] })
-      .catch(err);
-  }
-});
-
-// Welcome Message // not being used
-
-client.on(Events.GuildMemberAdd, async (member, err) => {
-  const welcomedata = await welcomeschema.findOne({ Guild: member.guild.id });
-
-  if (!welcomedata) return;
-  else {
-    const channelID = welcomedata.Channel;
-    const channelwelcome = member.guild.channels.cache.get(channelID);
-  }
-});
-
-// interaction logger
+// ------------------------------------------------------------------------ interaction logger
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction) return;
@@ -754,492 +654,6 @@ client.on(Events.GuildDelete, async (guild) => {
   await channel.send({ embeds: [embed] });
 });
 
-// AUDIT LOG //
-const Audit_Log = require("./Schemas.js/auditlog");
-
-client.on(Events.GuildBanAdd, async (guild, user) => {
-  const data = await Audit_Log.findOne({
-    Guild: guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  const banInfo = await guild.fetchBan(user);
-  if (!banInfo) return;
-
-  const { reason, executor } = banInfo;
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Ban Added")
-    .addFields(
-      { name: "Banned Member:", value: user.tag, inline: false },
-      { name: "Executor:", value: executor.tag, inline: false },
-      { name: "Reason:", reason }
-    );
-
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.GuildBanRemove, async (user) => {
-  const data = await Audit_Log.findOne({
-    Guild: user.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Ban Removed")
-    .addFields({ name: "Member:", value: `${user}` });
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.ChannelCreate, async (channel) => {
-  const data = await Audit_Log.findOne({
-    Guild: channel.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Channel Created")
-    .addFields(
-      { name: "Channel Name:", value: channel.name, inline: false },
-      { name: "Channel ID:", value: channel.id, inline: false }
-    );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.ChannelDelete, async (channel) => {
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const data = await Audit_Log.findOne({
-    Guild: channel.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Channel Deleted")
-    .addFields(
-      { name: "Channel Name:", value: channel.name, inline: false },
-      { name: "Channel ID:", value: channel.id, inline: false }
-    );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const data = await Audit_Log.findOne({
-    Guild: oldChannel.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-
-  const auditChannel = client.channels.cache.get(logID);
-  const changes = [];
-
-  if (oldChannel.name !== newChannel.name) {
-    changes.push(`Name: \`${oldChannel.name}\` → \`${newChannel.name}\``);
-  }
-
-  if (oldChannel.topic !== newChannel.topic) {
-    changes.push(
-      `Topic: \`${oldChannel.topic || "None"}\` → \`${
-        newChannel.topic || "None"
-      }\``
-    );
-  }
-
-  if (changes.length === 0) return;
-
-  const changesText = changes.join("\n");
-
-  auditEmbed
-    .setTitle("Channel Updated")
-    .addFields({ name: "Changes:", value: changesText });
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.GuildRoleCreate, async (role) => {
-  const data = await Audit_Log.findOne({
-    Guild: role.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Role Created")
-    .addFields(
-      { name: "Role Name:", value: role.name, inline: false },
-      { name: "Role ID:", value: role.id, inline: false }
-    );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.GuildRoleDelete, async (role) => {
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const data = await Audit_Log.findOne({
-    Guild: role.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Role Deleted")
-    .addFields(
-      { name: "Role Name:", value: role.name, inline: false },
-      { name: "Role ID:", value: role.id, inline: false }
-    );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.MessageDelete, async (message) => {
-  const data = await Audit_Log.findOne({
-    Guild: message.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  try {
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" });
-
-    const auditChannel = client.channels.cache.get(logID);
-
-    auditEmbed
-      .setTitle("Message Deleted")
-      .addFields(
-        { name: "Author:", value: `${message.author}`, inline: false },
-        { name: "Channel:", value: `${message.channel}`, inline: false },
-        { name: "Message:", value: `${message.content}`, inline: false },
-        { name: "Message ID:", value: `${message.id}` }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
-  } catch (err) {
-    return;
-  }
-});
-client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
-  if (oldMessage.author.id === client.user.id) return;
-  const data = await Audit_Log.findOne({
-    Guild: newMessage.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-
-  try {
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" });
-
-    const auditChannel = client.channels.cache.get(logID);
-
-    const changes = [];
-
-    if (oldMessage.content !== newMessage.content) {
-      changes.push(
-        `Topic: \`${oldMessage.content || "None"}\` → \`${
-          newMessage.content || "None"
-        }\``
-      );
-    }
-
-    if (changes.length === 0) return;
-
-    const changesText = changes.join("\n");
-
-    auditEmbed
-      .setTitle("Message Edited")
-      .addFields(
-        { name: "Author:", value: `${newMessage.author}`, inline: false },
-        { name: "Channel:", value: `${newMessage.channel}`, inline: false },
-        { name: "Message changes:", value: `${changesText}`, inline: false },
-        { name: "Message ID:", value: `${newMessage.id}` }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
-  } catch (err) {
-    return;
-  }
-});
-client.on(Events.AutoModerationRuleCreate, async (autoModerationRule) => {
-  const data = await Audit_Log.findOne({
-    Guild: autoModerationRule.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed.setTitle("Automod Rule Created").addFields(
-    {
-      name: "Rulecreator:",
-      value: `<@${autoModerationRule.creatorId}>`,
-      inline: false,
-    },
-    { name: "Rulename:", value: autoModerationRule.name },
-    {
-      name: "Actions:",
-      value: `${autoModerationRule.actions}`,
-      inline: false,
-    }
-  );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
-  const data = await Audit_Log.findOne({
-    Guild: autoModerationRule.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed.setTitle("Automod Rule Deleted").addFields(
-    {
-      name: "Rulecreator:",
-      value: `<@${autoModerationRule.creatorId}>`,
-      inline: false,
-    },
-    { name: "Rulename:", value: autoModerationRule.name, inline: false },
-    {
-      name: "Actions:",
-      value: `${autoModerationRule.actions}`,
-      inline: false,
-    }
-  );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(
-  Events.AutoModerationRuleUpdate,
-  // 1st param is "param or null" and reads null ???? #1
-  async (oldAutoModerationRule, newAutoModerationRule) => {
-    const data = await Audit_Log.findOne({
-      Guild: newAutoModerationRule.guild.id,
-    });
-    let logID;
-    if (data) {
-      logID = data.Channel;
-    } else {
-      return;
-    }
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" });
-
-    const auditChannel = client.channels.cache.get(logID);
-
-    auditEmbed.setTitle("Automod Rule Updated").addFields(
-      {
-        name: "New Rulename:",
-        value: `${newAutoModerationRule.name}`,
-        inline: false,
-      },
-      {
-        name: "New Actions:",
-        // value: `${newAutoModerationRule.actions}`, #1
-        value: `this doesn't work lol, fix it dumbass`,
-        inline: false,
-      }
-    );
-    await auditChannel.send({ embeds: [auditEmbed] });
-  }
-);
-client.on(
-  Events.AutoModerationRuleUpdate,
-  // 1st param is "param or null" and reads null ???? #1
-  async (newAutoModerationRule, oldAutoModerationRule) => {
-    const data = await Audit_Log.findOne({
-      Guild: oldAutoModerationRule.guild.id,
-    });
-    let logID;
-    if (data) {
-      logID = data.Channel;
-    } else {
-      return;
-    }
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" });
-
-    const auditChannel = client.channels.cache.get(logID);
-
-    auditEmbed.setTitle("Automod Rule Updated").addFields(
-      {
-        name: "Old Rulename:",
-        value: `${oldAutoModerationRule.name}`,
-        inline: false,
-      },
-      {
-        name: "Old Actions:",
-        // value: `${oldAutoModerationRule.actions}`, #1
-        value: `this doesn't work lol, fix it dumbass`,
-        inline: false,
-      }
-    );
-    await auditChannel.send({ embeds: [auditEmbed] });
-  }
-);
-client.on(Events.ThreadCreate, async (thread) => {
-  const data = await Audit_Log.findOne({
-    Guild: thread.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Thread Created")
-    .addFields(
-      { name: "Name:", value: thread.name, inline: false },
-      { name: "Tag:", value: `<#${thread.id}>`, inline: false },
-      { name: "ID:", value: thread.id, inline: false }
-    );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-client.on(Events.ThreadDelete, async (thread) => {
-  const data = await Audit_Log.findOne({
-    Guild: thread.guild.id,
-  });
-  let logID;
-  if (data) {
-    logID = data.Channel;
-  } else {
-    return;
-  }
-  const auditEmbed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setFooter({ text: "FKZ Log System" });
-  const auditChannel = client.channels.cache.get(logID);
-
-  auditEmbed
-    .setTitle("Thread Deleted")
-    .addFields(
-      { name: "Name:", value: thread.name, inline: false },
-      { name: "Tag:", value: `<#${thread.id}>`, inline: false },
-      { name: "ID:", value: thread.id, inline: false }
-    );
-  await auditChannel.send({ embeds: [auditEmbed] });
-});
-
-// AUTOROLE //
-const autorole = require("./Schemas.js/autorole");
-
-client.on(Events.GuildMemberAdd, async (member) => {
-  // only supports 1 role through command lol, added extra ones here lol #3
-  const data = await autorole.findOne({ Guild: member.guild.id });
-  const rol = process.env.autoroleID1;
-  const rol2 = process.env.autoroleID2;
-  if (!data) return;
-  else {
-    try {
-      await member.roles.add(data.Role);
-      await member.roles.add(rol);
-      await member.roles.add(rol2);
-    } catch (e) {
-      return;
-    }
-  }
-});
-
 // REACTION ROLES //
 const reactions = require("./Schemas.js/reactionrs");
 
@@ -1267,7 +681,6 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     return;
   }
 });
-
 // reaction remove
 client.on(Events.MessageReactionRemove, async (reaction, user) => {
   if (!reaction.message.guildId) return;
@@ -1290,5 +703,1484 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
     await member.roles.remove(data.Role);
   } catch (e) {
     return;
+  }
+});
+
+// AUDIT LOG //
+const Audit_Log = require("./Schemas.js/auditlog");
+// ------------------------------------------------------------------------ ban logs
+client.on(Events.GuildBanAdd, async (guild, user) => {
+  const data = await Audit_Log.findOne({
+    Guild: guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const banInfo = await guild.fetchBan(user);
+  if (!banInfo) return;
+
+  const { reason, executor } = banInfo;
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Ban Added")
+    .addFields(
+      {
+        name: "Banned Member:",
+        value: `${user.tag || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Executor:",
+        value: `${executor.tag || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Reason:",
+        value: `${reason || "none"}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildBanRemove, async (user) => {
+  const data = await Audit_Log.findOne({
+    Guild: user.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const banInfo = await user.guild.fetchBan(user);
+  if (!banInfo) return;
+
+  const { executor } = banInfo;
+
+  const auditChannel = client.channels.cache.get(logID);
+
+  user.fetch().then(async (fullUser) => {
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Ban Removed")
+      .addFields(
+        {
+          name: "Member:",
+          value: `${fullUser.user || user.user || "unknown"}`,
+          inline: false,
+        },
+        {
+          name: "Admin:",
+          value: `${executor || "unknown"}`,
+          inline: false,
+        }
+      );
+    await auditChannel.send({ embeds: [auditEmbed] });
+  });
+});
+// ------------------------------------------------------------------------ channel logs
+client.on(Events.ChannelCreate, async (channel) => {
+  const data = await Audit_Log.findOne({
+    Guild: channel.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Channel Created")
+    .addFields(
+      {
+        name: "Name:",
+        value: `${channel.name || "?"}`,
+        inline: false,
+      },
+      {
+        name: "Type:",
+        value: `${channel.type}`,
+        inline: false,
+      },
+      {
+        name: "Category:",
+        value: `${channel.parent || "No Category"}`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${channel.id}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.ChannelDelete, async (channel) => {
+  const data = await Audit_Log.findOne({
+    Guild: channel.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Channel Deleted")
+    .addFields(
+      {
+        name: "Name:",
+        value: `${channel.name || "?"}`,
+        inline: false,
+      },
+      {
+        name: "Type:",
+        value: `${channel.type}`,
+        inline: false,
+      },
+      {
+        name: "Category:",
+        value: `${channel.parent || "No Category"}`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${channel.id}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
+  const data = await Audit_Log.findOne({
+    Guild: oldChannel.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  const changes = [];
+
+  if (oldChannel.name !== newChannel.name) {
+    changes.push(
+      `Name: \`${oldChannel.name || "none"}\` → \`${
+        newChannel.name || "none"
+      }\``
+    );
+  }
+  if (oldChannel.parent !== newChannel.parent) {
+    changes.push(
+      `Category: \`${oldChannel.parent || "none"}\` → \`${
+        newChannel.parent || "none"
+      }\``
+    );
+  }
+  if (oldChannel.topic !== newChannel.topic) {
+    changes.push(
+      `Topic: \`${oldChannel.topic || "None"}\` → \`${
+        newChannel.topic || "None"
+      }\``
+    );
+  }
+
+  if (changes.length === 0) return;
+  const changesText = changes.join("\n");
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Channel Updated")
+    .addFields(
+      { name: "Changes:", value: `${changesText}`, inline: false },
+      { name: "ID:", value: `${newChannel.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+// ------------------------------------------------------------------------ Invite logs
+client.on(Events.InviteCreate, async (invite) => {
+  const data = await Audit_Log.findOne({
+    Guild: invite.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Invite Created")
+    .addFields(
+      {
+        name: "Creator:",
+        value: `${invite.inviterId || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Url:",
+        value: `${invite.url}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.InviteDelete, async (invite) => {
+  const data = await Audit_Log.findOne({
+    Guild: invite.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Invite Deleted")
+    .addFields(
+      {
+        name: "Author:",
+        value: `${invite.inviter || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Uses / Max Uses:",
+        value: `${invite.uses || "unknown"} / ${invite.maxUses || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Channel:",
+        value: `${invite.channel || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Invite:",
+        value: `${invite.code}`,
+        inline: false,
+      },
+      {
+        name: "Url:",
+        value: `${invite.url}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+// ------------------------------------------------------------------------ emoji logs
+client.on(Events.GuildEmojiCreate, async (emoji) => {
+  const data = await Audit_Log.findOne({
+    Guild: emoji.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  let image = emoji.imageURL({ size: 64 });
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(`${image}` || `https://femboy.kz/images/wide.png`)
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Emoji Added")
+    .addFields(
+      { name: "Name:", value: `${emoji.name || "?"}`, inline: false },
+      { name: "Author:", value: `${emoji.author || "unknown"}`, inline: false },
+      { name: "Animated?:", value: `${emoji.animated || "?"}`, inline: false },
+      { name: "ID:", value: `${emoji.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildEmojiDelete, async (emoji) => {
+  const data = await Audit_Log.findOne({
+    Guild: emoji.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  let image = emoji.imageURL({ size: 64 });
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(`${image}` || `https://femboy.kz/images/wide.png`)
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Emoji Deleted")
+    .addFields(
+      { name: "Name:", value: `${emoji.name || "?"}`, inline: false },
+      { name: "Author:", value: `${emoji.author || "unknown"}`, inline: false },
+      { name: "Animated?:", value: `${emoji.animated || "?"}`, inline: false },
+      { name: "ID:", value: `${emoji.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
+  const data = await Audit_Log.findOne({
+    Guild: newEmoji.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  const changes = [];
+
+  if (oldEmoji.name !== newEmoji.name) {
+    changes.push(
+      `Name: \`${oldEmoji.name || "none"}\` → \`${newEmoji.name || "none"}\``
+    );
+  }
+
+  if (changes.length === 0) return;
+  const changesText = changes.join("\n");
+  let image = newEmoji.imageURL({ size: 64 });
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(`${image}` || `https://femboy.kz/images/wide.png`)
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Emoji Edited")
+    .addFields(
+      { name: "Changes:", value: `${changesText}`, inline: false },
+      { name: "Author:", value: `${newEmoji.author || "null"}`, inline: false },
+      { name: "ID:", value: `${newEmoji.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+// ------------------------------------------------------------------------ Sticker logs
+client.on(Events.GuildStickerCreate, async (sticker) => {
+  const data = await Audit_Log.findOne({
+    Guild: sticker.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  let image = sticker.imageURL({ size: 64 });
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(`${image}` || `https://femboy.kz/images/wide.png`)
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Sticker Added")
+    .addFields(
+      {
+        name: "Name:",
+        value: `${sticker.name}`,
+        inline: false,
+      },
+      {
+        name: "Description:",
+        value: `${sticker.description || "none"}`,
+        inline: false,
+      },
+      {
+        name: "Format:",
+        value: `${sticker.format || "none"}`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${sticker.id}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildStickerDelete, async (sticker) => {
+  const data = await Audit_Log.findOne({
+    Guild: sticker.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  let image = sticker.url({ size: 128 });
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(`${image}` || `https://femboy.kz/images/wide.png`)
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Sticker Deleted")
+    .addFields(
+      { name: "Name:", value: `${sticker.name}`, inline: false },
+      { name: "ID:", value: `${sticker.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
+  const data = await Audit_Log.findOne({
+    Guild: newSticker.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  const changes = [];
+
+  if (oldSticker.name !== newSticker.name) {
+    changes.push(`Name: \`${oldSticker.name}\` → \`${newSticker.name}\``);
+  }
+  if (oldSticker.description !== newSticker.description) {
+    changes.push(
+      `Description: \`${oldSticker.description || "None"}\` → \`${
+        newSticker.description || "None"
+      }\``
+    );
+  }
+
+  if (changes.length === 0) return;
+  const changesText = changes.join("\n");
+  let image = newSticker.url({ size: 128 });
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(`${image}` || `https://femboy.kz/images/wide.png`)
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Sticker Edited")
+    .addFields(
+      { name: "Changes:", value: `${changesText}`, inline: false },
+      { name: "ID:", value: `${newSticker.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+// ------------------------------------------------------------------------ Role logs
+client.on(Events.GuildRoleCreate, async (role) => {
+  const data = await Audit_Log.findOne({
+    Guild: role.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Role Created")
+    .addFields(
+      { name: "Name:", value: `${role.name}`, inline: false },
+      { name: "ID:", value: `${role.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildRoleDelete, async (role) => {
+  const data = await Audit_Log.findOne({
+    Guild: role.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Role Deleted")
+    .addFields(
+      { name: "Name:", value: `${role.name}`, inline: false },
+      { name: "ID:", value: `${role.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
+  const data = await Audit_Log.findOne({
+    Guild: newRole.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  const changes = [];
+
+  if (oldRole.name !== newRole.name) {
+    changes.push(`Name: \`${oldRole.name}\` → \`${newRole.name}\``);
+  }
+
+  if (oldRole.permissions !== newRole.permissions) {
+    changes.push(
+      `Permissions: \`${oldRole.permissions || "None"}\` → \`${
+        newRole.permissions || "None"
+      }\``
+    );
+  }
+
+  if (oldRole.mentionable !== newRole.mentionable) {
+    changes.push(
+      `Mentionable?: \`${oldRole.mentionable || "None"}\` → \`${
+        newRole.mentionable || "None"
+      }\``
+    );
+  }
+
+  if (oldRole.hoist !== newRole.hoist) {
+    changes.push(
+      `Hoisted?: \`${oldRole.hoist || "None"}\` → \`${
+        newRole.hoist || "None"
+      }\``
+    );
+  }
+
+  if (oldRole.color !== newRole.color) {
+    changes.push(
+      `Color: \`${oldRole.color + " - " + oldRole.hexColor || "None"}\` → \`${
+        newRole.color + " - " + newRole.hexColor || "None"
+      }\``
+    );
+  }
+
+  if (changes.length === 0) return;
+  const changesText = changes.join("\n");
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle("Role Updated")
+    .setFooter({ text: "FKZ Log System" })
+    .addFields(
+      { name: "Changes:", value: `${changesText}`, inline: false },
+      { name: "ID:", value: `${newRole.id}`, inline: false }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+// ------------------------------------------------------------------------ message logs
+client.on(Events.MessageDelete, async (message) => {
+  const data = await Audit_Log.findOne({
+    Guild: message.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  if (!message.author) return;
+  if (message.author.bot) return;
+  if (!message.author.id === client.user.id) return;
+  if (message.partial) console.log("deleted msg is partial");
+
+  try {
+    message.fetch().then(async (fullMessage) => {
+      const auditChannel = client.channels.cache.get(logID);
+
+      if (message.content.length >= 3072) return;
+      if (fullMessage.content.length >= 3072) return;
+
+      const auditEmbed = new EmbedBuilder()
+        .setColor("#ff00b3")
+        .setTimestamp()
+        .setFooter({ text: "FKZ Log System" })
+        .setTitle("Message Deleted")
+        .setAuthor({ name: "Message:" })
+        .setDescription(`${fullMessage.content || message.content || "none"}`)
+        .addFields(
+          {
+            name: "Author:",
+            value: `${fullMessage.author || message.author}`,
+            inline: false,
+          },
+          {
+            name: "Channel:",
+            value: `${fullMessage.channel || message.channel}`,
+            inline: false,
+          },
+          {
+            name: "MessageID:",
+            value: `${fullMessage.id || message.id}`,
+            inline: false,
+          }
+        );
+      await auditChannel.send({ embeds: [auditEmbed] });
+    });
+  } catch (err) {
+    return console.log(err);
+  }
+});
+client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+  const data = await Audit_Log.findOne({
+    Guild: newMessage.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  if (!oldMessage.author) return;
+  if (oldMessage.author.bot) return;
+  if (oldMessage.partial) console.log("oldMessage = partial");
+
+  try {
+    const auditChannel = client.channels.cache.get(logID);
+    const changes = [];
+
+    if (oldMessage.content !== newMessage.content) {
+      oldMessage.fetch().then((fullOldMessage) => {
+        const fullOldMessageText = fullOldMessage.content;
+        const oldMessageText = oldMessage.content;
+        const fullOldAuthor = fullOldMessage.author;
+        changes.push(
+          `Message: \`${fullOldMessageText || oldMessageText || "None"}\` → \`${
+            newMessage.content || "None"
+          }\``
+        );
+
+        if (fullOldMessageText || oldMessageText >= 1536) return;
+        if (newMessage.content.length >= 1536) return;
+        if (changes.length === 0) return;
+        const changesText = changes.join("\n");
+
+        const auditEmbed = new EmbedBuilder()
+          .setColor("#ff00b3")
+          .setTimestamp()
+          .setFooter({ text: "FKZ Log System" })
+          .setTitle("Message Edited")
+          .setAuthor({ name: "Edit:" })
+          .setDescription(`${changesText}`)
+          .addFields(
+            {
+              name: "Author:",
+              value: `${fullOldAuthor || oldMessage.author || "unknown"}`,
+              inline: false,
+            },
+            {
+              name: "Channel:",
+              value: `${newMessage.channel}`,
+              inline: false,
+            },
+            {
+              name: "MessageID:",
+              value: `${newMessage.id}`,
+            }
+          );
+        auditChannel.send({ embeds: [auditEmbed] });
+      });
+    }
+  } catch (err) {
+    return console.log(err);
+  }
+});
+// ------------------------------------------------------------------------ Automod logs
+client.on(Events.AutoModerationRuleCreate, async (autoModerationRule) => {
+  const data = await Audit_Log.findOne({
+    Guild: autoModerationRule.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+
+  const auditChannel = client.channels.cache.get(logID);
+  let actions = autoModerationRule.actions.toString();
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Automod Rule Created")
+    .addFields(
+      {
+        name: "Creator:",
+        value: `<@${autoModerationRule.creatorId}>`,
+        inline: false,
+      },
+      {
+        name: "Name:",
+        value: `${autoModerationRule.name}`,
+        inline: false,
+      },
+      {
+        name: "Actions:",
+        value: `${actions}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
+  const data = await Audit_Log.findOne({
+    Guild: autoModerationRule.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  let actions = autoModerationRule.actions.toString();
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Automod Rule Deleted")
+    .addFields(
+      {
+        name: "Creator:",
+        value: `<@${autoModerationRule.creatorId}>`,
+        inline: false,
+      },
+      {
+        name: "Name:",
+        value: `${autoModerationRule.name}`,
+        inline: false,
+      },
+      {
+        name: "Actions:",
+        value: `${actions}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(
+  Events.AutoModerationRuleUpdate,
+  // 1st param is "param or null" and reads null ???? --------------------------- #1
+  async (oldAutoModerationRule, newAutoModerationRule) => {
+    const data = await Audit_Log.findOne({
+      Guild: newAutoModerationRule.guild.id,
+    });
+    let logID;
+    if (data) {
+      logID = data.Channel;
+    } else {
+      return;
+    }
+
+    const auditChannel = client.channels.cache.get(logID);
+    const changes = [];
+
+    const nullEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Automod Rule Updated")
+      .addFields({
+        name: "Changes:",
+        value: `NULL`,
+      });
+
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Automod Rule Updated");
+
+    if (oldAutoModerationRule === null) {
+      return await auditChannel.send({ embeds: [nullEmbed] }); // avoid crash cuz of #1
+    }
+
+    if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
+      changes.push(
+        `Name: \`${oldAutoModerationRule.name || "None"}\`  →  \`${
+          newAutoModerationRule.name || "None"
+        }\``
+      );
+      const changesText = changes.join("\n");
+      auditEmbed.addFields({
+        name: "Name Updated.",
+        value: `${changesText || "null"}`,
+      });
+      if (changes.length === 0) return;
+      await auditChannel.send({ embeds: [auditEmbed] });
+    }
+
+    if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
+      let oldActions = oldAutoModerationRule.actions.toString();
+      let newActions = newAutoModerationRule.actions.toString();
+      auditEmbed.addFields(
+        {
+          name: "Old Rules:",
+          value: `${oldActions || "none"}`,
+          inline: false,
+        },
+        {
+          name: "New Rules:",
+          value: `${newActions || "none"}`,
+          inline: false,
+        }
+      );
+      if (oldAutoModerationRule.actions === null) return;
+      if (newAutoModerationRule.actions === null) return;
+      await auditChannel.send({ embeds: [auditEmbed] });
+    }
+
+    if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
+      auditEmbed.addFields({
+        name: "Enabled?:",
+        value: `\`${oldAutoModerationRule.enabled || "Unknown"}\`  →  \`${
+          newAutoModerationRule.enabled || "Unknown"
+        }\``,
+        inline: false,
+      });
+      if (oldAutoModerationRule.enabled === null) return;
+      if (newAutoModerationRule.enabled === null) return;
+      await auditChannel.send({ embeds: [auditEmbed] });
+    }
+  }
+);
+// ------------------------------------------------------------------------ Thread logs
+client.on(Events.ThreadCreate, async (thread) => {
+  const data = await Audit_Log.findOne({
+    Guild: thread.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Thread Created")
+    .addFields(
+      {
+        name: "Name:",
+        value: `${thread.name}`,
+        inline: false,
+      },
+      {
+        name: "Creator:",
+        value: `${thread.ownerId || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Channel:",
+        value: `${thread.parent || "none"}`,
+        inline: false,
+      },
+      {
+        name: "Link:",
+        value: `<#${thread.id}>`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${thread.id}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.ThreadDelete, async (thread) => {
+  const data = await Audit_Log.findOne({
+    Guild: thread.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle("Thread Deleted")
+    .addFields(
+      {
+        name: "Name:",
+        value: `${thread.name}`,
+        inline: false,
+      },
+      {
+        name: "Creator:",
+        value: `${thread.ownerId || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Channel:",
+        value: `${thread.parent || "none"}`,
+        inline: false,
+      },
+      {
+        name: "Link:",
+        value: `<#${thread.id}>`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${thread.id}`,
+        inline: false,
+      }
+    );
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
+  const data = await Audit_Log.findOne({
+    Guild: oldThread.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+
+  const auditChannel = client.channels.cache.get(logID);
+  const changes = [];
+
+  if (oldThread.name !== newThread.name) {
+    changes.push(`Name: \`${oldThread.name}\` → \`${newThread.name}\``);
+  }
+
+  if (oldThread.archived !== newThread.archived) {
+    changes.push(
+      `Archived?: \`${oldThread.archived || "None"}\` → \`${
+        newThread.archived || "None"
+      }\``
+    );
+  }
+  if (oldThread.locked !== newThread.locked) {
+    changes.push(
+      `Locked?: \`${oldThread.locked || "None"}\` → \`${
+        newThread.locked || "None"
+      }\``
+    );
+  }
+
+  if (changes.length === 0) return;
+  const changesText = changes.join("\n");
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .addFields(
+      {
+        name: "Creator:",
+        value: `${newThread.ownerId || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Channel:",
+        value: `${newThread.parent || "unknown"}`,
+        inline: false,
+      },
+      {
+        name: "Link:",
+        value: `<#${newThread.id}>`,
+        inline: false,
+      },
+      {
+        name: "Changes:",
+        value: `${changesText}`,
+        inline: false,
+      },
+      {
+        name: "ID:",
+        value: `${newThread.id}`,
+        inline: false,
+      }
+    )
+    .setTitle("Thread Edited")
+    .setFooter({ text: "FKZ Log System" });
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+// ------------------------------------------------------------------------ member logs, invite join logs
+const invites = new Collection();
+const wait = require("timers/promises").setTimeout;
+client.on("ready", async () => {
+  await wait(2000);
+
+  client.guilds.cache.forEach(async (guild) => {
+    const clientMember = guild.members.cache.get(client.user.id);
+
+    if (!clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild))
+      return;
+
+    const firstInvites = await guild.invites.fetch().catch((err) => {
+      console.log(err);
+    });
+
+    invites.set(
+      guild.id,
+      new Collection(firstInvites.map((invite) => [invite.code, invite.uses]))
+    );
+  });
+
+  client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
+    const data = await Audit_Log.findOne({
+      Guild: oldMember.guild.id,
+    });
+    let logID;
+    if (data) {
+      logID = data.Channel;
+    } else {
+      return;
+    }
+
+    const logschatID = await client.channels.fetch(process.env.logschatID);
+
+    if (oldMember.user.bot || newMember.user.bot) return;
+    if (oldMember.user.system || newMember.user.system) return;
+    if (oldMember.partial) console.log("oldMember = partial");
+
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated")
+      .addFields({
+        name: "User:",
+        value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+        inline: false,
+      });
+
+    const auditChannel = client.channels.cache.get(logID);
+    if (auditChannel === undefined)
+      return console.log("undefined?", auditChannel);
+    const auditChannel2 = client.channels.cache.get(logschatID);
+    if (auditChannel2 === undefined)
+      return console.log("undefined? 2", auditChannel2);
+
+    if (oldMember.nickname !== newMember.nickname) {
+      oldMember.fetch().then(async (fullOldMember) => {
+        const fullOldNickName = fullOldMember.nickname;
+        auditEmbed.addFields({
+          name: `Nickname Updated`,
+          value: `DisplayName: \`${
+            fullOldNickName || oldMember.nickname || "none"
+          }\`  →  \`${newMember.nickname || "none"}\``,
+          inline: false,
+        });
+        if (fullOldNickName || oldMember.nickname === null)
+          return console.log("mem nickname null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+
+    if (oldMember.displayName !== newMember.displayName) {
+      oldMember.fetch().then(async (fullOldMember) => {
+        const fullOldDisplayName = fullOldMember.displayName;
+        auditEmbed.addFields({
+          name: `Nickname or Displayname Updated`,
+          value: `DisplayName: \`${
+            fullOldDisplayName || oldMember.displayName || "none"
+          }\`  →  \`${newMember.displayName || "none"}\``,
+          inline: false,
+        });
+        if (fullOldDisplayName || oldMember.displayName === null)
+          return console.log("mem displayname null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+
+    if (oldMember.user.username !== newMember.user.username) {
+      oldMember.fetch().then(async (fullOldMember) => {
+        const fullOldUsername = fullOldMember.user.username;
+        auditEmbed.addFields({
+          name: `Username Updated`,
+          value: `Name: \`${
+            fullOldUsername || oldMember.user.username || "none"
+          }\`  →  \`${newMember.user.username || "none"}\``,
+          inline: false,
+        });
+        if (fullOldUsername || oldMember.user.username === null)
+          return console.log("mem username null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+
+    if (oldMember.avatar !== newMember.avatar) {
+      oldMember.fetch().then(async (fullOldMember) => {
+        const fullOldPfp = fullOldMember.avatarURL({ size: 512 });
+        const oldPfp = oldMember.avatarURL({ size: 512 });
+        const pfp = newMember.avatarURL({ size: 64 });
+        auditEmbed.setImage(`${pfp}`).addFields({
+          name: `Profile picture updated`,
+          value: `[Old Pfp](<${
+            fullOldPfp || oldPfp
+          }>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`,
+          inline: false,
+        });
+        if (newMember.avatar === null) return console.log("mem avatar = null");
+        if (fullOldPfp && oldPfp === null)
+          return console.log("mem avatar old null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+
+    if (oldMember.user.avatar !== newMember.user.avatar) {
+      oldMember.fetch().then(async (fullOldMember) => {
+        const fullOldUserPfp = fullOldMember.user.avatarURL({ size: 512 });
+        const oldUserPfp = oldMember.user.avatarURL({ size: 512 });
+        const UserPfp = newMember.avatarURL({ size: 64 });
+        auditEmbed.setImage(`${UserPfp}`).addFields({
+          name: `Profile picture updated`,
+          value: `[Old Pfp](<${
+            fullOldUserPfp || oldUserPfp
+          }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`,
+          inline: false,
+        });
+        if (newMember.user.avatar === null)
+          return console.log("memusr avatar = null");
+        if (fullOldUserPfp && oldUserPfp === null)
+          return console.log("memusr avatar old null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+
+    if (oldMember.user.banner !== newMember.user.banner) {
+      oldMember.fetch().then(async (fullOldMember) => {
+        const fullOldBanner = fullOldMember.user.bannerURL({ size: 512 });
+        const oldBanner = oldMember.user.bannerURL({ size: 512 });
+        const Banner = newMember.user.bannerURL({ size: 64 });
+        auditEmbed.setImage(`${Banner}`).addFields({
+          name: `Banner updated`,
+          value: `[Old Banner](<${
+            fullOldBanner || oldBanner
+          }>)  →  [New Banner](<${newMember.user.bannerURL({ size: 512 })}>)`,
+          inline: false,
+        });
+        if (newMember.user.banner === null)
+          return console.log("memusr banner = null");
+        if (fullOldBanner && oldBanner === null)
+          return console.log("memusr banner old null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+  });
+  client.on(Events.UserUpdate, async (oldUser, newUser) => {
+    const logGuild = await client.guilds.fetch(process.env.guildID);
+    const data = await Audit_Log.findOne({ Guild: logGuild }); // can't fetch guild this way?
+    let logID;
+    if (data) {
+      logID = data.Channel;
+    } else {
+      return;
+    }
+    if (oldUser.bot || newUser.bot) return;
+    if (oldUser.system || newUser.system) return;
+    if (oldUser.partial) console.log("oldUser = partial");
+
+    // const data = process.env.guildID; // gettin guild this way means it only works on FKZ
+
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("User Updated")
+      .addFields({
+        name: "User:",
+        value: `<@${newUser.id}> - ${newUser.username}`,
+        inline: false,
+      });
+
+    const logschatID = await client.channels.fetch(process.env.logschatID);
+
+    const auditChannel = client.channels.cache.get(logID);
+    if (auditChannel === undefined) console.log("usr ndefined?", auditChannel);
+    const auditChannel2 = client.channels.cache.get(logschatID);
+    if (auditChannel === undefined)
+      console.log("usr undefined? 2", auditChannel2);
+
+    if (oldUser.username !== newUser.username) {
+      oldUser.fetch().then(async (fullOldUser) => {
+        const fullOldUsername = fullOldUser.username;
+        auditEmbed.addFields({
+          name: `Username Updated`,
+          value: `Name: \`${
+            fullOldUsername || oldUser.username || "none"
+          }\`  →  \`${newUser.username || "none"}\``,
+          inline: false,
+        });
+        if (newUser.username === null) return console.log("usr username null");
+        if (fullOldUsername || oldUser.username === null)
+          return console.log("usr username old null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+
+    if (oldUser.avatar !== newUser.avatar) {
+      oldUser.fetch().then(async (fullOldUser) => {
+        const fullOldPfp = fullOldUser.avatarURL({ size: 512 });
+        const oldPfp = oldUser.avatarURL({ size: 512 });
+        const UserPfp = newUser.avatarURL({ size: 64 });
+        auditEmbed.setImage(`${UserPfp}`).addFields({
+          name: `Profile picture updated`,
+          value: `[Old Pfp](<${
+            fullOldPfp || oldPfp
+          }>)  →  [New Pfp](<${newUser.avatarURL({ size: 512 })}>)`,
+          inline: false,
+        });
+        if (newUser.avatar === null) return console.log("usr avatar = null");
+        if (newUser.avatar === undefined)
+          return console.log("avatar = undefined");
+        if (fullOldPfp && oldPfp === null)
+          return console.log("usr avatar old = null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+
+    if (oldUser.banner !== newUser.banner) {
+      oldUser.fetch().then(async (fullOldUser) => {
+        const fullOldBanner = fullOldUser.bannerURL({ size: 512 });
+        const oldBanner = oldUser.bannerURL({ size: 512 });
+        const Banner = newUser.bannerURL({ size: 64 });
+        auditEmbed.setImage(`${Banner}`).addFields({
+          name: `Banner updated`,
+          value: `[Old Banner](<${
+            fullOldBanner || oldBanner
+          }>)  →  [New Banner](<${newUser.bannerURL({ size: 512 })}>)`,
+          inline: false,
+        });
+        if (newUser.banner === null) return console.log("banner = null");
+        if (newUser.banner === undefined)
+          return console.log("banner = undefined");
+        if (fullOldBanner && oldBanner === null)
+          return console.log("usr banner old = null");
+        // await auditChannel.send({ embeds: [auditEmbed] });
+        await auditChannel2.send({ embeds: [auditEmbed] });
+      });
+    }
+  });
+});
+client.on(Events.GuildMemberAdd, async (member) => {
+  const data = await Audit_Log.findOne({
+    Guild: member.guild.id,
+  });
+
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+
+  const newInvites = await member.guild.invites.fetch();
+  const oldInvites = invites.get(member.guild.id);
+
+  const invite = newInvites.find((i) => i.uses > oldInvites.get(i.code));
+
+  const auditChannel = client.channels.cache.get(logID);
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle(`${member.user.username} Has Joined the Server!`)
+    .setAuthor({ name: `Member Joined` })
+    .setImage("https://femboy.kz/images/wide.png")
+    .setFooter({ text: "FKZ Log System" });
+
+  if (!invite) {
+    auditEmbed.setDescription(
+      `<@${member.user.id}> joined the server using an \`unknown invite\`. This could mean they used a vanity invite link if the server has one.`
+    );
+    return await auditChannel.send({ embeds: [auditEmbed] });
+  }
+
+  const inviter = await client.users.fetch(invite.inviter.id);
+
+  const auditEmbed2 = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle(`${member.user.username} Has Joined the Server!`)
+    .setDescription(
+      `<@${member.user.id}> Joined the server using the invite: \`${invite.code}\` Which was created by: ${inviter.tag}.\nThe invite has been used \`${invite.uses}\` times since it was created.`
+    )
+    .setAuthor({ name: `Member Joined` })
+    .setImage("https://femboy.kz/images/wide.png")
+    .setFooter({ text: "FKZ Log System" });
+
+  const auditEmbed3 = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle(`${member.user.username} Has Joined the Server!`)
+    .setDescription(
+      `<@${member.user.id}> Joined the server, but the invite used cannot be found. `
+    )
+    .setAuthor({ name: `Member Joined` })
+    .setImage("https://femboy.kz/images/wide.png")
+    .setFooter({ text: "FKZ Log System" });
+
+  inviter
+    ? auditChannel.send({ embeds: [auditEmbed2] })
+    : auditChannel.send({ embeds: [auditEmbed3] });
+});
+client.on(Events.GuildMemberRemove, async (member) => {
+  const data = await Audit_Log.findOne({
+    Guild: member.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+  const auditChannel = client.channels.cache.get(logID);
+
+  const auditEmbed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setAuthor({ name: `Member Left` })
+    .setFooter({ text: "FKZ Log System" })
+    .setTitle(`${member.user.username} has left the server`)
+    .setDescription(`${member} has left the Server`);
+  await auditChannel.send({ embeds: [auditEmbed] });
+});
+client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
+  const data = await Audit_Log.findOne({
+    Guild: oldMember.guild.id,
+  });
+  let logID;
+  if (data) {
+    logID = data.Channel;
+  } else {
+    return;
+  }
+
+  if (oldMember.user.bot || newMember.user.bot) return;
+  if (oldMember.user.system || newMember.user.system) return;
+  if (oldMember.partial) console.log("oldMember = partial");
+
+  try {
+    const auditEmbed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: "FKZ Log System" })
+      .setTitle("Member Updated");
+
+    const auditChannel = client.channels.cache.get(logID);
+
+    if (oldMember.roles.cache.size > newMember.roles.cache.size) {
+      oldMember.roles.cache.forEach((role) => {
+        if (!newMember.roles.cache.has(role.id)) {
+          auditEmbed.addFields(
+            {
+              name: "Role Removed: ",
+              value: `${role}`,
+              inline: false,
+            },
+            {
+              name: "User:",
+              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              inline: false,
+            }
+          );
+          auditChannel.send({ embeds: [auditEmbed] });
+        }
+      });
+    }
+    if (oldMember.roles.cache.size < newMember.roles.cache.size) {
+      newMember.roles.cache.forEach((role) => {
+        if (!oldMember.roles.cache.has(role.id)) {
+          auditEmbed.addFields(
+            {
+              name: "Role Added: ",
+              value: `${role}`,
+              inline: false,
+            },
+            {
+              name: "User:",
+              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              inline: false,
+            }
+          );
+          auditChannel.send({ embeds: [auditEmbed] });
+        }
+      });
+    }
+  } catch (err) {
+    console.log("my balls", err);
+  }
+});
+
+// ------------------------------------------------------------------------ AUTOROLE
+const autorole = require("./Schemas.js/autorole");
+const { escape } = require("querystring");
+
+client.on(Events.GuildMemberAdd, async (member) => {
+  // only supports 1 role through command lol, added extra ones here lol #3
+  const data = await autorole.findOne({ Guild: member.guild.id });
+  const rol = process.env.autoroleID1;
+  const rol2 = process.env.autoroleID2;
+  if (!data) return;
+  else {
+    try {
+      await member.roles.add(data.Role);
+      await member.roles.add(rol);
+      await member.roles.add(rol2);
+    } catch (e) {
+      return;
+    }
   }
 });
