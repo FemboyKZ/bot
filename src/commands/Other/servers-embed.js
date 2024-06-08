@@ -36,6 +36,9 @@ module.exports = {
     const csgoWLna = "nawl.femboy.kz:28455";
     const csgo64na = "na64.femboy.kz:27945";
 
+    const cscl128eu = "classic.femboy.kz:27099";
+    const cscl64eu = "classic.femboy.kz:27093";
+
     const cs2WLeu = "euwl.femboy.kz";
     const cs2KZeu = "eu1.femboy.kz:27016";
     const cs2MVeu = "eu2.femboy.kz:27017";
@@ -101,6 +104,34 @@ module.exports = {
           inline: true,
         },
       ]);
+
+    const embedCSCL = new EmbedBuilder()
+      .setTitle("**ClassicCounter Servers**")
+      .setColor("#ff00b3")
+      .setImage("https://femboy.kz/images/wide.png")
+      .addFields([
+        {
+          name: "CC Whitelist Servers",
+          value: "** **",
+          inline: false,
+        },
+        {
+          name: ":flag_eu:  **128t VNL**",
+          value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128eu}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **64t VNL**",
+          value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64eu}>)`,
+          inline: true,
+        },
+      ]);
+
     const embedCS2 = new EmbedBuilder()
       .setTitle("**CS2 Servers**")
       .setColor("#ff00b3")
@@ -167,8 +198,9 @@ module.exports = {
           inline: true,
         },
       ]);
+
     await channel.send({
-      embeds: [embedHeader, embedCSGO, embedCS2],
+      embeds: [embedHeader, embedCSGO, embedCSCL, embedCS2],
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
