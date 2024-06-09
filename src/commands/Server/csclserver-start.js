@@ -3,7 +3,7 @@ const { exec } = require("child_process");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csclserver-restart")
+    .setName("csclserver-start")
     .setDescription("[Admin] Send a start command to a ClassicCounter server")
     .addStringOption((option) =>
       option
