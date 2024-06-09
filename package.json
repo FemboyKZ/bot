@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
-    "mongoose": "^6.0.12",
+    "mongoose": "^8.4.1",
     "undici": "^5.28.4"
   },
   "name": "another-fucking-bot",
