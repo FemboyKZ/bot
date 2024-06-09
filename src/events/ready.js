@@ -11,14 +11,15 @@ module.exports = {
 
     if (!mongodbURL) return console.log("Setup mongodbURL in .env");
 
-    await mongoose.connect(mongodbURL || ``, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-      keepAlive: true, // deprecated?
-    });
+    try {
+      await mongoose.connect(mongodbURL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
 
-    if (mongoose.connect) {
       console.log("The MongoDB Database is running.");
+    } catch (error) {
+      console.error("Error connecting to MongoDB:", error);
     }
   },
 };
