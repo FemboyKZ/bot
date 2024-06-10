@@ -1,11 +1,11 @@
-const {
+import {
   SlashCommandBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
-} = require("discord.js");
-const reportSchema = require("../../Schemas.js/reportSchema");
+} from "discord.js";
+import reportSchema from "../../Schemas.js/reportSchema";
 
 var timeout = [];
 

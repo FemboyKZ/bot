@@ -1,9 +1,9 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-} = require("discord.js");
-const unbanSchema = require("../../Schemas.js/unbanSchema");
+} from "discord.js";
+import unbanSchema from "../../Schemas.js/unbanSchema";
 
 module.exports = {
   data: new SlashCommandBuilder()

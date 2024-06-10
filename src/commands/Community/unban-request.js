@@ -1,11 +1,11 @@
-const {
+import {
   SlashCommandBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
-} = require("discord.js");
-const unbanSchema = require("../../Schemas.js/unbanSchema");
+} from "discord.js";
+import unbanSchema from "../../Schemas.js/unbanSchema";
 
 var timeout = [];
 

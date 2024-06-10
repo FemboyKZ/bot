@@ -1,19 +1,19 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
   ChannelType,
-} = require("discord.js");
-const unbanSchema = require("../../Schemas.js/unbanSchema");
+} from "discord.js";
+import whitelistSchema from "../../Schemas.js/whitelistSchema";
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("unban-setup")
-    .setDescription("[Admin] Setup the unban system")
+    .setName("whitelist-setup")
+    .setDescription("[Admin] Setup the whitelist system")
     .addChannelOption((option) =>
       option
         .setName("channel")
-        .setDescription(`The channel for unbans`)
+        .setDescription(`The channel`)
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
     ),
@@ -29,27 +29,27 @@ module.exports = {
       });
 
     const { channel, guildId, options } = interaction;
-    const unbanChannel = options.getChannel("channel");
+    const wlChannel = options.getChannel("channel");
 
     const embed = new EmbedBuilder();
 
-    unbanSchema.findOne({ Guild: guildId }, async (err, data) => {
+    whitelistSchema.findOne({ Guild: guildId }, async (err, data) => {
       if (!data) {
-        await unbanSchema.create({
+        await whitelistSchema.create({
           Guild: guildId,
-          Channel: unbanChannel.id,
+          Channel: wlChannel.id,
         });
 
         embed
           .setColor("#ff00b3")
           .setDescription(
-            `All submitted unban requests will be sent in ${unbanChannel}`
+            `All submitted wl requests will be sent in ${wlChannel}`
           );
       } else if (data) {
-        const d = client.channels.cache.get(data.channel);
+        const c = client.channels.cache.get(data.channel);
         embed
           .setColor("#ff00b3")
-          .setDescription(`Your unban channel has already been set to ${d}`);
+          .setDescription(`Your wl channel has already been set to ${c}`);
       }
 
       return await interaction.reply({ embeds: [embed] });

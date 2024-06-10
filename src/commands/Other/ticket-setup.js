@@ -1,12 +1,12 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
   ChannelType,
   ActionRowBuilder,
   StringSelectMenuBuilder,
-} = require("discord.js");
-const ticketSchema = require("../../Schemas.js/ticketSchema");
+} from "discord.js";
+import ticketSchema from "../../Schemas.js/ticketSchema";
 
 module.exports = {
   data: new SlashCommandBuilder()

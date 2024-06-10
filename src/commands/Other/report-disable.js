@@ -1,14 +1,14 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-} = require("discord.js");
-const whitelistSchema = require("../../Schemas.js/whitelistSchema");
+} from "discord.js";
+import reportSchema from "../../Schemas.js/reportSchema";
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("whitelist-disable")
-    .setDescription("[Admin] Disable the whitelist system"),
+    .setName("report-disable")
+    .setDescription("[Admin] Disable the report/suggestions system"),
   async execute(interaction) {
     if (
       !interaction.member.permissions.has(
@@ -24,10 +24,10 @@ module.exports = {
 
     const embed = new EmbedBuilder();
 
-    whitelistSchema.deleteMany({ Guild: guildId }, async (err, data) => {
+    reportSchema.deleteMany({ Guild: guildId }, async (err, data) => {
       embed
         .setColor("#ff00b3")
-        .setDescription(`The whitelist system has been disabled.`);
+        .setDescription(`The unban system has been disabled.`);
 
       return await interaction.reply({ embeds: [embed] });
     });

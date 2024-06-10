@@ -1,9 +1,9 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-} = require("discord.js");
-const autorole = require("../../Schemas.js/autorole");
+} from "discord.js";
+import autorole from "../../Schemas.js/autorole";
 
 const already = new EmbedBuilder()
   .setColor("#ff00b3")

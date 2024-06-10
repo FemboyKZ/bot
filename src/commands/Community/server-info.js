@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -6,8 +6,11 @@ module.exports = {
     .setDescription("Displays current server info"),
 
   async execute(interaction) {
-    const { guild } = interaction;
-    const { members } = guild;
+    if (!interaction || !interaction.guild) {
+      throw new Error("Missing required parameters");
+    }
+
+    const guild = interaction.guild;
     const { name, ownerId, createdTimestamp, memberCount } = guild;
     const icon =
       guild.iconURL() || "https://femboy.kz/images/discord-logo-7-11.png";
@@ -16,29 +19,43 @@ module.exports = {
     const id = guild.id;
     const channels = guild.channels.cache.size;
 
-    let baseVerification = guild.VerificationLevel;
+    let baseVerification = guild.verificationLevel;
 
-    if (baseVerification == 0) baseVerification = "None";
-    if (baseVerification == 1) baseVerification = "Low";
-    if (baseVerification == 2) baseVerification = "Medium";
-    if (baseVerification == 3) baseVerification = "High";
-    if (baseVerification == 4) baseVerification = "Very High";
+    switch (baseVerification) {
+      case "NONE":
+        baseVerification = "None";
+        break;
+      case "LOW":
+        baseVerification = "Low";
+        break;
+      case "MEDIUM":
+        baseVerification = "Medium";
+        break;
+      case "HIGH":
+        baseVerification = "High";
+        break;
+      case "VERY_HIGH":
+        baseVerification = "Very High";
+        break;
+      default:
+        baseVerification = "Unknown";
+    }
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setThumbnail(icon)
-      .setAuthor({ name: name, iconURL: icon })
+      .setAuthor({ name, iconURL: icon })
       .setFooter({ text: `ServerID: ${id}` })
       .setTimestamp()
       .addFields([
         {
           name: "Server Name",
-          value: `${name}`,
+          value: name,
           inline: false,
         },
         {
           name: "Date Created",
-          value: `<t:${parseInt(createdTimestamp / 1000)}:R>`,
+          value: `<t:${Math.floor(createdTimestamp / 1000)}:R>`,
           inline: true,
         },
         {
@@ -48,32 +65,32 @@ module.exports = {
         },
         {
           name: "Member Count",
-          value: `${memberCount}`,
+          value: String(memberCount),
           inline: true,
         },
         {
           name: "Role Count",
-          value: `${roles}`,
+          value: String(roles),
           inline: true,
         },
         {
           name: "Emoji Count",
-          value: `${emojis}`,
+          value: String(emojis),
           inline: true,
         },
         {
           name: "Verification Level",
-          value: `${baseVerification}`,
+          value: baseVerification,
           inline: true,
         },
         {
           name: "Server Boost Count",
-          value: `${guild.premiumSubscriptionCount}`,
+          value: String(guild.premiumSubscriptionCount),
           inline: true,
         },
         {
           name: "Channel Count",
-          value: `${channels}`,
+          value: String(channels),
           inline: true,
         },
       ]);

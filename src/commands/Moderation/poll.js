@@ -1,9 +1,9 @@
-const {
+import {
   EmbedBuilder,
   SlashCommandBuilder,
   PermissionsBitField,
   ChannelType,
-} = require("discord.js");
+} from "discord.js";
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("poll")

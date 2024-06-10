@@ -1,9 +1,9 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ChannelType,
   PermissionsBitField,
-} = require("discord.js");
+} from "discord.js";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -30,7 +30,7 @@ module.exports = {
 
     const channel = interaction.options.getChannel("channel");
 
-    const embed1 = new EmbedBuilder()
+    const embedInfo = new EmbedBuilder()
       .setTitle("**FKZ Minecraft Info**")
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
@@ -38,7 +38,7 @@ module.exports = {
         "> FemboyKZ has its own Minecraft server! Its mainly a survival server to build cool stuff as a community, but we could do other things on it in the future."
       );
 
-    const embed2 = new EmbedBuilder()
+    const embedWhitelist = new EmbedBuilder()
       .setTitle("**FKZ Minecraft Whitelist**")
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
@@ -54,7 +54,7 @@ module.exports = {
       ]);
 
     await channel.send({
-      embeds: [embed1, embed2],
+      embeds: [embedInfo, embedWhitelist],
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,

@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
-const ticketSchema = require("../../Schemas.js/ticketSchema");
+import { SlashCommandBuilder, PermissionsBitField } from "discord.js";
+import ticketSchema from "../../Schemas.js/ticketSchema";
 
 module.exports = {
   data: new SlashCommandBuilder()

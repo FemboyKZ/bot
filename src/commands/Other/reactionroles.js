@@ -1,9 +1,9 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-} = require("discord.js");
-const reaction = require("../../Schemas.js/reactionrs");
+} from "discord.js";
+import reaction from "../../Schemas.js/reactionrs";
 
 module.exports = {
   data: new SlashCommandBuilder()

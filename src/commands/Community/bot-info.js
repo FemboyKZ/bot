@@ -1,10 +1,10 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-} = require("discord.js");
+} from "discord.js";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,8 +12,20 @@ module.exports = {
     .setDescription("Displays current bot status and info"),
 
   async execute(interaction, client) {
+    if (!interaction || !client) {
+      throw new Error("Missing required parameters");
+    }
+
     const name = "Femboy KZ#7476";
-    const icon = `${client.user.displayAvatarURL()}`;
+    const user = client.user;
+    if (!user) {
+      throw new Error("User is not defined");
+    }
+    const icon = user.displayAvatarURL();
+    if (!icon) {
+      throw new Error("Icon is not defined");
+    }
+
     let servercount = await client.guilds.cache.reduce(
       (a, b) => a + b.memberCount,
       0
@@ -45,7 +57,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
-      .setThumbnail(`${icon}`)
+      .setThumbnail(icon)
       .setAuthor({ name: name, iconURL: icon })
       .setFooter({ text: `BotID: 935848758430793809` })
       .setTimestamp()

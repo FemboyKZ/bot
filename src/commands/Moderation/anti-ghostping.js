@@ -1,10 +1,10 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-} = require("discord.js");
-const ghostSchema = require("../../Schemas.js/ghostpingSchema");
-const numSchema = require("../../Schemas.js/ghostnumSchema");
+} from "discord.js";
+import ghostSchema from "../../Schemas.js/ghostpingSchema";
+import numSchema from "../../Schemas.js/ghostnumSchema";
 
 module.exports = {
   data: new SlashCommandBuilder()

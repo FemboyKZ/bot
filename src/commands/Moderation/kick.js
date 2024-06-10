@@ -1,8 +1,8 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
-} = require("discord.js");
+} from "discord.js";
 
 module.exports = {
   data: new SlashCommandBuilder()

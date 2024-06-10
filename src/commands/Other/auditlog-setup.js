@@ -1,10 +1,9 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
-  Embed,
-} = require("discord.js");
-const Schema = require("../../Schemas.js/auditlog");
+} from "discord.js";
+import Schema from "../../Schemas.js/auditlog";
 
 module.exports = {
   data: new SlashCommandBuilder()

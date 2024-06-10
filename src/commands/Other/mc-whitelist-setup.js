@@ -1,10 +1,10 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionsBitField,
   ChannelType,
-} = require("discord.js");
-const mcWhitelistSchema = require("../../Schemas.js/mcWhitelistSchema");
+} from "discord.js";
+import mcWhitelistSchema from "../../Schemas.js/mcWhitelistSchema";
 
 module.exports = {
   data: new SlashCommandBuilder()

@@ -1,9 +1,9 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ChannelType,
   PermissionsBitField,
-} = require("discord.js");
+} from "discord.js";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -29,17 +29,17 @@ module.exports = {
       });
     const channel = interaction.options.getChannel("channel");
 
-    const embed1 = new EmbedBuilder()
+    const embedBanner = new EmbedBuilder()
       .setTitle("**FKZ Roles**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/rolls.png");
-    const embed12 = new EmbedBuilder()
+    const embedInfo = new EmbedBuilder()
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
       .setDescription(
         "All the roles that affect the members on the Discord server and what they do. (*Excluding self-roles!*)\n\nRoles marked with [*AutoRole*] are the default roles given to members automatically by bots once they have accepted the server rules.\n\nCheck out our self-roles, these are roles which can be removed/added by members themselves below, by reacting to the messages with the predetermined reacts.\n\nSome members have also been granted personal roles which are not listed here, do not ask for one."
       );
-    const embed2 = new EmbedBuilder()
+    const embedStaff = new EmbedBuilder()
       .setTitle("**Staff Roles**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
@@ -65,7 +65,7 @@ module.exports = {
           inline: false,
         },
       ]);
-    const embed3 = new EmbedBuilder()
+    const embedSupport = new EmbedBuilder()
       .setTitle("**Supporter Roles**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
@@ -81,7 +81,7 @@ module.exports = {
           inline: true,
         },
       ]);
-    const embed4 = new EmbedBuilder()
+    const embedMember = new EmbedBuilder()
       .setTitle("**Member Roles**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
@@ -97,7 +97,7 @@ module.exports = {
           inline: true,
         },
       ]);
-    const embed5 = new EmbedBuilder()
+    const embedSpecial = new EmbedBuilder()
       .setTitle("**Special Roles**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
@@ -113,7 +113,7 @@ module.exports = {
           inline: true,
         },
       ]);
-    const embed6 = new EmbedBuilder()
+    const embedOld = new EmbedBuilder()
       .setTitle("**Old & Removed Roles**")
       .setColor("#ff00b3")
       .setImage("https://femboy.kz/images/wide.png")
@@ -141,7 +141,15 @@ module.exports = {
       ]);
 
     await channel.send({
-      embeds: [embed1, embed12, embed2, embed3, embed4, embed5, embed6],
+      embeds: [
+        embedBanner,
+        embedInfo,
+        embedStaff,
+        embedSupport,
+        embedMember,
+        embedSpecial,
+        embedOld,
+      ],
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
