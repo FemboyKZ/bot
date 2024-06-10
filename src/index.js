@@ -1,20 +1,21 @@
-import { 
-  Client, 
-  GatewayIntentBits, 
-  Partials, 
-  EmbedBuilder, 
-  PermissionsBitField, 
-  Collection, 
-  Events, 
-  ActionRowBuilder, 
-  ButtonBuilder, 
-  ButtonStyle, 
-  ModalBuilder, 
-  TextInputBuilder, 
-  TextInputStyle, 
-  ChannelType 
-} from `discord.js`;
-import fs, { readdirSync, readFileSync, writeFileSync } from "fs";
+const {
+  Client,
+  GatewayIntentBits,
+  Partials,
+  EmbedBuilder,
+  PermissionsBitField,
+  Collection,
+  Events,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  ChannelType,
+} = require("discord.js");
+const { readdirSync, readFileSync, writeFileSync } = require("fs");
+const fs = require("fs");
 const client = new Client({
   intents: [
     GatewayIntentBits.AutoModerationConfiguration,
@@ -52,15 +53,17 @@ client.commands = new Collection();
 
 require("dotenv").config();
 
-const functions = readdirSync("./src/functions")
+const functions = fs
+  .readdirSync("./src/functions")
   .filter((file) => file.endsWith(".js"));
-const eventFiles = readdirSync("./src/events")
+const eventFiles = fs
+  .readdirSync("./src/events")
   .filter((file) => file.endsWith(".js"));
-const commandFolders = readdirSync("./src/commands");
+const commandFolders = fs.readdirSync("./src/commands");
 
 // anticrash
-import { on, env } from "node:process";
-on("unhandledRejection", (reason, promise) => {
+const process = require("node:process");
+process.on("unhandledRejection", (reason, promise) => {
   console.log("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
@@ -70,27 +73,23 @@ on("unhandledRejection", (reason, promise) => {
   }
   client.handleEvents(eventFiles, "./src/events");
   client.handleCommands(commandFolders, "./src/commands");
-  client.login(env.token);
+  client.login(process.env.token);
 })();
 
 // console logging
-const logStream = fs.createWriteStream('../logs/console.txt', { flags: 'a' });
+/*
+const logStream = fs.createWriteStream("./logs/console.txt", { flags: "a" });
 const originalLog = console.log;
-console.log = function() {
+console.log = function () {
   logStream.write(`${new Date().toISOString()} - `);
-  logStream.write(Array.from(arguments).join(' ') + '\n');
+  logStream.write(Array.from(arguments).join(" ") + "\n");
 
   originalLog.apply(console, arguments);
 };
-
-
-// anti-ghostping, not used
-import ghostSchema from "./Schemas.js/ghostpingSchema";
-import numSchema from "./Schemas.js/ghostnumSchema";
-
+*/
 
 // Ticket system
-import ticketSchema from "./Schemas.js/ticketSchema";
+const ticketSchema = require("./Schemas.js/ticketSchema");
 
 // ticket modal create
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -266,10 +265,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // CS:GO & Mc whitelist request commands, unban request command, report command
-import whitelistSchema from "./Schemas.js/whitelistSchema";
-import mcWhitelistSchema from "./Schemas.js/mcWhitelistSchema";
-import unbanSchema from "./Schemas.js/unbanSchema";
-import reportSchema from "./Schemas.js/reportSchema";
+const whitelistSchema = require("./Schemas.js/whitelistSchema");
+const mcWhitelistSchema = require("./Schemas.js/mcWhitelistSchema");
+const unbanSchema = require("./Schemas.js/unbanSchema");
+const reportSchema = require("./Schemas.js/reportSchema");
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isModalSubmit()) return;
@@ -516,7 +515,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // antilink system
-import linkSchema from "./Schemas.js/linkSchema";
+const linkSchema = require("./Schemas.js/linkSchema");
 
 client.on(Events.MessageCreate, async (message) => {
   if (
@@ -549,20 +548,25 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 // ------------------------------------------------------------------------ guild scraper
-const guild = await client.guilds.cache.get('858419058135662622'); // fkz
-const members = await guild.members.fetch();
+async () => {
+  const guild = await client.guilds.cache.get("858419058135662622"); // fkz
+  const members = await guild.members.fetch();
 
-members.forEach(async (member) => {
-  const data = await Audit_Log.findOne({ Guild: guild.id, Member: member.id });
+  members.forEach(async (member) => {
+    const data = await Audit_Log.findOne({
+      Guild: guild.id,
+      Member: member.id,
+    });
 
-  if (data) {
-    // Member already exists in the audit log, update it
-    await data.updateOne({ Member: member.id });
-  } else {
-    // Member does not exist in the audit log, create a new entry
-    await Audit_Log.create({ Guild: guild.id, Member: member.id });
-  }
-});
+    if (data) {
+      // Member already exists in the audit log, update it
+      await data.updateOne({ Member: member.id });
+    } else {
+      // Member does not exist in the audit log, create a new entry
+      await Audit_Log.create({ Guild: guild.id, Member: member.id });
+    }
+  });
+};
 
 // ------------------------------------------------------------------------ interaction logger
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
@@ -570,9 +574,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction) return;
   if (!interaction.isChatInputCommand()) return;
   else {
-    const channel = await client.channels.cache.get(
-      `${env.logschatID}`
-    );
+    const channel = await client.channels.cache.get(`${env.logschatID}`);
     const server = interaction.guild.name;
     const serverID = interaction.guild.id;
     const user = interaction.user.username;
@@ -681,7 +683,7 @@ client.on(Events.GuildDelete, async (guild) => {
 });
 
 // REACTION ROLES //
-import reactions from "./Schemas.js/reactionrs";
+const reactions = require("./Schemas.js/reactionrs");
 
 // reaction add
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -733,7 +735,7 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
 });
 
 // AUDIT LOG //
-import Audit_Log from "./Schemas.js/auditlog";
+const Audit_Log = require("./Schemas.js/auditlog");
 // ------------------------------------------------------------------------ ban logs
 client.on(Events.GuildBanAdd, async (guild, user) => {
   const data = await Audit_Log.findOne({
@@ -1776,7 +1778,7 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
 });
 // ------------------------------------------------------------------------ member logs, invite join logs
 const invites = new Collection();
-import { setTimeout as wait } from "timers/promises";
+const wait = require("timers/promises").setTimeout;
 client.on("ready", async () => {
   await wait(2000);
 
@@ -2194,8 +2196,8 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 });
 
 // ------------------------------------------------------------------------ AUTOROLE
-import autorole from "./Schemas.js/autorole";
-import { escape } from "querystring";
+const autorole = require("./Schemas.js/autorole");
+const { escape } = require("querystring");
 
 client.on(Events.GuildMemberAdd, async (member) => {
   // only supports 1 role through command lol, added extra ones here lol #3

@@ -1,12 +1,12 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
   ChannelType,
   ActionRowBuilder,
   StringSelectMenuBuilder,
-} from "discord.js";
-import ticketSchema from "../../Schemas.js/ticketSchema";
+} = require("discord.js");
+const ticketSchema = require("../../Schemas.js/ticketSchema");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -28,11 +28,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,

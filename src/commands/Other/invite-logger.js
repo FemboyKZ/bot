@@ -1,10 +1,10 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
   ChannelType,
-} from "discord.js";
-import inviteSchema from "../../Schemas.js/inviteSchema";
+} = require("discord.js");
+const inviteSchema = require("../../Schemas.js/inviteSchema");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -28,11 +28,7 @@ module.exports = {
         .setDescription("[Admin] Disable the invite-logger")
     ),
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,

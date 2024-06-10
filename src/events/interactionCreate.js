@@ -1,4 +1,4 @@
-import { Interaction } from "discord.js";
+const { Interaction } = require("discord.js");
 
 module.exports = {
   name: "interactionCreate",

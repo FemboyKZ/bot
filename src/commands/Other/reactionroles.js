@@ -1,9 +1,9 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
-} from "discord.js";
-import reaction from "../../Schemas.js/reactionrs";
+  PermissionFlagsBits,
+} = require("discord.js");
+const reaction = require("../../Schemas.js/reactionrs");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -60,11 +60,7 @@ module.exports = {
       .catch((err) => {
         e = err;
       });
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,

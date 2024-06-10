@@ -1,9 +1,9 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
-} from "discord.js";
-import autorole from "../../Schemas.js/autorole";
+  PermissionFlagsBits,
+} = require("discord.js");
+const autorole = require("../../Schemas.js/autorole");
 
 const already = new EmbedBuilder()
   .setColor("#ff00b3")
@@ -30,11 +30,7 @@ module.exports = {
       .setColor("Green")
       .setDescription(`The Autorole has been set to ${role.name}`);
 
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({ embeds: [noperms], ephemeral: true });
 
     autorole.findOne({ Guild: interaction.guild.id }, async (err, data) => {

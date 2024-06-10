@@ -1,20 +1,16 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
-} from "discord.js";
-import whitelistSchema from "../../Schemas.js/whitelistSchema";
+  PermissionFlagsBits,
+} = require("discord.js");
+const whitelistSchema = require("../../Schemas.js/whitelistSchema");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("whitelist-disable")
     .setDescription("[Admin] Disable the whitelist system"),
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,

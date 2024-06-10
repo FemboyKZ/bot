@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 const mongodbURL = process.env.MONGODBURL;
 
 mongoose.set("strictQuery", false);

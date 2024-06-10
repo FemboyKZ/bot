@@ -1,20 +1,16 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
-} from "discord.js";
-import reportSchema from "../../Schemas.js/reportSchema";
+  PermissionFlagsBits,
+} = require("discord.js");
+const reportSchema = require("../../Schemas.js/reportSchema");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("report-disable")
     .setDescription("[Admin] Disable the report/suggestions system"),
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,

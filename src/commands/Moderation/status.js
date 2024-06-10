@@ -1,8 +1,8 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
-} from "discord.js";
+  PermissionFlagsBits,
+} = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -35,11 +35,7 @@ module.exports = {
     const type = options.getString("type");
     // const url = options.getString('url');
 
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,

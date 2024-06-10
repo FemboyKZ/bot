@@ -1,9 +1,9 @@
-import {
+const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
-} from "discord.js";
-import autorole from "../../Schemas.js/autorole";
+  PermissionFlagsBits,
+} = require("discord.js");
+const autorole = require("../../Schemas.js/autorole");
 
 const disable = new EmbedBuilder()
   .setColor("Green")
@@ -18,11 +18,7 @@ module.exports = {
     .setName("autorole-disable")
     .setDescription("[Admin] Disable the Autorole"),
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({ embeds: [noperms], ephemeral: true });
 
     autorole.deleteMany({ Guild: interaction.guild.id }, async (err, data) => {

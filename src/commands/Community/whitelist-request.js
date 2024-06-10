@@ -1,11 +1,11 @@
-import {
+const {
   SlashCommandBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
-} from "discord.js";
-import whitelistSchema from "../../Schemas.js/whitelistSchema";
+} = require("discord.js");
+const whitelistSchema = require("../../Schemas.js/whitelistSchema");
 
 var timeout = [];
 

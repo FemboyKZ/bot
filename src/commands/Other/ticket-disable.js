@@ -1,16 +1,12 @@
-import { SlashCommandBuilder, PermissionsBitField } from "discord.js";
-import ticketSchema from "../../Schemas.js/ticketSchema";
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const ticketSchema = require("../../Schemas.js/ticketSchema");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("ticket-disable")
     .setDescription("[Admin] Disable the tickets system"),
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    )
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
