@@ -14,7 +14,7 @@ import {
   TextInputStyle, 
   ChannelType 
 } from `discord.js`;
-import { readdirSync } from "fs";
+import fs, { readdirSync, readFileSync, writeFileSync } from "fs";
 const client = new Client({
   intents: [
     GatewayIntentBits.AutoModerationConfiguration,
@@ -72,6 +72,17 @@ on("unhandledRejection", (reason, promise) => {
   client.handleCommands(commandFolders, "./src/commands");
   client.login(env.token);
 })();
+
+// console logging
+const logStream = fs.createWriteStream('../logs/console.txt', { flags: 'a' });
+const originalLog = console.log;
+console.log = function() {
+  logStream.write(`${new Date().toISOString()} - `);
+  logStream.write(Array.from(arguments).join(' ') + '\n');
+
+  originalLog.apply(console, arguments);
+};
+
 
 // anti-ghostping, not used
 import ghostSchema from "./Schemas.js/ghostpingSchema";
@@ -551,7 +562,6 @@ members.forEach(async (member) => {
     // Member does not exist in the audit log, create a new entry
     await Audit_Log.create({ Guild: guild.id, Member: member.id });
   }
-
 });
 
 // ------------------------------------------------------------------------ interaction logger
