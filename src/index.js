@@ -574,7 +574,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction) return;
   if (!interaction.isChatInputCommand()) return;
   else {
-    const channel = await client.channels.cache.get(`${env.logschatID}`);
+    const channel = await client.channels.cache.get(
+      `${process.env.logschatID}`
+    );
     const server = interaction.guild.name;
     const serverID = interaction.guild.id;
     const user = interaction.user.username;
@@ -612,7 +614,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // bot join/leave logger, useless feature
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.GuildCreate, async (guild) => {
-  const channel = await client.channels.cache.get(`${env.logschatID}`);
+  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -647,7 +649,7 @@ client.on(Events.GuildCreate, async (guild) => {
   await channel.send({ embeds: [embed] });
 });
 client.on(Events.GuildDelete, async (guild) => {
-  const channel = await client.channels.cache.get(`${env.logschatID}`);
+  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -1809,7 +1811,7 @@ client.on("ready", async () => {
       return;
     }
 
-    const logschatID = await client.channels.fetch(env.logschatID);
+    const logschatID = await client.channels.fetch(process.env.logschatID);
 
     if (oldMember.user.system || newMember.user.system) return;
     if (oldMember.partial) {
@@ -1948,7 +1950,7 @@ client.on("ready", async () => {
     }
   });
   client.on(Events.UserUpdate, async (oldUser, newUser) => {
-    const logGuild = await client.guilds.fetch(env.guildID);
+    const logGuild = await client.guilds.fetch(process.env.guildID);
     const data = await Audit_Log.findOne({ Guild: logGuild }); // can't fetch guild this way?
     let logID;
     if (data) {
@@ -1973,7 +1975,7 @@ client.on("ready", async () => {
         inline: false,
       });
 
-    const logschatID = await client.channels.fetch(env.logschatID);
+    const logschatID = await client.channels.fetch(process.env.logschatID);
 
     const auditChannel = client.channels.cache.get(logID);
     if (auditChannel === undefined) console.log("usr ndefined?", auditChannel);
@@ -2202,8 +2204,8 @@ const { escape } = require("querystring");
 client.on(Events.GuildMemberAdd, async (member) => {
   // only supports 1 role through command lol, added extra ones here lol #3
   const data = await autorole.findOne({ Guild: member.guild.id });
-  const rol = env.autoroleID1;
-  const rol2 = env.autoroleID2;
+  const rol = process.env.autoroleID1;
+  const rol2 = process.env.autoroleID2;
   if (!data) return;
   else {
     try {
