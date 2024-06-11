@@ -32,7 +32,7 @@ module.exports = {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `/home/${server}/cs2server update`;
+    const command = `sudo -iu ${server} "/home/${server}/cs2server update"`;
 
     try {
       exec(command, (error, stdout, stderr) => {

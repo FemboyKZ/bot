@@ -31,7 +31,7 @@ module.exports = {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `/home/${server}/csgoserver restart`;
+    const command = `sudo -iu ${server} "/home/${server}/csgoserver restart"`;
 
     try {
       exec(command, (error, stdout, stderr) => {
