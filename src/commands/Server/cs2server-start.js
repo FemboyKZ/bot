@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
 
 module.exports = {
@@ -8,7 +8,7 @@ module.exports = {
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to update")
+        .setDescription("Which server do you want to start")
         .setRequired(true)
         .addChoices(
           { name: "CS:2 FKZ 1 - Whitelist", value: "cs2-fkz-1" },
@@ -18,43 +18,45 @@ module.exports = {
         )
     ),
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    ) {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });
-    }
+
+    const wait = require("timers/promises").setTimeout;
 
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} "/home/${server}/cs2server start"`;
+    const command = `sudo -iu ${server} /home/${server}/cs2server start`;
 
     try {
-      exec(command, (error, stdout, stderr) => {
+      await interaction.reply({
+        content: `Starting: ${server}`,
+        ephemeral: true,
+      });
+      exec(command, async (error, stdout, stderr) => {
+        await wait(5000);
         if (error) {
-          return interaction.reply({
+          return await interaction.reply({
             content: `Error: ${error.message}`,
             ephemeral: true,
           });
         }
         if (stderr) {
-          return interaction.reply({
+          return await interaction.reply({
             content: `Stderr: ${stderr}`,
             ephemeral: true,
           });
         }
-        return interaction.reply({
-          content: `Output: ${stdout}`,
+        return await interaction.reply({
+          content: `Started: ${server}`,
           ephemeral: true,
         });
       });
     } catch (error) {
-      interaction.reply({ content: `Error: ${error}`, ephemeral: true });
+      await interaction.reply({ content: `Error: ${error}`, ephemeral: true });
     }
   },
 };
