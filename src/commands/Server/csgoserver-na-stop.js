@@ -20,58 +20,68 @@ module.exports = {
 
   async execute(interaction) {
     const { options } = interaction;
-    const server = options.getString("server");
+    const servers = options.getString("server");
 
-    let serverID;
-    let serverName;
-    switch (server) {
-      case "csgo-fkz-1":
-        serverName = "CS:GO FKZ 1 - Whitelist 128t";
-        serverID = process.env.NA_CSGO_WL_SERVERID;
-        break;
-      case "csgo-fkz-2":
-        serverName = "CS:GO FKZ 2 - Public 64t";
-        serverID = process.env.NA_CSGO_64_SERVERID;
-        break;
-      default:
-        serverName = "Unknown";
-        serverID = "unknown";
-        break;
+    const server = {
+      "csgo-fkz-1": {
+        name: "CS:GO FKZ 1 - Whitelist 128t",
+        id: process.env.NA_CSGO_WL_SERVERID,
+      },
+      "csgo-fkz-2": {
+        name: "CS:GO FKZ 2 - Public 64t",
+        id: process.env.NA_CSGO_64_SERVERID,
+      },
+    }[servers];
+
+    if (!server) {
+      await interaction.reply({
+        content: "Unknown server.",
+        ephemeral: true,
+      });
+      return;
     }
 
+    const { name, id } = server;
+
     if (
-      interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has(`${process.env.CSGO_MANAGER_ROLE}`)
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
+      !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
     ) {
-      try {
-        await interaction.reply({
-          content: `Stopping: ${serverName}`,
-          ephemeral: true,
-        });
-        const response = await axios.post(
-          `https://dathost.net/api/0.1/game-servers/${serverID}/start`,
-          {}
-        );
-        await wait(5000);
-        if (response.status === 200) {
-          await interaction.editReply({
-            content: `Stopped: ${serverName}`,
-            ephemeral: true,
-          });
-        }
-      } catch (error) {
-        if (interaction) {
-          await interaction.editReply({
-            content: `Error: ${error}`,
-            ephemeral: true,
-          });
-        }
-      }
-    } else {
       await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });
+      return;
+    }
+
+    try {
+      await interaction.reply({
+        content: `Stopping: ${name}`,
+        ephemeral: true,
+      });
+      const response = await axios.post(
+        `https://dathost.net/api/0.1/game-servers/${id}/start`,
+        {}
+      );
+      await wait(5000);
+      if (response.status === 200) {
+        await interaction.editReply({
+          content: `Stopped: ${name}`,
+          ephemeral: true,
+        });
+      } else {
+        await interaction.editReply({
+          content: `Error: ${response.data}`,
+          ephemeral: true,
+        });
+      }
+    } catch (error) {
+      if (interaction) {
+        await interaction.editReply({
+          content: `Error: ${error}`,
+          ephemeral: true,
+        });
+      }
     }
   },
 };
