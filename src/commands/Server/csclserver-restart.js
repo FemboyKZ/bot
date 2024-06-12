@@ -30,32 +30,50 @@ module.exports = {
 
     const command = `sudo -iu ${server} /home/${server}/csgoserver restart`;
 
+    let serverName = server;
+    switch (serverName) {
+      case "cscl-fkz-1":
+        serverName = "CS:CL FKZ 1 - VNL 128t";
+        break;
+      case "cscl-fkz-2":
+        serverName = "CS:CL FKZ 2 - VNL 64t";
+        break;
+      default:
+        serverName = "Unknown";
+    }
+
     try {
       await interaction.reply({
-        content: `Restarting: ${server}`,
+        content: `Restarting: ${serverName}`,
         ephemeral: true,
       });
       exec(command, async (error, stdout, stderr) => {
         await wait(5000);
+        if (!interaction) return;
         if (error) {
-          return await interaction.reply({
+          return await interaction.editReply({
             content: `Error: ${error.message}`,
             ephemeral: true,
           });
         }
         if (stderr) {
-          return await interaction.reply({
+          return await interaction.editReply({
             content: `Stderr: ${stderr}`,
             ephemeral: true,
           });
         }
-        return await interaction.reply({
-          content: `Restarted: ${server}`,
+        return await interaction.editReply({
+          content: `Restarted: ${serverName}`,
           ephemeral: true,
         });
       });
     } catch (error) {
-      await interaction.reply({ content: `Error: ${error}`, ephemeral: true });
+      if (interaction) {
+        await interaction.editReply({
+          content: `Error: ${error}`,
+          ephemeral: true,
+        });
+      }
     }
   },
 };
