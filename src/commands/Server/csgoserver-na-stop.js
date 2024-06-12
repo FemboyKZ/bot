@@ -5,12 +5,12 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgoserver-na-start")
-    .setDescription("[Admin] Send a START command to a NA CS:GO server")
+    .setName("csgoserver-na-stop")
+    .setDescription("[Admin] Send a STOP command to a NA CS:GO server")
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to start")
+        .setDescription("Which server do you want to stop")
         .setRequired(true)
         .addChoices(
           { name: "CS:GO FKZ 1 - Whitelist 128t", value: "csgo-fkz-1" },
@@ -45,7 +45,7 @@ module.exports = {
     ) {
       try {
         await interaction.reply({
-          content: `Starting: ${serverName}`,
+          content: `Stopping: ${serverName}`,
           ephemeral: true,
         });
         const response = await axios.post(
@@ -55,7 +55,7 @@ module.exports = {
         await wait(5000);
         if (response.status === 200) {
           await interaction.editReply({
-            content: `Started: ${serverName}`,
+            content: `Stopped: ${serverName}`,
             ephemeral: true,
           });
         }
