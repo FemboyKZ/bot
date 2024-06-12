@@ -45,7 +45,7 @@ module.exports = {
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
-      !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
+      !interaction.member.roles.cache.has(process.env.CSGO_MANAGER_ROLE)
     ) {
       await interaction.reply({
         content: "You don't have perms to use this command.",
