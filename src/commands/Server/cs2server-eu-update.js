@@ -4,36 +4,43 @@ const wait = require("timers/promises").setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgoserver-stop")
-    .setDescription("[Admin] Send a stop command to a CS:GO server")
+    .setName("cs2server-eu-update")
+    .setDescription("[Admin] Send a UPDATE command to a EU CS:2 server")
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to stop")
+        .setDescription("Which server do you want to uptdate")
         .setRequired(true)
         .addChoices(
-          { name: "CS:GO FKZ 1 - Whitelist 128t", value: "csgo-fkz-1" },
-          { name: "CS:GO FKZ 2 - Public 64t", value: "csgo-fkz-2" },
-          { name: "CS:GO FKZ 3 - Public Nuke", value: "csgo-fkz-3" }
+          { name: "CS:2 FKZ 1 - Whitelist", value: "cs2-fkz-1" },
+          { name: "CS:2 FKZ 2 - Public KZ", value: "cs2-fkz-2" },
+          { name: "CS:2 FKZ 3 - Public MV", value: "cs2-fkz-3" },
+          { name: "CS:2 FKZ 4 - Public HNS", value: "cs2-fkz-4" },
+          { name: "CS:2 FKZ 5 - Testing", value: "cs2-fkz-5" }
         )
     ),
-
   async execute(interaction) {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/csgoserver stop`;
+    const command = `sudo -iu ${server} /home/${server}/cs2server update`;
 
     let serverName = server;
     switch (serverName) {
-      case "csgo-fkz-1":
-        serverName = "CS:GO FKZ 1 - Whitelist 128t";
+      case "cs2-fkz-1":
+        serverName = "CS:2 FKZ 1 - Whitelist";
         break;
-      case "csgo-fkz-2":
-        serverName = "CS:GO FKZ 2 - Public 64t";
+      case "cs2-fkz-2":
+        serverName = "CS:2 FKZ 2 - Public KZ";
         break;
-      case "csgo-fkz-3":
-        serverName = "CS:GO FKZ 3 - Public Nuke";
+      case "cs2-fkz-3":
+        serverName = "CS:2 FKZ 3 - Public MV";
+        break;
+      case "cs2-fkz-4":
+        serverName = "CS:2 FKZ 4 - Public HNS";
+        break;
+      case "cs2-fkz-5":
+        serverName = "CS:2 FKZ 5 - Testing";
         break;
       default:
         serverName = "Unknown";
@@ -41,15 +48,15 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250269530991759435")
+      interaction.member.roles.cache.has(`${process.env.CS2_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
-          content: `Stopping: ${serverName}`,
+          content: `Updating: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
-          await wait(5000);
+          await wait(30000);
           if (!interaction) return;
           if (error) {
             return await interaction.editReply({
@@ -64,7 +71,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Stopped: ${serverName}`,
+            content: `Updated: ${serverName}`,
             ephemeral: true,
           });
         });
@@ -78,7 +85,7 @@ module.exports = {
       }
     } else {
       await interaction.reply({
-        content: "You do not have permission to use this command",
+        content: "You don't have perms to use this command.",
         ephemeral: true,
       });
     }

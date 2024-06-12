@@ -1,15 +1,18 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
+require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csclserver-stop")
-    .setDescription("[Admin] Send a stop command to a ClassicCounter server")
+    .setName("csclserver-eu-start")
+    .setDescription(
+      "[Admin] Send a START command to a EU ClassicCounter server"
+    )
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to stop")
+        .setDescription("Which server do you want to start")
         .setRequired(true)
         .addChoices(
           { name: "CS:CL FKZ 1 - VNL 128t", value: "cscl-fkz-1" },
@@ -21,7 +24,7 @@ module.exports = {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/csgoserver stop`;
+    const command = `sudo -iu ${server} /home/${server}/csgoserver start`;
 
     let serverName = server;
     switch (serverName) {
@@ -37,11 +40,11 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250270842571718718")
+      interaction.member.roles.cache.has(`${process.env.CSCL_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
-          content: `Stopping: ${serverName}`,
+          content: `Starting: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
@@ -60,7 +63,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Stopped: ${serverName}`,
+            content: `Started: ${serverName}`,
             ephemeral: true,
           });
         });

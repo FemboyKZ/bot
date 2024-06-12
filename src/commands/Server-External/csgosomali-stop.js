@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
+require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -39,7 +40,7 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250275231839420416")
+      interaction.member.roles.cache.has(`${process.env.PIRATE_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({

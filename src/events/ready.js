@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const mongodbURL = process.env.MONGODBURL;
+const mongodbURL = process.env.MONGODB_URL;
 
 mongoose.set("strictQuery", false);
 

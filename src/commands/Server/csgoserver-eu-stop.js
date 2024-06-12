@@ -1,19 +1,21 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
+require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csclserver-restart")
-    .setDescription("[Admin] Send a restart command to a ClassicCounter server")
+    .setName("csgoserver-eu-stop")
+    .setDescription("[Admin] Send a STOP command to a EU CS:GO server")
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to restart")
+        .setDescription("Which server do you want to stop")
         .setRequired(true)
         .addChoices(
-          { name: "CS:CL FKZ 1 - VNL 128t", value: "cscl-fkz-1" },
-          { name: "CS:CL FKZ 2 - VNL 64t", value: "cscl-fkz-2" }
+          { name: "CS:GO FKZ 1 - Whitelist 128t", value: "csgo-fkz-1" },
+          { name: "CS:GO FKZ 2 - Public 64t", value: "csgo-fkz-2" },
+          { name: "CS:GO FKZ 3 - Public Nuke", value: "csgo-fkz-3" }
         )
     ),
 
@@ -21,15 +23,18 @@ module.exports = {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/csgoserver restart`;
+    const command = `sudo -iu ${server} /home/${server}/csgoserver stop`;
 
     let serverName = server;
     switch (serverName) {
-      case "cscl-fkz-1":
-        serverName = "CS:CL FKZ 1 - VNL 128t";
+      case "csgo-fkz-1":
+        serverName = "CS:GO FKZ 1 - Whitelist 128t";
         break;
-      case "cscl-fkz-2":
-        serverName = "CS:CL FKZ 2 - VNL 64t";
+      case "csgo-fkz-2":
+        serverName = "CS:GO FKZ 2 - Public 64t";
+        break;
+      case "csgo-fkz-3":
+        serverName = "CS:GO FKZ 3 - Public Nuke";
         break;
       default:
         serverName = "Unknown";
@@ -37,11 +42,11 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250270842571718718")
+      interaction.member.roles.cache.has(`${process.env.CSGO_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
-          content: `Restarting: ${serverName}`,
+          content: `Stopping: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
@@ -60,7 +65,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Restarted: ${serverName}`,
+            content: `Stopped: ${serverName}`,
             ephemeral: true,
           });
         });
@@ -74,7 +79,7 @@ module.exports = {
       }
     } else {
       await interaction.reply({
-        content: "You don't have perms to use this command.",
+        content: "You do not have permission to use this command",
         ephemeral: true,
       });
     }

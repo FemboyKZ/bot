@@ -1,11 +1,12 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
+require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgoserver-start")
-    .setDescription("[Admin] Send a start command to a CS:GO server")
+    .setName("csgoserver-eu-start")
+    .setDescription("[Admin] Send a START command to a EU CS:GO server")
     .addStringOption((option) =>
       option
         .setName("server")
@@ -41,7 +42,7 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250269530991759435")
+      interaction.member.roles.cache.has(`${process.env.CSGO_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({

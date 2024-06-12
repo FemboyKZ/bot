@@ -1,46 +1,38 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
+require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("cs2server-start")
-    .setDescription("[Admin] Send a start command to a CS:2 server")
+    .setName("csclserver-eu-restart")
+    .setDescription(
+      "[Admin] Send a RESTART command to a EU ClassicCounter server"
+    )
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to start")
+        .setDescription("Which server do you want to restart")
         .setRequired(true)
         .addChoices(
-          { name: "CS:2 FKZ 1 - Whitelist", value: "cs2-fkz-1" },
-          { name: "CS:2 FKZ 2 - Public KZ", value: "cs2-fkz-2" },
-          { name: "CS:2 FKZ 3 - Public MV", value: "cs2-fkz-3" },
-          { name: "CS:2 FKZ 4 - Public HNS", value: "cs2-fkz-4" },
-          { name: "CS:2 FKZ 5 - Testing", value: "cs2-fkz-5" }
+          { name: "CS:CL FKZ 1 - VNL 128t", value: "cscl-fkz-1" },
+          { name: "CS:CL FKZ 2 - VNL 64t", value: "cscl-fkz-2" }
         )
     ),
+
   async execute(interaction) {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/cs2server start`;
+    const command = `sudo -iu ${server} /home/${server}/csgoserver restart`;
 
     let serverName = server;
     switch (serverName) {
-      case "cs2-fkz-1":
-        serverName = "CS:2 FKZ 1 - Whitelist";
+      case "cscl-fkz-1":
+        serverName = "CS:CL FKZ 1 - VNL 128t";
         break;
-      case "cs2-fkz-2":
-        serverName = "CS:2 FKZ 2 - Public KZ";
-        break;
-      case "cs2-fkz-3":
-        serverName = "CS:2 FKZ 3 - Public MV";
-        break;
-      case "cs2-fkz-4":
-        serverName = "CS:2 FKZ 4 - Public HNS";
-        break;
-      case "cs2-fkz-5":
-        serverName = "CS:2 FKZ 5 - Testing";
+      case "cscl-fkz-2":
+        serverName = "CS:CL FKZ 2 - VNL 64t";
         break;
       default:
         serverName = "Unknown";
@@ -48,11 +40,11 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250268777678110741")
+      interaction.member.roles.cache.has(`${process.env.CSCL_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
-          content: `Starting: ${serverName}`,
+          content: `Restarting: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
@@ -71,7 +63,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Started: ${serverName}`,
+            content: `Restarted: ${serverName}`,
             ephemeral: true,
           });
         });
@@ -84,7 +76,7 @@ module.exports = {
         }
       }
     } else {
-      return await interaction.reply({
+      await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });

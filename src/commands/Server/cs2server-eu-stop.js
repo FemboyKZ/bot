@@ -4,32 +4,43 @@ const wait = require("timers/promises").setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csclserver-start")
-    .setDescription("[Admin] Send a start command to a ClassicCounter server")
+    .setName("cs2server-eu-stop")
+    .setDescription("[Admin] Send a STOP command to a EU CS:2 server")
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to start")
+        .setDescription("Which server do you want to stop")
         .setRequired(true)
         .addChoices(
-          { name: "CS:CL FKZ 1 - VNL 128t", value: "cscl-fkz-1" },
-          { name: "CS:CL FKZ 2 - VNL 64t", value: "cscl-fkz-2" }
+          { name: "CS:2 FKZ 1 - Whitelist", value: "cs2-fkz-1" },
+          { name: "CS:2 FKZ 2 - Public KZ", value: "cs2-fkz-2" },
+          { name: "CS:2 FKZ 3 - Public MV", value: "cs2-fkz-3" },
+          { name: "CS:2 FKZ 4 - Public HNS", value: "cs2-fkz-4" },
+          { name: "CS:2 FKZ 5 - Testing", value: "cs2-fkz-5" }
         )
     ),
-
   async execute(interaction) {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/csgoserver start`;
+    const command = `sudo -iu ${server} /home/${server}/cs2server stop`;
 
     let serverName = server;
     switch (serverName) {
-      case "cscl-fkz-1":
-        serverName = "CS:CL FKZ 1 - VNL 128t";
+      case "cs2-fkz-1":
+        serverName = "CS:2 FKZ 1 - Whitelist";
         break;
-      case "cscl-fkz-2":
-        serverName = "CS:CL FKZ 2 - VNL 64t";
+      case "cs2-fkz-2":
+        serverName = "CS:2 FKZ 2 - Public KZ";
+        break;
+      case "cs2-fkz-3":
+        serverName = "CS:2 FKZ 3 - Public MV";
+        break;
+      case "cs2-fkz-4":
+        serverName = "CS:2 FKZ 4 - Public HNS";
+        break;
+      case "cs2-fkz-5":
+        serverName = "CS:2 FKZ 5 - Testing";
         break;
       default:
         serverName = "Unknown";
@@ -37,11 +48,11 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250270842571718718")
+      interaction.member.roles.cache.has(`${process.env.CS2_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
-          content: `Starting: ${serverName}`,
+          content: `Stopping: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
@@ -60,7 +71,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Started: ${serverName}`,
+            content: `Stopped: ${serverName}`,
             ephemeral: true,
           });
         });

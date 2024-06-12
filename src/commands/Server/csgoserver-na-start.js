@@ -1,22 +1,20 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const { exec } = require("child_process");
+const axios = require("axios");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgosomali-start")
-    .setDescription(
-      "[Pirate] Send a start command to a Somali Pirates CS:GO server"
-    )
+    .setName("csgoserver-na-start")
+    .setDescription("[Admin] Send a START command to a EU CS:GO server")
     .addStringOption((option) =>
       option
         .setName("server")
         .setDescription("Which server do you want to start")
         .setRequired(true)
         .addChoices(
-          { name: "Somali Pirates 1", value: "csgo-somali-1" },
-          { name: "Somali Pirates 2", value: "csgo-somali-2" }
+          { name: "CS:GO FKZ 1 - Whitelist 128t", value: "csgo-fkz-1" },
+          { name: "CS:GO FKZ 2 - Public 64t", value: "csgo-fkz-2" }
         )
     ),
 
@@ -24,15 +22,16 @@ module.exports = {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/csgoserver start`;
-
+    let serverID;
     let serverName = server;
     switch (serverName) {
-      case "csgo-somali-1":
-        serverName = "Somali Pirates 1";
+      case "csgo-fkz-1":
+        serverName = "CS:GO FKZ 1 - Whitelist 128t";
+        serverID = process.env.NA_CSGO_WL_SERVERID;
         break;
-      case "csgo-somali-2":
-        serverName = "Somali Pirates 2";
+      case "csgo-fkz-2":
+        serverName = "CS:GO FKZ 2 - Public 64t";
+        serverID = process.env.NA_CSGO_64_SERVERID;
         break;
       default:
         serverName = "Unknown";
@@ -40,33 +39,29 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has(`${process.env.PIRATE_MANAGER_ROLE}`)
+      interaction.member.roles.cache.has(`${process.env.CSGO_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
           content: `Starting: ${serverName}`,
           ephemeral: true,
         });
-        exec(command, async (error, stdout, stderr) => {
-          await wait(5000);
-          if (!interaction) return;
-          if (error) {
-            return await interaction.editReply({
-              content: `Error: ${error.message}`,
-              ephemeral: true,
-            });
+        const response = await axios.post(
+          `https://dathost.net/api/0.1/game-servers/${serverID}/start`,
+          {},
+          {
+            auth: {
+              username: process.env.DATHOST_USERNAME,
+              password: process.env.DATHOST_API_KEY,
+            },
           }
-          if (stderr) {
-            return await interaction.editReply({
-              content: `Stderr: ${stderr}`,
-              ephemeral: true,
-            });
-          }
-          return await interaction.editReply({
+        );
+        if (response.status === 200) {
+          await interaction.editReply({
             content: `Started: ${serverName}`,
             ephemeral: true,
           });
-        });
+        }
       } catch (error) {
         if (interaction) {
           await interaction.editReply({
@@ -77,7 +72,7 @@ module.exports = {
       }
     } else {
       await interaction.reply({
-        content: `You do not have permission to use this command.`,
+        content: "You don't have perms to use this command.",
         ephemeral: true,
       });
     }

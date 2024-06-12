@@ -73,7 +73,7 @@ process.on("unhandledRejection", (reason, promise) => {
   }
   client.handleEvents(eventFiles, "./src/events");
   client.handleCommands(commandFolders, "./src/commands");
-  client.login(process.env.token);
+  client.login(process.env.TOKEN);
 })();
 
 // console logging
@@ -549,7 +549,7 @@ client.on(Events.MessageCreate, async (message) => {
 
 // ------------------------------------------------------------------------ guild scraper
 async () => {
-  const guild = await client.guilds.cache.get("858419058135662622"); // fkz
+  const guild = await client.guilds.cache.get(`${process.env.GUILD_ID}`); // fkz
   const members = await guild.members.fetch();
 
   members.forEach(async (member) => {
@@ -575,7 +575,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   else {
     const channel = await client.channels.cache.get(
-      `${process.env.logschatID}`
+      `${process.env.LOGS_CHAT_ID}`
     );
     const server = interaction.guild.name;
     const serverID = interaction.guild.id;
@@ -614,7 +614,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // bot join/leave logger, useless feature
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.GuildCreate, async (guild) => {
-  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
+  const channel = await client.channels.cache.get(
+    `${process.env.LOGS_CHAT_ID}`
+  );
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -649,7 +651,9 @@ client.on(Events.GuildCreate, async (guild) => {
   await channel.send({ embeds: [embed] });
 });
 client.on(Events.GuildDelete, async (guild) => {
-  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
+  const channel = await client.channels.cache.get(
+    `${process.env.LOGS_CHAT_ID}`
+  );
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -1811,7 +1815,7 @@ client.on("ready", async () => {
       return;
     }
 
-    const logschatID = await client.channels.fetch(process.env.logschatID);
+    const logschatID = await client.channels.fetch(process.env.LOGS_CHAT_ID);
 
     if (oldMember.user.system || newMember.user.system) return;
     if (oldMember.partial) {
@@ -1950,7 +1954,7 @@ client.on("ready", async () => {
     }
   });
   client.on(Events.UserUpdate, async (oldUser, newUser) => {
-    const logGuild = await client.guilds.fetch(process.env.guildID);
+    const logGuild = await client.guilds.fetch(process.env.GUILD_ID);
     const data = await Audit_Log.findOne({ Guild: logGuild }); // can't fetch guild this way?
     let logID;
     if (data) {
@@ -1962,7 +1966,7 @@ client.on("ready", async () => {
     if (oldUser.system || newUser.system) return;
     if (oldUser.partial) console.log("oldUser = partial");
 
-    // const data = process.env.guildID; // gettin guild this way means it only works on FKZ
+    // const data = process.env.GUILD_ID; // gettin guild this way means it only works on FKZ
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -1975,7 +1979,7 @@ client.on("ready", async () => {
         inline: false,
       });
 
-    const logschatID = await client.channels.fetch(process.env.logschatID);
+    const logschatID = await client.channels.fetch(process.env.LOGS_CHAT_ID);
 
     const auditChannel = client.channels.cache.get(logID);
     if (auditChannel === undefined) console.log("usr ndefined?", auditChannel);
@@ -2204,14 +2208,14 @@ const { escape } = require("querystring");
 client.on(Events.GuildMemberAdd, async (member) => {
   // only supports 1 role through command lol, added extra ones here lol #3
   const data = await autorole.findOne({ Guild: member.guild.id });
-  const rol = process.env.autoroleID1;
-  const rol2 = process.env.autoroleID2;
+  const role1 = process.env.AUTO_ROLE_ID1;
+  const role2 = process.env.AUTO_ROLE_ID2;
   if (!data) return;
   else {
     try {
       await member.roles.add(data.Role);
-      await member.roles.add(rol);
-      await member.roles.add(rol2);
+      await member.roles.add(role1);
+      await member.roles.add(role2);
     } catch (e) {
       return;
     }

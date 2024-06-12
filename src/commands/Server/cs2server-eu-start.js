@@ -4,12 +4,12 @@ const wait = require("timers/promises").setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("cs2server-stop")
-    .setDescription("[Admin] Send a stop command to a CS:2 server")
+    .setName("cs2server-eu-start")
+    .setDescription("[Admin] Send a START command to a EU CS:2 server")
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to stop")
+        .setDescription("Which server do you want to start")
         .setRequired(true)
         .addChoices(
           { name: "CS:2 FKZ 1 - Whitelist", value: "cs2-fkz-1" },
@@ -23,7 +23,7 @@ module.exports = {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/cs2server stop`;
+    const command = `sudo -iu ${server} /home/${server}/cs2server start`;
 
     let serverName = server;
     switch (serverName) {
@@ -48,11 +48,11 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has("1250268777678110741")
+      interaction.member.roles.cache.has(`${process.env.CS2_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
-          content: `Stopping: ${serverName}`,
+          content: `Starting: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
@@ -71,7 +71,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Stopped: ${serverName}`,
+            content: `Started: ${serverName}`,
             ephemeral: true,
           });
         });
@@ -84,7 +84,7 @@ module.exports = {
         }
       }
     } else {
-      await interaction.reply({
+      return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });
