@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
+const wait = require("timers/promises").setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,14 +20,6 @@ module.exports = {
         )
     ),
   async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        ephemeral: true,
-      });
-
-    const wait = require("timers/promises").setTimeout;
-
     const { options } = interaction;
     const server = options.getString("server");
 
@@ -53,38 +46,48 @@ module.exports = {
         serverName = "Unknown";
     }
 
-    try {
+    if (
+      interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+      interaction.member.roles.cache.has("1250268777678110741")
+    ) {
+      try {
+        await interaction.reply({
+          content: `Stopping: ${serverName}`,
+          ephemeral: true,
+        });
+        exec(command, async (error, stdout, stderr) => {
+          await wait(5000);
+          if (!interaction) return;
+          if (error) {
+            return await interaction.editReply({
+              content: `Error: ${error.message}`,
+              ephemeral: true,
+            });
+          }
+          if (stderr) {
+            return await interaction.editReply({
+              content: `Stderr: ${stderr}`,
+              ephemeral: true,
+            });
+          }
+          return await interaction.editReply({
+            content: `Stopped: ${serverName}`,
+            ephemeral: true,
+          });
+        });
+      } catch (error) {
+        if (interaction) {
+          await interaction.editReply({
+            content: `Error: ${error}`,
+            ephemeral: true,
+          });
+        }
+      }
+    } else {
       await interaction.reply({
-        content: `Stopping: ${serverName}`,
+        content: "You don't have perms to use this command.",
         ephemeral: true,
       });
-      exec(command, async (error, stdout, stderr) => {
-        await wait(5000);
-        if (!interaction) return;
-        if (error) {
-          return await interaction.editReply({
-            content: `Error: ${error.message}`,
-            ephemeral: true,
-          });
-        }
-        if (stderr) {
-          return await interaction.editReply({
-            content: `Stderr: ${stderr}`,
-            ephemeral: true,
-          });
-        }
-        return await interaction.editReply({
-          content: `Stopped: ${serverName}`,
-          ephemeral: true,
-        });
-      });
-    } catch (error) {
-      if (interaction) {
-        await interaction.editReply({
-          content: `Error: ${error}`,
-          ephemeral: true,
-        });
-      }
     }
   },
 };
