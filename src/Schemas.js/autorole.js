@@ -2,7 +2,7 @@ const { model, Schema } = require("mongoose");
 
 let autorole = new Schema({
   Guild: String,
-  Role: String,
+  Roles: [String],
 });
 
 module.exports = model("autorole", autorole);

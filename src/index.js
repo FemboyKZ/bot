@@ -2203,21 +2203,18 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
 // ------------------------------------------------------------------------ AUTOROLE
 const autorole = require("./Schemas.js/autorole");
-const { escape } = require("querystring");
 
 client.on(Events.GuildMemberAdd, async (member) => {
-  // only supports 1 role through command lol, added extra ones here lol #3
   const data = await autorole.findOne({ Guild: member.guild.id });
-  const role1 = process.env.AUTO_ROLE_ID1;
-  const role2 = process.env.AUTO_ROLE_ID2;
-  if (!data) return;
-  else {
-    try {
-      await member.roles.add(data.Role);
-      await member.roles.add(role1);
-      await member.roles.add(role2);
-    } catch (e) {
-      return;
+  if (!data || !data.Roles.length) return;
+  try {
+    for (const roleId of data.Roles) {
+      const role = await member.guild.roles.cache.get(roleId);
+      if (role) {
+        await member.roles.add(role);
+      }
     }
+  } catch (e) {
+    return console.log(e);
   }
 });
