@@ -6,13 +6,13 @@
     "mongoose": "^8.4.1",
     "undici": "^5.28.4"
   },
-  "name": "another-fucking-bot",
-  "version": "1.0.0",
+  "name": "fkz-bot",
+  "version": "1.2.0",
   "main": "src/index.js",
   "scripts": {
     "test": "node src/index.js"
   },
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "author": "camwhore",
+  "license": "GPL-3.0-only",
+  "description": "Discord Bot for managing FKZ Discord Server, FKZ Dedicated Server and more."
 }
