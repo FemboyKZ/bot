@@ -16,15 +16,17 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
-    const roles = interaction.options.getRole("role", true);
+    const roleOptions = ["role"];
+    const roles = roleOptions
+      .map((roleOption) => interaction.options.getRole(roleOption))
+      .filter((role) => role !== null);
 
-    const set = new EmbedBuilder()
-      .setColor("Green")
-      .setDescription(
-        `The Autoroles have been set to ${roles
-          .map((role) => role.name)
-          .join(", ")}`
-      );
+    if (roles.length === 0) {
+      return await interaction.reply({
+        content: "No valid roles provided.",
+        ephemeral: true,
+      });
+    }
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
@@ -39,9 +41,16 @@ module.exports = {
 
     await autorole.updateOne(
       { Guild: interaction.guild.id },
-      { $set: { Roles: roleIds } },
+      { $push: { Roles: { $each: roleIds } } },
       { upsert: true }
     );
+
+    const roleNames = roles.map((role) => role.name).join(", ");
+    const set = new EmbedBuilder()
+      .setColor("Green")
+      .setDescription(
+        `You have added the roles: ${roleNames}, to the autoroles.`
+      );
 
     await interaction.reply({ embeds: [set], ephemeral: true });
   },

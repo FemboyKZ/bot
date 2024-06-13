@@ -19,13 +19,17 @@ module.exports = {
       });
     }
 
-    const autoroleData = await autorole.findOne({ Guild: message.guild.id });
+    const autoroleData = await autorole.findOne({
+      Guild: interaction.guild.id,
+    });
     const autoroles = autoroleData ? autoroleData.Roles : [];
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("Autoroles")
-      .setDescription(autoroles.map((role) => `<@&${role}>`).join("\n"));
+      .setDescription(
+        autoroles.map((role) => `<@&${role}>`).join("\n") || "None"
+      );
 
     await interaction.reply({ embeds: [embed], ephemeral: true });
   },
