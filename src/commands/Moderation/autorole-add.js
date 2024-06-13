@@ -5,10 +5,6 @@ const {
 } = require("discord.js");
 const autorole = require("../../Schemas/autorole");
 
-const already = new EmbedBuilder()
-  .setColor("#ff00b3")
-  .setDescription("You already have a autorole setup!");
-
 const noperms = new EmbedBuilder()
   .setColor("#ff00b3")
   .setDescription("You need to have Admin to use this command!");
@@ -22,7 +18,6 @@ module.exports = {
         .setName("role")
         .setDescription("The Role you want to set for the Autoroles")
         .setRequired(true)
-        .setAutocomplete(true)
     ),
   async execute(interaction) {
     const roles = interaction.options.getRole("role", true);
