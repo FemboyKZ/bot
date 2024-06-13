@@ -56,6 +56,9 @@ module.exports = {
     }
 
     const { name, id } = server;
+    const urlStop = `https://dathost.net/api/0.1/game-servers/${id}/stop`;
+    const urlStart = `https://dathost.net/api/0.1/game-servers/${id}/start`;
+    const method = { method: "POST" };
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
@@ -73,23 +76,15 @@ module.exports = {
         content: `Restarting: ${name}`,
         ephemeral: true,
       });
-      const responseStop = await fetch(
-        `https://dathost.net/api/0.1/game-servers/${id}/stop`,
-        {
-          method: "POST",
-          headers,
-        }
+      const responseStop = await fetch(urlStop, method, headers).then(
+        (response) => console.log(response)
       );
       await wait(3000);
       if (responseStop.status !== 200) {
         await interaction.editReply(`Error: ${responseStop.statusText}`);
       }
-      const responseStart = await fetch(
-        `https://dathost.net/api/0.1/game-servers/${id}/start`,
-        {
-          method: "POST",
-          headers,
-        }
+      const responseStart = await fetch(urlStart, method, headers).then(
+        (response) => console.log(response)
       );
       await wait(3000);
       if (responseStart.status !== 200) {

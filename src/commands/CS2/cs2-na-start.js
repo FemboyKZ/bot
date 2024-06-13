@@ -56,6 +56,8 @@ module.exports = {
     }
 
     const { name, id } = server;
+    const url = `https://dathost.net/api/0.1/game-servers/${id}/start`;
+    const method = { method: "POST" };
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
@@ -73,12 +75,8 @@ module.exports = {
         content: `Starting: ${name}`,
         ephemeral: true,
       });
-      const response = await fetch(
-        `https://dathost.net/api/0.1/game-servers/${id}/start`,
-        {
-          method: "POST",
-          headers,
-        }
+      const response = await fetch(url, method, headers).then((response) =>
+        console.log(response)
       );
       await wait(2000);
       if (response.status === 200) {
