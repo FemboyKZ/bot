@@ -1,7 +1,15 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const axios = require("axios");
+const fetch = require("node-fetch");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
+
+const username = process.env.DATHOST_USERNAME;
+const password = process.env.DATHOST_PASSWORD;
+const headers = {
+  authorization: `Basic ${Buffer.from(`${username}:${password}`).toString(
+    "base64"
+  )}`,
+};
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -59,18 +67,28 @@ module.exports = {
         content: `Restarting: ${name}`,
         ephemeral: true,
       });
-
-      await axios.post(
+      const responseStop = await fetch(
         `https://dathost.net/api/0.1/game-servers/${id}/stop`,
-        {}
+        {
+          method: "POST",
+          headers,
+        }
       );
-      await wait(5000);
-      await axios.post(
+      await wait(3000);
+      if (responseStop.status !== 200) {
+        await interaction.editReply(`Error: ${responseStop.statusText}`);
+      }
+      const responseStart = await fetch(
         `https://dathost.net/api/0.1/game-servers/${id}/start`,
-        {}
+        {
+          method: "POST",
+          headers,
+        }
       );
-      await wait(5000);
-
+      await wait(3000);
+      if (responseStart.status !== 200) {
+        await interaction.editReply(`Error: ${responseStart.statusText}`);
+      }
       await interaction.editReply({
         content: `Restarted: ${name}`,
         ephemeral: true,

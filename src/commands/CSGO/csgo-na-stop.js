@@ -1,7 +1,15 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const axios = require("axios");
+const fetch = require("node-fetch");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
+
+const username = process.env.DATHOST_USERNAME;
+const password = process.env.DATHOST_PASSWORD;
+const headers = {
+  authorization: `Basic ${Buffer.from(`${username}:${password}`).toString(
+    "base64"
+  )}`,
+};
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -59,9 +67,12 @@ module.exports = {
         content: `Stopping: ${name}`,
         ephemeral: true,
       });
-      const response = await axios.post(
-        `https://dathost.net/api/0.1/game-servers/${id}/start`,
-        {}
+      const response = await fetch(
+        `https://dathost.net/api/0.1/game-servers/${id}/stop`,
+        {
+          method: "POST",
+          headers,
+        }
       );
       await wait(5000);
       if (response.status === 200) {
