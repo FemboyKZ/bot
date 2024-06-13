@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const whitelistSchema = require("../../Schemas.js/whitelistSchema");
+const whitelistSchema = require("../../Schemas/whitelistSchema");
 
 module.exports = {
   data: new SlashCommandBuilder()

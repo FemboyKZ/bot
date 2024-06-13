@@ -6,7 +6,7 @@ const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
 } = require("discord.js");
-const ticketSchema = require("../../Schemas.js/ticketSchema");
+const ticketSchema = require("../../Schemas/ticketSchema");
 
 module.exports = {
   data: new SlashCommandBuilder()

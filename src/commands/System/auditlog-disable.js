@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const Schema = require("../../Schemas.js/auditlog");
+const Schema = require("../../Schemas/auditlog");
 
 module.exports = {
   data: new SlashCommandBuilder()
