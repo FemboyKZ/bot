@@ -13,7 +13,8 @@ const {
   TextInputBuilder,
   TextInputStyle,
   ChannelType,
-} = require(`discord.js`);
+} = require("discord.js");
+const { readdirSync, readFileSync, writeFileSync } = require("fs");
 const fs = require("fs");
 const client = new Client({
   intents: [
@@ -72,15 +73,23 @@ process.on("unhandledRejection", (reason, promise) => {
   }
   client.handleEvents(eventFiles, "./src/events");
   client.handleCommands(commandFolders, "./src/commands");
-  client.login(process.env.token);
+  client.login(process.env.TOKEN);
 })();
 
-// anti-ghostping, not used
-const ghostSchema = require("./Schemas.js/ghostpingSchema");
-const numSchema = require("./Schemas.js/ghostnumSchema");
+// console logging
+/*
+const logStream = fs.createWriteStream("./logs/console.txt", { flags: "a" });
+const originalLog = console.log;
+console.log = function () {
+  logStream.write(`${new Date().toISOString()} - `);
+  logStream.write(Array.from(arguments).join(" ") + "\n");
+
+  originalLog.apply(console, arguments);
+};
+*/
 
 // Ticket system
-const ticketSchema = require("./Schemas.js/ticketSchema");
+const ticketSchema = require("./Schemas/ticketSchema");
 
 // ticket modal create
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -256,10 +265,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // CS:GO & Mc whitelist request commands, unban request command, report command
-const whitelistSchema = require("./Schemas.js/whitelistSchema");
-const mcWhitelistSchema = require("./Schemas.js/mcWhitelistSchema");
-const unbanSchema = require("./Schemas.js/unbanSchema");
-const reportSchema = require("./Schemas.js/reportSchema");
+const whitelistSchema = require("./Schemas/whitelistSchema");
+const mcWhitelistSchema = require("./Schemas/mcWhitelistSchema");
+const unbanSchema = require("./Schemas/unbanSchema");
+const reportSchema = require("./Schemas/reportSchema");
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isModalSubmit()) return;
@@ -506,7 +515,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // antilink system
-const linkSchema = require("./Schemas.js/linkSchema");
+const linkSchema = require("./Schemas/linkSchema");
 
 client.on(Events.MessageCreate, async (message) => {
   if (
@@ -538,6 +547,27 @@ client.on(Events.MessageCreate, async (message) => {
   }
 });
 
+// ------------------------------------------------------------------------ guild scraper
+async () => {
+  const guild = await client.guilds.cache.get(`${process.env.GUILD_ID}`); // fkz
+  const members = await guild.members.fetch();
+
+  members.forEach(async (member) => {
+    const data = await Audit_Log.findOne({
+      Guild: guild.id,
+      Member: member.id,
+    });
+
+    if (data) {
+      // Member already exists in the audit log, update it
+      await data.updateOne({ Member: member.id });
+    } else {
+      // Member does not exist in the audit log, create a new entry
+      await Audit_Log.create({ Guild: guild.id, Member: member.id });
+    }
+  });
+};
+
 // ------------------------------------------------------------------------ interaction logger
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -545,7 +575,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   else {
     const channel = await client.channels.cache.get(
-      `${process.env.logschatID}`
+      `${process.env.LOGS_CHAT_ID}`
     );
     const server = interaction.guild.name;
     const serverID = interaction.guild.id;
@@ -584,7 +614,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // bot join/leave logger, useless feature
 // doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.GuildCreate, async (guild) => {
-  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
+  const channel = await client.channels.cache.get(
+    `${process.env.LOGS_CHAT_ID}`
+  );
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -619,7 +651,9 @@ client.on(Events.GuildCreate, async (guild) => {
   await channel.send({ embeds: [embed] });
 });
 client.on(Events.GuildDelete, async (guild) => {
-  const channel = await client.channels.cache.get(`${process.env.logschatID}`);
+  const channel = await client.channels.cache.get(
+    `${process.env.LOGS_CHAT_ID}`
+  );
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -655,7 +689,7 @@ client.on(Events.GuildDelete, async (guild) => {
 });
 
 // REACTION ROLES //
-const reactions = require("./Schemas.js/reactionrs");
+const reactions = require("./Schemas/reactionrs");
 
 // reaction add
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -707,7 +741,7 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
 });
 
 // AUDIT LOG //
-const Audit_Log = require("./Schemas.js/auditlog");
+const Audit_Log = require("./Schemas/auditlog");
 // ------------------------------------------------------------------------ ban logs
 client.on(Events.GuildBanAdd, async (guild, user) => {
   const data = await Audit_Log.findOne({
@@ -1320,7 +1354,7 @@ client.on(Events.MessageDelete, async (message) => {
   }
   if (!message.author) return;
   if (message.author.bot) return;
-  if (!message.author.id === client.user.id) return;
+  if (message.author.id !== client.user.id) return;
   if (message.partial) console.log("deleted msg is partial");
 
   try {
@@ -1781,11 +1815,12 @@ client.on("ready", async () => {
       return;
     }
 
-    const logschatID = await client.channels.fetch(process.env.logschatID);
+    const logschatID = await client.channels.fetch(process.env.LOGS_CHAT_ID);
 
-    if (oldMember.user.bot || newMember.user.bot) return;
     if (oldMember.user.system || newMember.user.system) return;
-    if (oldMember.partial) console.log("oldMember = partial");
+    if (oldMember.partial) {
+      await oldMember.fetch().catch(() => {});
+    }
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -1919,7 +1954,7 @@ client.on("ready", async () => {
     }
   });
   client.on(Events.UserUpdate, async (oldUser, newUser) => {
-    const logGuild = await client.guilds.fetch(process.env.guildID);
+    const logGuild = await client.guilds.fetch(process.env.GUILD_ID);
     const data = await Audit_Log.findOne({ Guild: logGuild }); // can't fetch guild this way?
     let logID;
     if (data) {
@@ -1931,7 +1966,7 @@ client.on("ready", async () => {
     if (oldUser.system || newUser.system) return;
     if (oldUser.partial) console.log("oldUser = partial");
 
-    // const data = process.env.guildID; // gettin guild this way means it only works on FKZ
+    // const data = process.env.GUILD_ID; // gettin guild this way means it only works on FKZ
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -1944,7 +1979,7 @@ client.on("ready", async () => {
         inline: false,
       });
 
-    const logschatID = await client.channels.fetch(process.env.logschatID);
+    const logschatID = await client.channels.fetch(process.env.LOGS_CHAT_ID);
 
     const auditChannel = client.channels.cache.get(logID);
     if (auditChannel === undefined) console.log("usr ndefined?", auditChannel);
@@ -2110,7 +2145,9 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
   if (oldMember.user.bot || newMember.user.bot) return;
   if (oldMember.user.system || newMember.user.system) return;
-  if (oldMember.partial) console.log("oldMember = partial");
+  if (oldMember.partial) {
+    await oldMember.fetch().catch(() => {});
+  }
 
   try {
     const auditEmbed = new EmbedBuilder()
@@ -2165,22 +2202,19 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 });
 
 // ------------------------------------------------------------------------ AUTOROLE
-const autorole = require("./Schemas.js/autorole");
-const { escape } = require("querystring");
+const autorole = require("./Schemas/autorole");
 
 client.on(Events.GuildMemberAdd, async (member) => {
-  // only supports 1 role through command lol, added extra ones here lol #3
   const data = await autorole.findOne({ Guild: member.guild.id });
-  const rol = process.env.autoroleID1;
-  const rol2 = process.env.autoroleID2;
-  if (!data) return;
-  else {
-    try {
-      await member.roles.add(data.Role);
-      await member.roles.add(rol);
-      await member.roles.add(rol2);
-    } catch (e) {
-      return;
+  if (!data || !data.Roles.length) return;
+  try {
+    for (const roleId of data.Roles) {
+      const role = await member.guild.roles.cache.get(roleId);
+      if (role) {
+        await member.roles.add(role);
+      }
     }
+  } catch (e) {
+    return console.log(e);
   }
 });

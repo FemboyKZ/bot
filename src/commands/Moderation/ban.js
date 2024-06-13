@@ -1,7 +1,7 @@
 const {
   SlashCommandBuilder,
   EmbedBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
 } = require("discord.js");
 
 module.exports = {
@@ -19,9 +19,7 @@ module.exports = {
     ),
   async execute(interaction) {
     if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
     ) {
       const noPermissionEmbed = new EmbedBuilder()
         .setColor("#ff00b3")

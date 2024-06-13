@@ -3,7 +3,7 @@
 
 Really shitty Discord bot with a random assortment of features.
 
-Don't recommend running this for yourself.
+I don't recommend running this for yourself.
 
 You can contact me and see the bot in action on the [FKZ Discord](https://discord.gg/fkz)
 
@@ -14,6 +14,6 @@ If you wish to help with this feel free to open prs.
 
 ## usage
 
-run `npm install` to install dependencies
-create and fill out a `.env` file with details shown on the `.example`
-open a terminal and execute `node .` to start the bot
+- run `npm install` to install dependencies
+- create and fill out a `.env` file with details shown on the `.example`
+- open a terminal and execute `node .` to start the bot
