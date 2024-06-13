@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const fetch = require("node-fetch");
-const wait = require("timers/promises").setTimeout;
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 require("dotenv").config();
 
 const username = process.env.DATHOST_USERNAME;
