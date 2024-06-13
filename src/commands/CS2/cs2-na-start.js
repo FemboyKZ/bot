@@ -5,7 +5,7 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgoserver-na-start")
+    .setName("cs2server-na-start")
     .setDescription("[Admin] Send a START command to a NA CS:GO server")
     .addStringOption((option) =>
       option
