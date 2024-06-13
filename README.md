@@ -14,6 +14,7 @@ If you wish to help with this feel free to open prs.
 
 ## usage
 
+- run `git clone https://github.com/FemboyKZ/bot` to download the files
 - run `npm install` to install dependencies
 - create and fill out a `.env` file with details shown on the `.example`
 - open a terminal and execute `node .` to start the bot
