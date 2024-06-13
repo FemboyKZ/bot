@@ -5,10 +5,6 @@ const {
 } = require("discord.js");
 const autorole = require("../../Schemas/autorole");
 
-const noperms = new EmbedBuilder()
-  .setColor("#ff00b3")
-  .setDescription("You need to have Admin to use this command!");
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("autorole-add")
@@ -30,8 +26,14 @@ module.exports = {
           .join(", ")}`
       );
 
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
-      return await interaction.reply({ embeds: [noperms], ephemeral: true });
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
+      return await interaction.reply({
+        content: "You don't have perms to use this command.",
+        ephemeral: true,
+      });
+    }
 
     const roleIds = roles.map((role) => role.id);
 

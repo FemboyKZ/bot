@@ -19,20 +19,14 @@ module.exports = {
       });
     }
 
-    const role = interaction.options.getRole("role", true);
+    const autoroleData = await autorole.findOne({ Guild: message.guild.id });
+    const autoroles = autoroleData ? autoroleData.Roles : [];
 
-    await autorole.updateOne(
-      { Guild: interaction.guild.id },
-      { $pull: { Roles: role.id } },
-      { upsert: true }
-    );
+    const embed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTitle("Autoroles")
+      .setDescription(autoroles.map((role) => `<@&${role}>`).join("\n"));
 
-    const removed = new EmbedBuilder()
-      .setColor("Green")
-      .setDescription(
-        `The role ${role.name} has been removed from the autoroles`
-      );
-
-    await interaction.reply({ embeds: [removed], ephemeral: true });
+    await interaction.reply({ embeds: [embed], ephemeral: true });
   },
 };
