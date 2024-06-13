@@ -7,8 +7,8 @@ const autorole = require("../../Schemas/autorole");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("autorole-remove")
-    .setDescription("[Admin] Remove a role from the autoroles"),
+    .setName("autorole-list")
+    .setDescription("[Admin] List all autoroles"),
   async execute(interaction) {
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
