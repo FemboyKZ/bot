@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const autorole = require("../../Schemas.js/autorole");
+const autorole = require("../../Schemas/autorole");
 
 const noperms = new EmbedBuilder()
   .setColor("Red")

@@ -89,7 +89,7 @@ console.log = function () {
 */
 
 // Ticket system
-const ticketSchema = require("./Schemas.js/ticketSchema");
+const ticketSchema = require("./Schemas/ticketSchema");
 
 // ticket modal create
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -265,10 +265,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // CS:GO & Mc whitelist request commands, unban request command, report command
-const whitelistSchema = require("./Schemas.js/whitelistSchema");
-const mcWhitelistSchema = require("./Schemas.js/mcWhitelistSchema");
-const unbanSchema = require("./Schemas.js/unbanSchema");
-const reportSchema = require("./Schemas.js/reportSchema");
+const whitelistSchema = require("./Schemas/whitelistSchema");
+const mcWhitelistSchema = require("./Schemas/mcWhitelistSchema");
+const unbanSchema = require("./Schemas/unbanSchema");
+const reportSchema = require("./Schemas/reportSchema");
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isModalSubmit()) return;
@@ -515,7 +515,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 // antilink system
-const linkSchema = require("./Schemas.js/linkSchema");
+const linkSchema = require("./Schemas/linkSchema");
 
 client.on(Events.MessageCreate, async (message) => {
   if (
@@ -689,7 +689,7 @@ client.on(Events.GuildDelete, async (guild) => {
 });
 
 // REACTION ROLES //
-const reactions = require("./Schemas.js/reactionrs");
+const reactions = require("./Schemas/reactionrs");
 
 // reaction add
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -741,7 +741,7 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
 });
 
 // AUDIT LOG //
-const Audit_Log = require("./Schemas.js/auditlog");
+const Audit_Log = require("./Schemas/auditlog");
 // ------------------------------------------------------------------------ ban logs
 client.on(Events.GuildBanAdd, async (guild, user) => {
   const data = await Audit_Log.findOne({
@@ -2202,7 +2202,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 });
 
 // ------------------------------------------------------------------------ AUTOROLE
-const autorole = require("./Schemas.js/autorole");
+const autorole = require("./Schemas/autorole");
 
 client.on(Events.GuildMemberAdd, async (member) => {
   const data = await autorole.findOne({ Guild: member.guild.id });

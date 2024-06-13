@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const reaction = require("../../Schemas.js/reactionrs");
+const reaction = require("../../Schemas/reactionrs");
 
 module.exports = {
   data: new SlashCommandBuilder()
