@@ -69,7 +69,6 @@ module.exports = {
         {}
       );
       await wait(5000);
-      if (!interaction) return;
       if (response.status === 200) {
         await interaction.editReply({
           content: `Stopped: ${name}`,
