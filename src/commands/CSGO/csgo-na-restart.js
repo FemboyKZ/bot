@@ -1,16 +1,10 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
 const username = process.env.DATHOST_USERNAME;
 const password = process.env.DATHOST_PASSWORD;
-const headers = {
-  authorization: `Basic ${Buffer.from(`${username}:${password}`).toString(
-    "base64"
-  )}`,
-};
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -51,13 +45,19 @@ module.exports = {
     }
 
     const { name, id } = server;
+
     const urlStop = `https://dathost.net/api/0.1/game-servers/${id}/stop`;
+    const commandStop = `curl -u "${username}:${password}" --request POST \--url ${urlStop}`;
+
     const urlStart = `https://dathost.net/api/0.1/game-servers/${id}/start`;
-    const method = { method: "POST" };
+    const commandStart = `curl -u "${username}:${password}" --request POST \--url ${urlStart}`;
+
+    const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
+    const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
-      !interaction.member.roles.cache.has(process.env.CSGO_MANAGER_ROLE)
+      !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
     ) {
       await interaction.reply({
         content: "You don't have perms to use this command.",
@@ -71,23 +71,41 @@ module.exports = {
         content: `Restarting: ${name}`,
         ephemeral: true,
       });
-      const responseStop = await fetch(urlStop, method, headers).then(
-        (response) => console.log(response)
-      );
+      exec(commandStop, async (error, stdout, stderr) => {
+        if (error) console.log(error);
+        //if (stderr) console.log(stderr);
+        //if (stdout) console.log(stdout);
+        await interaction.reply({
+          content: `Stopped: ${name}`,
+          ephemeral: true,
+        });
+      });
       await wait(3000);
-      if (responseStop.status !== 200) {
-        await interaction.editReply(`Error: ${responseStop.statusText}`);
-      }
-      const responseStart = await fetch(urlStart, method, headers).then(
-        (response) => console.log(response)
-      );
+      exec(commandStart, async (error, stdout, stderr) => {
+        if (error) console.log(error);
+        //if (stderr) console.log(stderr);
+        //if (stdout) console.log(stdout);
+        await interaction.reply({
+          content: `Started: ${name}`,
+          ephemeral: true,
+        });
+      });
       await wait(3000);
-      if (responseStart.status !== 200) {
-        await interaction.editReply(`Error: ${responseStart.statusText}`);
-      }
-      await interaction.editReply({
-        content: `Restarted: ${name}`,
-        ephemeral: true,
+      exec(statusCommand, async (error, stdout, stderr) => {
+        if (error) console.log(error);
+        //if (stderr) console.log(stderr);
+        //if (stdout) console.log(stdout);
+        if (stdout.includes(`"on":true`)) {
+          return await interaction.editReply({
+            content: `Restarted: ${name}`,
+            ephemeral: true,
+          });
+        } else {
+          return await interaction.editReply({
+            content: `(Probably) Restarted: ${name}`,
+            ephemeral: true,
+          });
+        }
       });
     } catch (error) {
       await interaction.editReply({
