@@ -5,8 +5,8 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgosalad-stop")
-    .setDescription("[Salad] Send a stop command to Fruity CS:GO server"),
+    .setName("salad-stop")
+    .setDescription("[Salad] Send a STOP command to Fruity CS:GO server"),
 
   async execute(interaction) {
     if (

@@ -5,14 +5,14 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgosomali-stop")
+    .setName("somali-restart")
     .setDescription(
-      "[Pirate] Send a stop command to a Somali Pirates CS:GO server"
+      "[Pirate] Send a RESTART command to a Somali Pirates CS:GO server"
     )
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to stop")
+        .setDescription("Which server do you want to restart")
         .setRequired(true)
         .addChoices(
           { name: "Somali Pirates 1", value: "csgo-somali-1" },
@@ -24,7 +24,7 @@ module.exports = {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/csgoserver stop`;
+    const command = `sudo -iu ${server} /home/${server}/csgoserver restart`;
 
     let serverName = server;
     switch (serverName) {
@@ -44,7 +44,7 @@ module.exports = {
     ) {
       try {
         await interaction.reply({
-          content: `Stopping: ${serverName}`,
+          content: `Restarting: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
@@ -63,7 +63,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Stopped: ${serverName}`,
+            content: `Restarted: ${serverName}`,
             ephemeral: true,
           });
         });

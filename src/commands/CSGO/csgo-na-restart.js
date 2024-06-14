@@ -14,7 +14,7 @@ const headers = {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgoserver-na-restart")
+    .setName("csgo-na-restart")
     .setDescription("[Admin] Send a RESTART command to a NA CS:GO server")
     .addStringOption((option) =>
       option

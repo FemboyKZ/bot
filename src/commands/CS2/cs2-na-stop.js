@@ -14,7 +14,7 @@ const headers = {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("cs2server-na-stop")
+    .setName("cs2-na-stop")
     .setDescription("[Admin] Send a STOP command to a NA CS:GO server")
     .addStringOption((option) =>
       option

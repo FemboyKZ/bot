@@ -14,7 +14,7 @@ const headers = {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("cs2server-na-restart")
+    .setName("cs2-na-restart")
     .setDescription("[Admin] Send a RESTART command to a NA CS2 server")
     .addStringOption((option) =>
       option

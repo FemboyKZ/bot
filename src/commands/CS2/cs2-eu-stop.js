@@ -4,7 +4,7 @@ const wait = require("timers/promises").setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("cs2server-eu-stop")
+    .setName("cs2-eu-stop")
     .setDescription("[Admin] Send a STOP command to a EU CS:2 server")
     .addStringOption((option) =>
       option
