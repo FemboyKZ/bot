@@ -59,7 +59,7 @@ module.exports = {
       return;
     }
 
-    const { name, id, command } = server;
+    const { name, id } = server;
 
     const url = `https://dathost.net/api/0.1/game-servers/${id}/start`;
 

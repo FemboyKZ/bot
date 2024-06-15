@@ -59,7 +59,7 @@ module.exports = {
       return;
     }
 
-    const { name, id, command } = server;
+    const { name, id } = server;
 
     const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
     const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
