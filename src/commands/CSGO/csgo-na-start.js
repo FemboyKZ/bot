@@ -1,11 +1,19 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const axios = require("axios");
+const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
+const username = process.env.DATHOST_USERNAME;
+const password = process.env.DATHOST_PASSWORD;
+const headers = {
+  authorization: `Basic ${Buffer.from(`${username}:${password}`).toString(
+    "base64"
+  )}`,
+};
+
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgoserver-na-start")
+    .setName("csgo-na-start")
     .setDescription("[Admin] Send a START command to a NA CS:GO server")
     .addStringOption((option) =>
       option
@@ -40,12 +48,17 @@ module.exports = {
       });
       return;
     }
-
     const { name, id } = server;
+
+    const url = `https://dathost.net/api/0.1/game-servers/${id}/start`;
+    const command = `curl -u "${username}:${password}" --request POST \--url ${url}`;
+
+    const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
+    const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
-      !interaction.member.roles.cache.has(process.env.CSGO_MANAGER_ROLE)
+      !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
     ) {
       await interaction.reply({
         content: "You don't have perms to use this command.",
@@ -59,22 +72,28 @@ module.exports = {
         content: `Starting: ${name}`,
         ephemeral: true,
       });
-      const response = await axios.post(
-        `https://dathost.net/api/0.1/game-servers/${id}/start`,
-        {}
-      );
-      await wait(5000);
-      if (response.status === 200) {
-        await interaction.editReply({
-          content: `Started: ${name}`,
-          ephemeral: true,
-        });
-      } else {
-        await interaction.editReply({
-          content: `Error: ${response.data}`,
-          ephemeral: true,
-        });
-      }
+      exec(command, async (error, stdout, stderr) => {
+        if (error) console.log(error);
+        //if (stderr) console.log(stderr);
+        //if (stdout) console.log(stdout);
+      });
+      await wait(3000);
+      exec(statusCommand, async (error, stdout, stderr) => {
+        if (error) console.log(error);
+        //if (stderr) console.log(stderr);
+        //if (stdout) console.log(stdout);
+        if (stdout.includes(`"on":true`)) {
+          return await interaction.editReply({
+            content: `Started: ${name}`,
+            ephemeral: true,
+          });
+        } else {
+          return await interaction.editReply({
+            content: `(Probably) Started: ${name}`,
+            ephemeral: true,
+          });
+        }
+      });
     } catch (error) {
       if (interaction) {
         await interaction.editReply({

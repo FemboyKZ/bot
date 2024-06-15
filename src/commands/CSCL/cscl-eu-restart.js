@@ -5,7 +5,7 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csclserver-eu-restart")
+    .setName("cscl-eu-restart")
     .setDescription(
       "[Admin] Send a RESTART command to a EU ClassicCounter server"
     )

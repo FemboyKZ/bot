@@ -5,7 +5,7 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgoserver-eu-stop")
+    .setName("csgo-eu-stop")
     .setDescription("[Admin] Send a STOP command to a EU CS:GO server")
     .addStringOption((option) =>
       option

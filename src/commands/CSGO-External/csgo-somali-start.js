@@ -5,9 +5,9 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgosomali-start")
+    .setName("somali-start")
     .setDescription(
-      "[Pirate] Send a start command to a Somali Pirates CS:GO server"
+      "[Pirate] Send a START command to a Somali Pirates CS:GO server"
     )
     .addStringOption((option) =>
       option

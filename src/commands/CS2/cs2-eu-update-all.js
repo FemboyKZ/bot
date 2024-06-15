@@ -4,7 +4,7 @@ const wait = require("timers/promises").setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("cs2server-eu-update-all")
+    .setName("cs2-eu-update-all")
     .setDescription("[Admin] Send a UPDATE command to all 5 FKZ CS:2 servers"),
   async execute(interaction) {
     const servers = [

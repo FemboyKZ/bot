@@ -1,38 +1,46 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
-require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("csgosomali-stop")
-    .setDescription(
-      "[Pirate] Send a stop command to a Somali Pirates CS:GO server"
-    )
+    .setName("cs2-eu-force-update")
+    .setDescription("[Admin] Send a FORCE-UPDATE command to a EU CS:2 server")
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to stop")
+        .setDescription("Which server do you want to uptdate")
         .setRequired(true)
         .addChoices(
-          { name: "Somali Pirates 1", value: "csgo-somali-1" },
-          { name: "Somali Pirates 2", value: "csgo-somali-2" }
+          { name: "CS:2 FKZ 1 - Whitelist", value: "cs2-fkz-1" },
+          { name: "CS:2 FKZ 2 - Public KZ", value: "cs2-fkz-2" },
+          { name: "CS:2 FKZ 3 - Public MV", value: "cs2-fkz-3" },
+          { name: "CS:2 FKZ 4 - Public HNS", value: "cs2-fkz-4" },
+          { name: "CS:2 FKZ 5 - Testing", value: "cs2-fkz-5" }
         )
     ),
-
   async execute(interaction) {
     const { options } = interaction;
     const server = options.getString("server");
 
-    const command = `sudo -iu ${server} /home/${server}/csgoserver stop`;
+    const command = `sudo -iu ${server} /home/${server}/cs2server force-update`;
 
     let serverName = server;
     switch (serverName) {
-      case "csgo-somali-1":
-        serverName = "Somali Pirates 1";
+      case "cs2-fkz-1":
+        serverName = "CS:2 FKZ 1 - Whitelist";
         break;
-      case "csgo-somali-2":
-        serverName = "Somali Pirates 2";
+      case "cs2-fkz-2":
+        serverName = "CS:2 FKZ 2 - Public KZ";
+        break;
+      case "cs2-fkz-3":
+        serverName = "CS:2 FKZ 3 - Public MV";
+        break;
+      case "cs2-fkz-4":
+        serverName = "CS:2 FKZ 4 - Public HNS";
+        break;
+      case "cs2-fkz-5":
+        serverName = "CS:2 FKZ 5 - Testing";
         break;
       default:
         serverName = "Unknown";
@@ -40,15 +48,15 @@ module.exports = {
 
     if (
       interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      interaction.member.roles.cache.has(`${process.env.PIRATE_MANAGER_ROLE}`)
+      interaction.member.roles.cache.has(`${process.env.CS2_MANAGER_ROLE}`)
     ) {
       try {
         await interaction.reply({
-          content: `Stopping: ${serverName}`,
+          content: `Forcefully Updating: ${serverName}`,
           ephemeral: true,
         });
         exec(command, async (error, stdout, stderr) => {
-          await wait(5000);
+          await wait(30000);
           if (!interaction) return;
           if (error) {
             return await interaction.editReply({
@@ -63,7 +71,7 @@ module.exports = {
             });
           }
           return await interaction.editReply({
-            content: `Stopped: ${serverName}`,
+            content: `ForceUpdated: ${serverName}`,
             ephemeral: true,
           });
         });
@@ -77,7 +85,7 @@ module.exports = {
       }
     } else {
       await interaction.reply({
-        content: `You do not have permission to use this command.`,
+        content: "You don't have perms to use this command.",
         ephemeral: true,
       });
     }
