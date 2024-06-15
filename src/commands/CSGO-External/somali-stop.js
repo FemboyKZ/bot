@@ -37,7 +37,7 @@ module.exports = {
       },
     }[servers];
 
-    const { name, id, user } = server;
+    const { name, user, id } = server;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
