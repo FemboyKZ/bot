@@ -34,34 +34,42 @@ module.exports = {
     const server = {
       "cs2-fkz-1": {
         name: "CS2 EU - FKZ 1 - Whitelist",
+        user: "cs2-fkz-1",
         id: null,
       },
       "cs2-fkz-2": {
         name: "CS2 EU - FKZ 2 - Public KZ",
+        user: "cs2-fkz-2",
         id: null,
       },
       "cs2-fkz-3": {
         name: "CS2 EU - FKZ 3 - Public MV",
+        user: "cs2-fkz-3",
         id: null,
       },
       "cs2-fkz-4": {
         name: "CS2 EU - FKZ 4 - Public HNS",
+        user: "cs2-fkz-4",
         id: null,
       },
       "cs2-fkz-5": {
         name: "CS2 EU - FKZ 5 - Testing",
+        user: "cs2-fkz-5",
         id: null,
       },
       "cs2-fkz-6": {
         name: "CS2 NA - FKZ 1 - Public KZ",
+        user: "cs2-fkz-6",
         id: process.env.NA_CS2_KZ_SERVERID,
       },
       "cs2-fkz-7": {
         name: "CS2 NA - FKZ 1 - Public MV",
+        user: "cs2-fkz-7",
         id: process.env.NA_CS2_MV_SERVERID,
       },
       "cs2-fkz-7": {
         name: "CS2 NA - FKZ 1 - Public HNS",
+        user: "cs2-fkz-8",
         id: process.env.NA_CS2_HNS_SERVERID,
       },
     }[servers];
@@ -74,7 +82,7 @@ module.exports = {
       return;
     }
 
-    const { name, id } = server;
+    const { name, user, id } = server;
 
     const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
     const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
@@ -123,7 +131,7 @@ module.exports = {
         });
       } else {
         exec(
-          `sudo -iu ${server} /home/${server}/cs2server start`,
+          `sudo -iu ${user} /home/${user}/cs2server start`,
           async (error, stdout, stderr) => {
             if (error) console.log(error);
             //if (stderr) console.log(stderr);

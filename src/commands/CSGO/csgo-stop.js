@@ -31,22 +31,27 @@ module.exports = {
     const server = {
       "csgo-fkz-1": {
         name: "CS:GO EU - FKZ 1 - Whitelist 128t",
+        user: "csgo-fkz-1",
         id: null,
       },
       "csgo-fkz-2": {
         name: "CS:GO EU - FKZ 2 - Public 64t",
+        user: "csgo-fkz-2",
         id: null,
       },
       "csgo-fkz-3": {
         name: "CS:GO EU - FKZ 3 - Public Nuke",
+        user: "csgo-fkz-3",
         id: null,
       },
       "csgo-fkz-4": {
         name: "CS:GO NA - FKZ 1 - Whitelist 128t",
+        user: "csgo-fkz-4",
         id: process.env.NA_CSGO_WL_SERVERID,
       },
       "csgo-fkz-5": {
         name: "CS:GO NA - FKZ 2 - Public 64t",
+        user: "csgo-fkz-5",
         id: process.env.NA_CSGO_64_SERVERID,
       },
     }[servers];
@@ -59,11 +64,12 @@ module.exports = {
       return;
     }
 
-    const { name, id } = server;
+    const { name, user, id } = server;
 
     const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
     const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
     // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
+
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
@@ -108,7 +114,7 @@ module.exports = {
         });
       } else {
         exec(
-          `sudo -iu ${server} /home/${server}/csgoserver stop`,
+          `sudo -iu ${user} /home/${user}/csgoserver stop`,
           async (error, stdout, stderr) => {
             if (error) console.log(error);
             //if (stderr) console.log(stderr);
