@@ -67,7 +67,7 @@ module.exports = {
         user: "cs2-fkz-7",
         id: process.env.NA_CS2_MV_SERVERID,
       },
-      "cs2-fkz-7": {
+      "cs2-fkz-8": {
         name: "CS2 NA - FKZ 1 - Public HNS",
         user: "cs2-fkz-8",
         id: process.env.NA_CS2_HNS_SERVERID,
