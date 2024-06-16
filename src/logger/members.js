@@ -5,8 +5,8 @@ const {
   Events,
 } = require("discord.js");
 require("dotenv").config();
-const Audit_Log = require("./Schemas/auditlog");
-const { client } = require("./index.js");
+const Audit_Log = require("../Schemas/auditlog.js");
+const { client } = require("../index.js");
 
 const invites = new Collection();
 const wait = require("timers/promises").setTimeout;

@@ -1,6 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("./Schemas/auditlog");
-const { client } = require("./index.js");
+const Audit_Log = require("../Schemas/auditlog.js");
+const { client } = require("../index.js");
 
 client.on(Events.InviteCreate, async (invite) => {
   const data = await Audit_Log.findOne({
