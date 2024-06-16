@@ -135,7 +135,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const result = choices.join("");
 
-    ticketSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    ticketSchema.findOne({ Guild: interaction.guild.id }).then((data) => {
+      if (!data) return;
       const filter = { Guild: interaction.guild.id };
       const update = { Ticket: result };
 
@@ -158,9 +159,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isModalSubmit()) {
     if (interaction.customId === "modalTicket") {
-      ticketSchema.findOne(
-        { Guild: interaction.guild.id },
-        async (err, data) => {
+      ticketSchema
+        .findOne({ Guild: interaction.guild.id })
+        .then(async (data) => {
+          if (!data) return;
           const topicInput =
             interaction.fields.getTextInputValue("topicTicket");
           const infoInput = interaction.fields.getTextInputValue("infoTicket");
@@ -258,8 +260,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
             await channel.delete();
           });
-        }
-      );
+        });
     }
   }
 });
@@ -314,24 +315,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    mcWhitelistSchema.findOne(
-      { Guild: interaction.guild.id },
-      async (err, data) => {
+    mcWhitelistSchema
+      .findOne({ Guild: interaction.guild.id })
+      .then(async (data) => {
         if (!data) return;
 
-        if (data) {
-          const channelID = data.Channel;
-          const channel = interaction.guild.channels.cache.get(channelID);
+        const channelID = data.Channel;
+        const channel = interaction.guild.channels.cache.get(channelID);
 
-          channel.send({ embeds: [embedMc] });
+        channel.send({ embeds: [embedMc] });
 
-          await interaction.reply({
-            content: "Your request has been submitted.",
-            ephemeral: true,
-          });
-        }
-      }
-    );
+        await interaction.reply({
+          content: "Your request has been submitted.",
+          ephemeral: true,
+        });
+      })
+      .catch(async (error) => {
+        console.error("Error executing command:", error);
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      });
   }
 
   if (interaction.customId === "modalWhitelist") {
@@ -375,24 +380,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    whitelistSchema.findOne(
-      { Guild: interaction.guild.id },
-      async (err, data) => {
+    whitelistSchema
+      .findOne({ Guild: interaction.guild.id })
+      .then(async (data) => {
         if (!data) return;
 
-        if (data) {
-          const channelID = data.Channel;
-          const channel = interaction.guild.channels.cache.get(channelID);
+        const channelID = data.Channel;
+        const channel = interaction.guild.channels.cache.get(channelID);
 
-          channel.send({ embeds: [embedWhitelist] });
+        channel.send({ embeds: [embedWhitelist] });
 
-          await interaction.reply({
-            content: "Your request has been submitted.",
-            ephemeral: true,
-          });
-        }
-      }
-    );
+        await interaction.reply({
+          content: "Your request has been submitted.",
+          ephemeral: true,
+        });
+      })
+      .catch(async (error) => {
+        console.error("Error executing command:", error);
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      });
   }
 
   // unban request command
@@ -437,10 +446,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    unbanSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-      if (!data) return;
+    unbanSchema
+      .findOne({ Guild: interaction.guild.id })
+      .then(async (data) => {
+        if (!data) return;
 
-      if (data) {
         const channelID = data.Channel;
         const channel = interaction.guild.channels.cache.get(channelID);
 
@@ -450,8 +460,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
           content: "Your request has been submitted.",
           ephemeral: true,
         });
-      }
-    });
+      })
+      .catch(async (error) => {
+        console.error("Error executing command:", error);
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      });
   }
 
   // report/suggestion command
@@ -496,21 +512,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    reportSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
-      if (!data) return;
+    reportSchema
+      .findOne({ Guild: interaction.guild.id })
+      .then(async (data) => {
+        if (!data) return;
 
-      if (data) {
         const channelID = data.Channel;
         const channel = interaction.guild.channels.cache.get(channelID);
 
         channel.send({ embeds: [embedReport] });
 
         await interaction.reply({
-          content: "Your report/suggestion has been submitted.",
+          content: "Your request has been submitted.",
           ephemeral: true,
         });
-      }
-    });
+      })
+      .catch(async (error) => {
+        console.error("Error executing command:", error);
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          ephemeral: true,
+        });
+      });
   }
 });
 

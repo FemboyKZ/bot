@@ -14,69 +14,84 @@ module.exports = {
     .setName("report-or-suggest")
     .setDescription("Report an issue, or suggest an idea/improvement."),
   async execute(interaction) {
-    if (timeout.includes(interaction.user.id))
-      return await interaction.reply({
-        content: `You are on a cooldown! Try again in a few seconds.`,
-        ephemeral: true,
-      });
+    if (!interaction || !interaction.user || !interaction.guild) {
+      return;
+    }
 
-    reportSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+    if (timeout.includes(interaction.user.id)) {
+      try {
+        await interaction.reply({
+          content: `You are on a cooldown! Try again in a few seconds.`,
+          ephemeral: true,
+        });
+      } catch (error) {
+        console.error(`Failed to send reply: ${error}`);
+      }
+      return;
+    }
+
+    try {
+      const data = await reportSchema.findOne({ Guild: interaction.guild.id });
       if (!data) {
-        return await interaction.reply({
+        await interaction.reply({
           content: "The reports/suggestions are currently disabled.",
           ephemeral: true,
         });
+        return;
       }
 
-      if (data) {
-        const modalReport = new ModalBuilder()
-          .setTitle("Report/Suggestion form")
-          .setCustomId("modalReport");
+      const modalReport = new ModalBuilder()
+        .setTitle("Report/Suggestion form")
+        .setCustomId("modalReport");
 
-        const issueReport = new TextInputBuilder()
-          .setCustomId("issueReport")
-          .setRequired(true)
-          .setLabel("What do you want to report/suggest")
-          .setPlaceholder("A cheater? New server? Etc.")
-          .setStyle(TextInputStyle.Short);
+      const issueReport = new TextInputBuilder()
+        .setCustomId("issueReport")
+        .setRequired(true)
+        .setLabel("What do you want to report/suggest")
+        .setPlaceholder("A cheater? New server? Etc.")
+        .setStyle(TextInputStyle.Short);
 
-        const infoReport = new TextInputBuilder()
-          .setCustomId("infoReport")
-          .setRequired(true)
-          .setLabel("Explain what/who you're suggesting/reporting.")
-          .setPlaceholder(
-            "What happened? Where? / What makes your suggestion worth adding."
-          )
-          .setStyle(TextInputStyle.Paragraph);
+      const infoReport = new TextInputBuilder()
+        .setCustomId("infoReport")
+        .setRequired(true)
+        .setLabel("Explain what/who you're suggesting/reporting.")
+        .setPlaceholder(
+          "What happened? Where? / What makes your suggestion worth adding."
+        )
+        .setStyle(TextInputStyle.Paragraph);
 
-        const moreReport = new TextInputBuilder()
-          .setCustomId("moreReport")
-          .setRequired(true)
-          .setLabel("Anything to add?")
-          .setPlaceholder("Links to images/videos for proof/concepts? Etc.")
-          .setStyle(TextInputStyle.Paragraph);
+      const moreReport = new TextInputBuilder()
+        .setCustomId("moreReport")
+        .setRequired(true)
+        .setLabel("Anything to add?")
+        .setPlaceholder("Links to images/videos for proof/concepts? Etc.")
+        .setStyle(TextInputStyle.Paragraph);
 
-        const firstActionRow = new ActionRowBuilder().addComponents(
-          issueReport
-        );
-        const secondActionRow = new ActionRowBuilder().addComponents(
-          infoReport
-        );
-        const thirdActionRow = new ActionRowBuilder().addComponents(moreReport);
+      const firstActionRow = new ActionRowBuilder().addComponents(issueReport);
+      const secondActionRow = new ActionRowBuilder().addComponents(infoReport);
+      const thirdActionRow = new ActionRowBuilder().addComponents(moreReport);
 
-        modalReport.addComponents(
-          firstActionRow,
-          secondActionRow,
-          thirdActionRow
-        );
+      modalReport.addComponents(
+        firstActionRow,
+        secondActionRow,
+        thirdActionRow
+      );
 
-        interaction.showModal(modalReport);
+      await interaction.showModal(modalReport);
+      timeout.push(interaction.user.id);
+      setTimeout(() => {
+        timeout.shift();
+      }, 10000);
+    } catch (error) {
+      console.error(`Failed to execute report-or-suggest command: ${error}`);
+      try {
+        await interaction.reply({
+          content: `An error occurred while executing the command. Please try again later.`,
+          ephemeral: true,
+        });
+      } catch (error) {
+        console.error(`Failed to send reply: ${error}`);
       }
-    });
-
-    timeout.push(interaction.user.id);
-    setTimeout(() => {
-      timeout.shift();
-    }, 10000);
+    }
   },
 };
