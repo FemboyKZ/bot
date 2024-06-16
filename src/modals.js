@@ -3,7 +3,7 @@ const whitelistSchema = require("./Schemas/whitelistSchema");
 const mcWhitelistSchema = require("./Schemas/mcWhitelistSchema");
 const unbanSchema = require("./Schemas/unbanSchema");
 const reportSchema = require("./Schemas/reportSchema");
-const { client } = require(".");
+const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isModalSubmit()) return;

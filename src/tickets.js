@@ -11,7 +11,7 @@ const {
   ChannelType,
 } = require("discord.js");
 const ticketSchema = require("./Schemas/ticketSchema");
-const { client } = require(".");
+const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isButton()) return;

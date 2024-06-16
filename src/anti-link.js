@@ -1,6 +1,6 @@
 const { Events } = require("discord.js");
 const linkSchema = require("./Schemas/linkSchema");
-const { client } = require(".");
+const { client } = require("./index.js");
 
 client.on(Events.MessageCreate, async (message) => {
   if (
