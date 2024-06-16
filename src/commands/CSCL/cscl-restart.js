@@ -30,15 +30,17 @@ module.exports = {
     const server = {
       "cscl-fkz-1": {
         name: "CS:CL FKZ 1 - VNL 128t",
+        user: "cscl-fkz-1",
         id: null,
       },
       "cscl-fkz-2": {
         name: "CS:CL FKZ 2 - VNL 64t",
+        user: "cscl-fkz-2",
         id: null,
       },
     }[servers];
 
-    const { name, id } = server;
+    const { name, user, id } = server;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
@@ -56,18 +58,18 @@ module.exports = {
         ephemeral: true,
       });
       exec(
-        `sudo -iu ${server} /home/${server}/csgoserver restart`,
+        `sudo -iu ${user} /home/${user}/csgoserver restart`,
         async (error, stdout, stderr) => {
           if (error) console.log(error);
           //if (stderr) console.log(stderr);
           //if (stdout) console.log(stdout);
-          await wait(5000);
-          return await interaction.editReply({
-            content: `Restarted: ${name}`,
-            ephemeral: true,
-          });
         }
       );
+      await wait(3000);
+      return await interaction.editReply({
+        content: `Restarted: ${name}`,
+        ephemeral: true,
+      });
     } catch (error) {
       if (interaction) {
         await interaction.editReply({

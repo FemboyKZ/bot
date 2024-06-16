@@ -27,15 +27,17 @@ module.exports = {
     const server = {
       "csgo-somali-1": {
         name: "Somali Pirates 1",
+        user: "csgo-somali-1",
         id: null,
       },
       "csgo-somali-2": {
         name: "Somali Pirates 2",
+        user: "csgo-somali-2",
         id: null,
       },
     }[servers];
 
-    const { name, id } = server;
+    const { name, user, id } = server;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
@@ -53,18 +55,18 @@ module.exports = {
         ephemeral: true,
       });
       exec(
-        `sudo -iu ${server} /home/${server}/csgoserver stop`,
+        `sudo -iu ${user} /home/${user}/csgoserver stop`,
         async (error, stdout, stderr) => {
           if (error) console.log(error);
           //if (stderr) console.log(stderr);
           //if (stdout) console.log(stdout);
-          await wait(3000);
-          return await interaction.editReply({
-            content: `Stopped: ${name}`,
-            ephemeral: true,
-          });
         }
       );
+      await wait(3000);
+      return await interaction.editReply({
+        content: `Stopped: ${name}`,
+        ephemeral: true,
+      });
     } catch (error) {
       if (interaction) {
         await interaction.editReply({
