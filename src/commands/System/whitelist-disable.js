@@ -20,12 +20,14 @@ module.exports = {
 
     const embed = new EmbedBuilder();
 
-    whitelistSchema.deleteMany({ Guild: guildId }, async (err, data) => {
-      embed
-        .setColor("#ff00b3")
-        .setDescription(`The whitelist system has been disabled.`);
+    whitelistSchema.deleteMany(
+      { Guild: guildId }.then(async (data) => {
+        embed
+          .setColor("#ff00b3")
+          .setDescription(`The whitelist system has been disabled.`);
 
-      return await interaction.reply({ embeds: [embed] });
-    });
+        return await interaction.reply({ embeds: [embed], ephemeral: true });
+      })
+    );
   },
 };

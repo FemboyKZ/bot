@@ -29,26 +29,28 @@ module.exports = {
 
     const embed = new EmbedBuilder();
 
-    whitelistSchema.findOne({ Guild: guildId }, async (err, data) => {
-      if (!data) {
-        await whitelistSchema.create({
-          Guild: guildId,
-          Channel: wlChannel.id,
-        });
+    whitelistSchema.findOne(
+      { Guild: guildId }.then(async (data) => {
+        if (!data) {
+          await whitelistSchema.create({
+            Guild: guildId,
+            Channel: wlChannel.id,
+          });
 
-        embed
-          .setColor("#ff00b3")
-          .setDescription(
-            `All submitted wl requests will be sent in ${wlChannel}`
-          );
-      } else if (data) {
-        const c = client.channels.cache.get(data.channel);
-        embed
-          .setColor("#ff00b3")
-          .setDescription(`Your wl channel has already been set to ${c}`);
-      }
+          embed
+            .setColor("#ff00b3")
+            .setDescription(
+              `All submitted wl requests will be sent in ${wlChannel}`
+            );
+        } else if (data) {
+          const c = client.channels.cache.get(data.channel);
+          embed
+            .setColor("#ff00b3")
+            .setDescription(`Your wl channel has already been set to ${c}`);
+        }
 
-      return await interaction.reply({ embeds: [embed] });
-    });
+        return await interaction.reply({ embeds: [embed], ephemeral: true });
+      })
+    );
   },
 };

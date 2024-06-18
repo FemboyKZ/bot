@@ -20,12 +20,14 @@ module.exports = {
 
     const embed = new EmbedBuilder();
 
-    unbanSchema.deleteMany({ Guild: guildId }, async (err, data) => {
-      embed
-        .setColor("#ff00b3")
-        .setDescription(`The unban system has been disabled.`);
+    unbanSchema.deleteMany(
+      { Guild: guildId }.then(async (data) => {
+        embed
+          .setColor("#ff00b3")
+          .setDescription(`The unban system has been disabled.`);
 
-      return await interaction.reply({ embeds: [embed] });
-    });
+        return await interaction.reply({ embeds: [embed], ephemeral: true });
+      })
+    );
   },
 };

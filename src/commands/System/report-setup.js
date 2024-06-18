@@ -50,7 +50,7 @@ module.exports = {
           );
       }
 
-      return await interaction.reply({ embeds: [embed] });
+      return await interaction.reply({ embeds: [embed], ephemeral: true });
     });
   },
 };
