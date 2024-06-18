@@ -18,14 +18,20 @@ module.exports = {
 
     const { guildId } = interaction;
 
-    const embed = new EmbedBuilder();
+    const embed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setDescription(`The unban system has been disabled.`);
 
-    reportSchema.deleteMany({ Guild: guildId }, async (err, data) => {
-      embed
-        .setColor("#ff00b3")
-        .setDescription(`The unban system has been disabled.`);
+    try {
+      reportSchema.deleteMany({ Guild: guildId });
 
-      return await interaction.reply({ embeds: [embed] });
-    });
+      return await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (err) {
+      console.error("Error executing command:", err);
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    }
   },
 };

@@ -29,7 +29,8 @@ module.exports = {
 
     const embed = new EmbedBuilder();
 
-    reportSchema.findOne({ Guild: guildId }, async (err, data) => {
+    try {
+      const data = await reportSchema.findOne({ Guild: guildId });
       if (!data) {
         await reportSchema.create({
           Guild: guildId,
@@ -42,7 +43,7 @@ module.exports = {
             `All submitted reports/suggestions requests will be sent in ${reportChannel}`
           );
       } else if (data) {
-        const e = client.channels.cache.get(data.channel);
+        const e = client.channels.cache.get(data.Channel);
         embed
           .setColor("#ff00b3")
           .setDescription(
@@ -50,7 +51,13 @@ module.exports = {
           );
       }
 
-      return await interaction.reply({ embeds: [embed] });
-    });
+      return await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (err) {
+      console.error("Error executing command:", err);
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    }
   },
 };

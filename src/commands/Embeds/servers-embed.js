@@ -33,7 +33,8 @@ module.exports = {
     const csgo64na = "na64.femboy.kz:27945";
 
     const cscl128eu = "classic.femboy.kz:27099";
-    const cscl64eu = "classic.femboy.kz:27093";
+    const cscl128eukzt = "classic.femboy.kz:27079";
+    const cscl64eu = "classic.femboy.kz:27089";
 
     const cs2WLeu = "euwl.femboy.kz";
     const cs2KZeu = "eu1.femboy.kz:27016";
@@ -112,7 +113,7 @@ module.exports = {
           inline: false,
         },
         {
-          name: ":flag_eu:  **128t VNL**",
+          name: ":flag_eu:  **128t VNL KZ**",
           value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128eu}>)`,
           inline: true,
         },
@@ -122,8 +123,13 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_eu:  **64t VNL**",
+          name: ":flag_eu:  **64t VNL KZ**",
           value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64eu}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **128t KZTimer**",
+          value: `[*${cscl128eukzt}*](<https://classic.femboy.kz/connect?ip=${cscl128eukzt}>)`,
           inline: true,
         },
       ]);

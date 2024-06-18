@@ -60,7 +60,7 @@ module.exports = {
               `The invite-logger has been enabled, logs will be sent to ${channel}`
             );
 
-          await interaction.reply({ embeds: [embed] });
+          await interaction.reply({ embeds: [embed], ephemeral: true });
         }
     }
 
