@@ -13,24 +13,34 @@ module.exports = {
   async execute(interaction) {
     const { options, guild } = interaction;
 
-    const data = await Schema.findOne({
-      Guild: guild.id,
-    });
-    if (!data) {
-      return await interaction.reply("You dont have a audit log system here!");
+    try {
+      const data = await Schema.findOne({
+        Guild: guild.id,
+      });
+      if (!data) {
+        return await interaction.reply(
+          "You dont have a audit log system here!"
+        );
+      }
+      const embed = new EmbedBuilder()
+        .setTitle("Audit Log Setup")
+        .setDescription(`Your Audit Log has been deleted!`)
+        .setColor("#ff00b3");
+
+      await Schema.deleteMany({
+        Guild: guild.id,
+      });
+
+      return await interaction.reply({
+        embeds: [embed],
+        ephemeral: true,
+      });
+    } catch (err) {
+      console.error("Error executing command:", err);
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
     }
-    const embed = new EmbedBuilder()
-      .setTitle("Audit Log Setup")
-      .setDescription(`Your Audit Log has been deleted!`)
-      .setColor("#ff00b3");
-
-    await Schema.deleteMany({
-      Guild: guild.id,
-    });
-
-    return await interaction.reply({
-      embeds: [embed],
-      ephemeral: true,
-    });
   },
 };

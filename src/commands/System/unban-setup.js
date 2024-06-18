@@ -29,28 +29,33 @@ module.exports = {
 
     const embed = new EmbedBuilder();
 
-    unbanSchema.findOne(
-      { Guild: guildId }.then(async (data) => {
-        if (!data) {
-          await unbanSchema.create({
-            Guild: guildId,
-            Channel: unbanChannel.id,
-          });
+    try {
+      const data = await unbanSchema.findOne({ Guild: guildId });
+      if (!data) {
+        await unbanSchema.create({
+          Guild: guildId,
+          Channel: unbanChannel.id,
+        });
 
-          embed
-            .setColor("#ff00b3")
-            .setDescription(
-              `All submitted unban requests will be sent in ${unbanChannel}`
-            );
-        } else if (data) {
-          const d = client.channels.cache.get(data.channel);
-          embed
-            .setColor("#ff00b3")
-            .setDescription(`Your unban channel has already been set to ${d}`);
-        }
+        embed
+          .setColor("#ff00b3")
+          .setDescription(
+            `All submitted unban requests will be sent in ${unbanChannel}`
+          );
+      } else if (data) {
+        const d = client.channels.cache.get(data.Channel);
+        embed
+          .setColor("#ff00b3")
+          .setDescription(`Your unban channel has already been set to ${d}`);
+      }
 
-        return await interaction.reply({ embeds: [embed], ephemeral: true });
-      })
-    );
+      return await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (err) {
+      console.error("Error executing command:", err);
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    }
   },
 };

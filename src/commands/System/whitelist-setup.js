@@ -29,28 +29,33 @@ module.exports = {
 
     const embed = new EmbedBuilder();
 
-    whitelistSchema.findOne(
-      { Guild: guildId }.then(async (data) => {
-        if (!data) {
-          await whitelistSchema.create({
-            Guild: guildId,
-            Channel: wlChannel.id,
-          });
+    try {
+      const data = await whitelistSchema.findOne({ Guild: guildId });
+      if (!data) {
+        await whitelistSchema.create({
+          Guild: guildId,
+          Channel: wlChannel.id,
+        });
 
-          embed
-            .setColor("#ff00b3")
-            .setDescription(
-              `All submitted wl requests will be sent in ${wlChannel}`
-            );
-        } else if (data) {
-          const c = client.channels.cache.get(data.channel);
-          embed
-            .setColor("#ff00b3")
-            .setDescription(`Your wl channel has already been set to ${c}`);
-        }
+        embed
+          .setColor("#ff00b3")
+          .setDescription(
+            `All submitted wl requests will be sent in ${wlChannel}`
+          );
+      } else if (data) {
+        const c = client.channels.cache.get(data.Channel);
+        embed
+          .setColor("#ff00b3")
+          .setDescription(`Your wl channel has already been set to ${c}`);
+      }
 
-        return await interaction.reply({ embeds: [embed], ephemeral: true });
-      })
-    );
+      return await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (err) {
+      console.error("Error executing command:", err);
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    }
   },
 };
