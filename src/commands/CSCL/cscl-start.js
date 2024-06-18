@@ -18,8 +18,9 @@ module.exports = {
         .setDescription("Which server do you want to start")
         .setRequired(true)
         .addChoices(
-          { name: "CS:CL FKZ 1 - VNL 128t", value: "cscl-fkz-1" },
-          { name: "CS:CL FKZ 2 - VNL 64t", value: "cscl-fkz-2" }
+          { name: "CS:CL FKZ 1 - VNL KZ 128t", value: "cscl-fkz-1" },
+          { name: "CS:CL FKZ 2 - VNL KZ 64t", value: "cscl-fkz-2" },
+          { name: "CS:CL FKZ 3 - KZTimer 128t", value: "cscl-fkz-3" }
         )
     ),
 
@@ -29,13 +30,18 @@ module.exports = {
 
     const server = {
       "cscl-fkz-1": {
-        name: "CS:CL FKZ 1 - VNL 128t",
+        name: "CS:CL FKZ 1 - VNL KZ 128t",
         user: "cscl-fkz-1",
         id: null,
       },
       "cscl-fkz-2": {
-        name: "CS:CL FKZ 2 - VNL 64t",
+        name: "CS:CL FKZ 2 - VNL KZ 64t",
         user: "cscl-fkz-2",
+        id: null,
+      },
+      "cscl-fkz-3": {
+        name: "CS:CL FKZ 3 - KZTimer 128t",
+        user: "cscl-fkz-3",
         id: null,
       },
     }[servers];
