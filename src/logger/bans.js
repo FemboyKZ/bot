@@ -23,12 +23,12 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
     .addFields(
       {
         name: "Banned Member:",
-        value: user.tag || "unknown",
+        value: `<@${user.id}>` || "unknown",
         inline: false,
       },
       {
         name: "Executor:",
-        value: executor.tag || "unknown",
+        value: `<@${executor.id}>` || "unknown",
         inline: false,
       },
       {
@@ -68,7 +68,7 @@ client.on(Events.GuildBanRemove, async (user) => {
       },
       {
         name: "Admin:",
-        value: executor.tag || "unknown",
+        value: `<@${executor.id}>` || "unknown",
         inline: false,
       }
     );

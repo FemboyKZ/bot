@@ -19,7 +19,7 @@ client.on(Events.MessageDelete, async (message) => {
     const auditChannel = client.channels.cache.get(logID);
     if (!auditChannel) return;
 
-    const content = fullMessage.content || message.content || "none";
+    const content = message.content || fullMessage.content || "none";
     if (content.length >= 3072) return;
 
     const auditEmbed = new EmbedBuilder()
@@ -74,7 +74,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
       const oldMessageText = oldMessage.content;
       const fullOldAuthor = fullOldMessage.author;
       changes.push(
-        `Message: \`${fullOldMessageText || oldMessageText || "None"}\` → \`${
+        `Message: \`${oldMessageText || fullOldMessageText || "None"}\` → \`${
           newMessage.content || "None"
         }\``
       );

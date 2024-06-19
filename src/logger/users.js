@@ -41,11 +41,10 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
       auditEmbed.addFields({
         name: `Username Updated`,
         value: `Name: \`${
-          fullOldUsername || oldUser.username || "none"
+          oldUser.username || fullOldUsername || "none"
         }\`  →  \`${newUser.username || "none"}\``,
         inline: false,
       });
-      if (!newUser.username || !fullOldUsername) return;
       await auditChannel2.send({ embeds: [auditEmbed] });
     }
 
@@ -57,11 +56,10 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
       auditEmbed.setImage(`${UserPfp}`).addFields({
         name: `Profile picture updated`,
         value: `[Old Pfp](<${
-          fullOldPfp || oldPfp
+          oldPfp || fullOldPfp
         }>)  →  [New Pfp](<${newUser.avatarURL({ size: 512 })}>)`,
         inline: false,
       });
-      if (!newUser.avatar || !fullOldPfp || !oldPfp) return;
       await auditChannel2.send({ embeds: [auditEmbed] });
     }
 
@@ -73,11 +71,10 @@ client.on(Events.UserUpdate, async (oldUser, newUser) => {
       auditEmbed.setImage(`${Banner}`).addFields({
         name: `Banner updated`,
         value: `[Old Banner](<${
-          fullOldBanner || oldBanner
+          oldBanner || fullOldBanner
         }>)  →  [New Banner](<${newUser.bannerURL({ size: 512 })}>)`,
         inline: false,
       });
-      if (!newUser.banner || !fullOldBanner || !oldBanner) return;
       await auditChannel2.send({ embeds: [auditEmbed] });
     }
   } catch (error) {

@@ -32,7 +32,7 @@ client.on(Events.ChannelCreate, async (channel) => {
       },
       {
         name: "ID:",
-        value: `${channel.id}`,
+        value: `<#${channel.id}>`,
         inline: false,
       }
     );
@@ -69,7 +69,7 @@ client.on(Events.ChannelDelete, async (channel) => {
       },
       {
         name: "ID:",
-        value: `${channel.id}`,
+        value: `<#${channel.id}>`,
         inline: false,
       }
     );
@@ -117,7 +117,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     .setTitle("Channel Updated")
     .addFields(
       { name: "Changes:", value: `${changesText}`, inline: false },
-      { name: "ID:", value: `${newChannel.id}`, inline: false }
+      { name: "ID:", value: `<#${newChannel.id}>`, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });

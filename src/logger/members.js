@@ -71,10 +71,10 @@ client.on("ready", async () => {
       if (oldMember.nickname !== newMember.nickname) {
         const fullOldMember = await oldMember.fetch();
         const fullOldNickName = fullOldMember.nickname;
-        auditEmbed.addFields({
+        await auditEmbed.addFields({
           name: `Nickname Updated`,
           value: `DisplayName: \`${
-            fullOldNickName || oldMember.nickname || "none"
+            oldMember.nickname || fullOldNickName || "none"
           }\`  →  \`${newMember.nickname || "none"}\``,
           inline: false,
         });
@@ -84,10 +84,10 @@ client.on("ready", async () => {
       if (oldMember.displayName !== newMember.displayName) {
         const fullOldMember = await oldMember.fetch();
         const fullOldDisplayName = fullOldMember.displayName;
-        auditEmbed.addFields({
-          name: `Nickname or Displayname Updated`,
+        await auditEmbed.addFields({
+          name: `Displayname Updated`,
           value: `DisplayName: \`${
-            fullOldDisplayName || oldMember.displayName || "none"
+            oldMember.displayName || fullOldDisplayName || "none"
           }\`  →  \`${newMember.displayName || "none"}\``,
           inline: false,
         });
@@ -100,7 +100,7 @@ client.on("ready", async () => {
         auditEmbed.addFields({
           name: `Username Updated`,
           value: `Name: \`${
-            fullOldUsername || oldMember.user.username || "none"
+            oldMember.user.username || fullOldUsername || "none"
           }\`  →  \`${newMember.user.username || "none"}\``,
           inline: false,
         });
@@ -115,7 +115,7 @@ client.on("ready", async () => {
         auditEmbed.setImage(`${pfp}`).addFields({
           name: `Profile picture updated`,
           value: `[Old Pfp](<${
-            fullOldPfp || oldPfp
+            oldPfp || fullOldPfp
           }>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`,
           inline: false,
         });
@@ -130,7 +130,7 @@ client.on("ready", async () => {
         auditEmbed.setImage(`${UserPfp}`).addFields({
           name: `Profile picture updated`,
           value: `[Old Pfp](<${
-            fullOldUserPfp || oldUserPfp
+            oldUserPfp || fullOldUserPfp
           }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`,
           inline: false,
         });
@@ -145,7 +145,7 @@ client.on("ready", async () => {
         auditEmbed.setImage(`${Banner}`).addFields({
           name: `Banner updated`,
           value: `[Old Banner](<${
-            fullOldBanner || oldBanner
+            oldBanner || fullOldBanner
           }>)  →  [New Banner](<${newMember.user.bannerURL({ size: 512 })}>)`,
           inline: false,
         });
