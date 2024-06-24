@@ -131,7 +131,7 @@ module.exports = {
           }
         );
         await wait(3000);
-        await interaction.reply({
+        await interaction.editReply({
           content: `Restarted: ${name}`,
           ephemeral: true,
         });
