@@ -29,7 +29,7 @@ client.on(Events.AutoModerationRuleCreate, async (autoModerationRule) => {
       return;
     }
 
-    const actions = autoModerationRule.actions?.toString() || "none";
+    let actions = JSON.stringify(autoModerationRule.actions);
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -64,15 +64,24 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
     const data = await Audit_Log.findOne({
       Guild: autoModerationRule.guild.id,
     });
-    let logID;
-    if (data) {
-      logID = data.Channel;
-    } else {
+    if (!data) {
       console.error("No audit log data found for guild");
       return;
     }
+
+    let logID = data.Channel;
+    if (!logID) {
+      console.error("No log channel ID found in audit log data");
+      return;
+    }
+
     const auditChannel = client.channels.cache.get(logID);
-    let actions = autoModerationRule.actions.toString();
+    if (!auditChannel) {
+      console.error("Audit log channel not found in cache");
+      return;
+    }
+
+    let actions = JSON.stringify(autoModerationRule.actions);
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -128,16 +137,6 @@ client.on(
 
     const changes = [];
 
-    const nullEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Automod Rule Updated")
-      .addFields({
-        name: "Changes:",
-        value: `NULL`,
-      });
-
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
@@ -159,8 +158,8 @@ client.on(
     }
 
     if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
-      let oldActions = oldAutoModerationRule.actions?.toString() || "none";
-      let newActions = newAutoModerationRule.actions?.toString() || "none";
+      let oldActions = JSON.stringify(oldAutoModerationRule.actions) || "none";
+      let newActions = JSON.stringify(newAutoModerationRule.actions) || "none";
       auditEmbed.addFields(
         {
           name: "Old Rules:",
