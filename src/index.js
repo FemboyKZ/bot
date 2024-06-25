@@ -47,12 +47,13 @@ process.on("unhandledRejection", (reason, promise) => {
 
 require("dotenv").config();
 
-require("./auto-roles.js");
 require("./anti-link.js");
+require("./auto-roles.js");
 require("./bot-guilds.js");
+require("./guild-scraper.js");
 require("./modals.js");
-require("./tickets.js");
 require("./reaction-roles.js");
+require("./tickets.js");
 
 require("./logger/automod-rules.js");
 require("./logger/bans.js");
@@ -83,21 +84,3 @@ const commandFolders = fs.readdirSync("./src/commands");
   client.handleCommands(commandFolders, "./src/commands");
   client.login(process.env.TOKEN);
 })();
-
-async () => {
-  const guild = await client.guilds.cache.get(`${process.env.GUILD_ID}`); // fkz
-  const members = await guild.members.fetch();
-
-  members.forEach(async (member) => {
-    const data = await Audit_Log.findOne({
-      Guild: guild.id,
-      Member: member.id,
-    });
-
-    if (data) {
-      await data.updateOne({ Member: member.id });
-    } else {
-      await Audit_Log.create({ Guild: guild.id, Member: member.id });
-    }
-  });
-};
