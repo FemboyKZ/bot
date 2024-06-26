@@ -35,19 +35,21 @@ client.on("ready", async () => {
       const data = await Audit_Log.findOne({
         Guild: oldMember.guild.id,
       });
-      let logID;
-      if (data) {
-        logID = data.Channel;
-      } else {
-        return;
-      }
+      if (!data) return;
 
-      const logschatID = await client.channels.fetch(process.env.LOGS_CHAT_ID);
+      const logID = data.Channel;
+      const logsChatID = await client.channels.fetch(process.env.LOGS_CHAT_ID);
+
+      let auditChannel = client.channels.cache.get(logID);
+      if (auditChannel === undefined) {
+        let auditChannel = client.channels.cache.get(logsChatID);
+        if (auditChannel === undefined) {
+          return;
+        }
+      }
 
       if (oldMember.user.system || newMember.user.system) return;
-      if (oldMember.partial) {
-        await oldMember.fetch();
-      }
+      const fullOldMember = await oldMember.fetch(); // fetch seems to return same as newMember. ?
 
       const auditEmbed = new EmbedBuilder()
         .setColor("#ff00b3")
@@ -60,95 +62,100 @@ client.on("ready", async () => {
           inline: false,
         });
 
-      let auditChannel = client.channels.cache.get(logID);
-      if (auditChannel === undefined) {
-        let auditChannel = client.channels.cache.get(logschatID);
-        if (auditChannel === undefined) {
-          return;
-        }
-      }
-
       if (oldMember.nickname !== newMember.nickname) {
-        const fullOldMember = await oldMember.fetch();
-        const fullOldNickName = fullOldMember.nickname;
-        auditEmbed.addFields({
-          name: `Nickname Updated`,
-          value: `DisplayName: \`${
-            fullOldNickName || oldMember.nickname || "none"
-          }\`  →  \`${newMember.nickname || "none"}\``,
-          inline: false,
-        });
-        await auditChannel.send({ embeds: [auditEmbed] });
+        const auditEmbedNick = new EmbedBuilder()
+          .setColor("#ff00b3")
+          .setTimestamp()
+          .setFooter({ text: "FKZ Log System" })
+          .setTitle("Member Updated")
+          .addFields(
+            {
+              name: "User:",
+              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              inline: false,
+            },
+            {
+              name: `Nickname Updated`,
+              value: `DisplayName: \`${oldMember.nickname || "none"}\`  →  \`${
+                newMember.nickname || "none"
+              }\``,
+              inline: false,
+            }
+          );
+        if (oldMember.nickname === null && newMember.nickname === null) return;
+        await auditChannel.send({ embeds: [auditEmbedNick] });
       }
 
       if (oldMember.displayName !== newMember.displayName) {
-        const fullOldMember = await oldMember.fetch();
-        const fullOldDisplayName = fullOldMember.displayName;
-        auditEmbed.addFields({
-          name: `Nickname or Displayname Updated`,
-          value: `DisplayName: \`${
-            fullOldDisplayName || oldMember.displayName || "none"
-          }\`  →  \`${newMember.displayName || "none"}\``,
-          inline: false,
-        });
-        await auditChannel.send({ embeds: [auditEmbed] });
+        const auditEmbedDisplay = new EmbedBuilder()
+          .setColor("#ff00b3")
+          .setTimestamp()
+          .setFooter({ text: "FKZ Log System" })
+          .setTitle("Member Updated")
+          .addFields(
+            {
+              name: "User:",
+              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              inline: false,
+            },
+            {
+              name: `Displayname Updated`,
+              value: `DisplayName: \`${
+                oldMember.displayName || "none"
+              }\`  →  \`${newMember.displayName || "none"}\``,
+              inline: false,
+            }
+          );
+        await auditChannel.send({ embeds: [auditEmbedDisplay] });
       }
 
       if (oldMember.user.username !== newMember.user.username) {
-        const fullOldMember = await oldMember.fetch();
-        const fullOldUsername = fullOldMember.user.username;
         auditEmbed.addFields({
           name: `Username Updated`,
-          value: `Name: \`${
-            fullOldUsername || oldMember.user.username || "none"
-          }\`  →  \`${newMember.user.username || "none"}\``,
+          value: `Name: \`${oldMember.user.username || "none"}\`  →  \`${
+            newMember.user.username || "none"
+          }\``,
           inline: false,
         });
         await auditChannel.send({ embeds: [auditEmbed] });
       }
 
       if (oldMember.avatar !== newMember.avatar) {
-        const fullOldMember = await oldMember.fetch();
-        const fullOldPfp = fullOldMember.avatarURL({ size: 512 });
-        const oldPfp = oldMember.avatarURL({ size: 512 });
-        const pfp = newMember.avatarURL({ size: 64 });
-        auditEmbed.setImage(`${pfp}`).addFields({
+        auditEmbed.setImage(`${newMember.avatarURL({ size: 128 })}`).addFields({
           name: `Profile picture updated`,
-          value: `[Old Pfp](<${
-            fullOldPfp || oldPfp
-          }>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`,
+          value: `[Old Pfp](<${oldMember.avatarURL({
+            size: 512,
+          })}>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`,
           inline: false,
         });
         await auditChannel.send({ embeds: [auditEmbed] });
       }
 
       if (oldMember.user.avatar !== newMember.user.avatar) {
-        const fullOldMember = await oldMember.fetch();
-        const fullOldUserPfp = fullOldMember.user.avatarURL({ size: 512 });
-        const oldUserPfp = oldMember.user.avatarURL({ size: 512 });
-        const UserPfp = newMember.avatarURL({ size: 64 });
-        auditEmbed.setImage(`${UserPfp}`).addFields({
-          name: `Profile picture updated`,
-          value: `[Old Pfp](<${
-            fullOldUserPfp || oldUserPfp
-          }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`,
-          inline: false,
-        });
+        auditEmbed
+          .setImage(`${newMember.user.avatarURL({ size: 128 })}`)
+          .addFields({
+            name: `Profile picture updated`,
+            value: `[Old Pfp](<${oldMember.user.avatarURL({
+              size: 512,
+            })}>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`,
+            inline: false,
+          });
         await auditChannel.send({ embeds: [auditEmbed] });
       }
 
       if (oldMember.user.banner !== newMember.user.banner) {
-        const fullOldMember = await oldMember.fetch();
-        const fullOldBanner = fullOldMember.user.bannerURL({ size: 512 });
-        const oldBanner = oldMember.user.bannerURL({ size: 512 });
-        const Banner = newMember.user.bannerURL({ size: 64 });
-        auditEmbed.setImage(`${Banner}`).addFields({
-          name: `Banner updated`,
-          value: `[Old Banner](<${
-            fullOldBanner || oldBanner
-          }>)  →  [New Banner](<${newMember.user.bannerURL({ size: 512 })}>)`,
-          inline: false,
-        });
+        auditEmbed
+          .setImage(`${newMember.user.bannerURL({ size: 128 })}`)
+          .addFields({
+            name: `Banner updated`,
+            value: `[Old Banner](<${oldMember.user.bannerURL({
+              size: 512,
+            })}>)  →  [New Banner](<${newMember.user.bannerURL({
+              size: 512,
+            })}>)`,
+            inline: false,
+          });
         await auditChannel.send({ embeds: [auditEmbed] });
       }
     } catch (error) {
@@ -163,16 +170,12 @@ client.on(Events.GuildMemberAdd, async (member) => {
       Guild: member.guild.id,
     });
 
-    if (!data) {
-      return;
-    }
-
+    if (!data) return;
     const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
+    if (!logID) return;
 
-    if (!auditChannel) {
-      return;
-    }
+    const auditChannel = client.channels.cache.get(logID);
+    if (!auditChannel) return;
 
     const newInvites = await member.guild.invites.fetch();
     const oldInvites = invites.get(member.guild.id) || new Map();
@@ -209,9 +212,11 @@ client.on(Events.GuildMemberRemove, async (member) => {
     const data = await Audit_Log.findOne({
       Guild: member.guild.id,
     });
-    if (!data) return;
 
+    if (!data) return;
     const logID = data.Channel;
+    if (!logID) return;
+
     const auditChannel = client.channels.cache.get(logID);
     if (!auditChannel) return;
 
@@ -233,16 +238,13 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
   const data = await Audit_Log.findOne({
     Guild: oldMember.guild.id,
   });
-  if (!data) {
-    return;
-  }
 
+  if (!data) return;
   const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
+  if (!logID) return;
 
-  if (!auditChannel) {
-    return;
-  }
+  const auditChannel = client.channels.cache.get(logID);
+  if (!auditChannel) return;
 
   if (oldMember.user.bot || newMember.user.bot) return;
   if (oldMember.user.system || newMember.user.system) return;

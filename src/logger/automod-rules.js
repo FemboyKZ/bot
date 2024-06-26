@@ -3,33 +3,19 @@ const Audit_Log = require("../Schemas/auditlog.js");
 const { client } = require("../index.js");
 
 client.on(Events.AutoModerationRuleCreate, async (autoModerationRule) => {
-  if (!autoModerationRule) {
-    console.error("AutoModerationRuleCreate event received with no rule");
-    return;
-  }
-
   try {
     const data = await Audit_Log.findOne({
       Guild: autoModerationRule.guild?.id,
     });
-    if (!data) {
-      console.error("No audit log data found for guild");
-      return;
-    }
+    if (!data) return;
 
     const logID = data.Channel;
-    if (!logID) {
-      console.error("No log channel ID found in audit log data");
-      return;
-    }
+    if (!logID) return;
 
     const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) {
-      console.error("Audit log channel not found in cache");
-      return;
-    }
+    if (!auditChannel) return;
 
-    const actions = autoModerationRule.actions?.toString() || "none";
+    let actions = JSON.stringify(autoModerationRule.actions);
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -64,15 +50,15 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
     const data = await Audit_Log.findOne({
       Guild: autoModerationRule.guild.id,
     });
-    let logID;
-    if (data) {
-      logID = data.Channel;
-    } else {
-      console.error("No audit log data found for guild");
-      return;
-    }
+    if (!data) return;
+
+    let logID = data.Channel;
+    if (!logID) return;
+
     const auditChannel = client.channels.cache.get(logID);
-    let actions = autoModerationRule.actions.toString();
+    if (!auditChannel) return;
+
+    let actions = JSON.stringify(autoModerationRule.actions);
 
     const auditEmbed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -105,86 +91,72 @@ client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
 client.on(
   Events.AutoModerationRuleUpdate,
   async (oldAutoModerationRule, newAutoModerationRule) => {
-    if (!oldAutoModerationRule || !newAutoModerationRule) {
-      throw new Error("Param cannot be null");
-    }
-
-    const data = await Audit_Log.findOne({
-      Guild: newAutoModerationRule.guild.id,
-    });
-    if (!data) {
-      throw new Error("No audit log data found for guild");
-    }
-
-    const logID = data.Channel;
-    if (!logID) {
-      throw new Error("No log channel ID found in audit log data");
-    }
-
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) {
-      throw new Error("Audit log channel not found in cache");
-    }
-
-    const changes = [];
-
-    const nullEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Automod Rule Updated")
-      .addFields({
-        name: "Changes:",
-        value: `NULL`,
+    try {
+      const data = await Audit_Log.findOne({
+        Guild: newAutoModerationRule.guild.id,
       });
+      if (!data) return;
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Automod Rule Updated");
+      const logID = data.Channel;
+      if (!logID) return;
 
-    if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
-      changes.push(
-        `Name: \`${oldAutoModerationRule.name || "None"}\`  →  \`${
-          newAutoModerationRule.name || "None"
-        }\``
-      );
-      const changesText = changes.join("\n");
-      auditEmbed.addFields({
-        name: "Name Updated.",
-        value: changesText || "null",
-      });
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
+      const auditChannel = client.channels.cache.get(logID);
+      if (!auditChannel) return;
 
-    if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
-      let oldActions = oldAutoModerationRule.actions?.toString() || "none";
-      let newActions = newAutoModerationRule.actions?.toString() || "none";
-      auditEmbed.addFields(
-        {
-          name: "Old Rules:",
-          value: oldActions,
+      const changes = [];
+
+      const auditEmbed = new EmbedBuilder()
+        .setColor("#ff00b3")
+        .setTimestamp()
+        .setFooter({ text: "FKZ Log System" })
+        .setTitle("Automod Rule Updated");
+
+      if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
+        changes.push(
+          `Name: \`${oldAutoModerationRule.name || "None"}\`  →  \`${
+            newAutoModerationRule.name || "None"
+          }\``
+        );
+        const changesText = changes.join("\n");
+        auditEmbed.addFields({
+          name: "Name Updated.",
+          value: changesText,
+        });
+        await auditChannel.send({ embeds: [auditEmbed] });
+      }
+
+      if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
+        let oldActions =
+          JSON.stringify(oldAutoModerationRule.actions) || "none";
+        let newActions =
+          JSON.stringify(newAutoModerationRule.actions) || "none";
+        auditEmbed.addFields(
+          {
+            name: "Old Rules:",
+            value: oldActions,
+            inline: false,
+          },
+          {
+            name: "New Rules:",
+            value: newActions,
+            inline: false,
+          }
+        );
+        await auditChannel.send({ embeds: [auditEmbed] });
+      }
+
+      if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
+        auditEmbed.addFields({
+          name: "Enabled?:",
+          value: `\`${oldAutoModerationRule.enabled || "Unknown"}\`  →  \`${
+            newAutoModerationRule.enabled || "Unknown"
+          }\``,
           inline: false,
-        },
-        {
-          name: "New Rules:",
-          value: newActions,
-          inline: false,
-        }
-      );
-      await auditChannel.send({ embeds: [auditEmbed] });
-    }
-
-    if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
-      auditEmbed.addFields({
-        name: "Enabled?:",
-        value: `\`${oldAutoModerationRule.enabled || "Unknown"}\`  →  \`${
-          newAutoModerationRule.enabled || "Unknown"
-        }\``,
-        inline: false,
-      });
-      await auditChannel.send({ embeds: [auditEmbed] });
+        });
+        await auditChannel.send({ embeds: [auditEmbed] });
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 );

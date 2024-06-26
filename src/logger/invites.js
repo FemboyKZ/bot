@@ -19,7 +19,7 @@ client.on(Events.InviteCreate, async (invite) => {
     .addFields(
       {
         name: "Creator:",
-        value: `${invite.inviterId || "unknown"}`,
+        value: `<@${invite.inviter?.id}>` || `unknown`,
         inline: false,
       },
       {
@@ -48,7 +48,7 @@ client.on(Events.InviteDelete, async (invite) => {
     .addFields(
       {
         name: "Author:",
-        value: `${invite.inviter?.id || "unknown"}`,
+        value: `<@${invite.inviter?.id}>` || `unknown`,
         inline: false,
       },
       {

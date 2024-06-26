@@ -33,11 +33,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
         },
         {
           name: "Channel / ChannelID",
-          value: `${iChannel} / ${iChannelID}`,
+          value: `${iChannel} / <#${iChannelID}>`,
         },
         {
           name: "User / UserID",
-          value: `${user} / ${userID}`,
+          value: `${user} / <@${userID}>`,
         },
         {
           name: "Command & User Input",

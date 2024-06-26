@@ -7,14 +7,27 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
     Guild: guild.id,
   });
   if (!data) return;
+
   const logID = data.Channel;
+  if (!logID) return;
+
   const banInfo = await guild.fetchBan(user);
   if (!banInfo) return;
 
   const { reason, executor } = banInfo;
+  let reasons = JSON.stringify(reason);
+
   const auditChannel = client.channels.cache.get(logID);
   if (!auditChannel) return;
 
+  const fullUser = await user.fetch();
+  let banUser;
+
+  if (user === undefined || user === null) {
+    banUser = fullUser.id;
+  } else {
+    banUser = user.id;
+  }
   const auditEmbed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
@@ -23,17 +36,17 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
     .addFields(
       {
         name: "Banned Member:",
-        value: user.tag || "unknown",
+        value: `<@${banUser}>` || "unknown",
         inline: false,
       },
       {
         name: "Executor:",
-        value: executor.tag || "unknown",
+        value: `<@${executor.id}>` || "unknown",
         inline: false,
       },
       {
         name: "Reason:",
-        value: reason || "none",
+        value: `${reasons}` || "none",
         inline: false,
       }
     );
@@ -45,7 +58,10 @@ client.on(Events.GuildBanRemove, async (user) => {
     Guild: user.guild.id,
   });
   if (!data) return;
+
   const logID = data.Channel;
+  if (!logID) return;
+
   const banInfo = await user.guild.fetchBan(user);
   if (!banInfo) return;
 
@@ -68,7 +84,7 @@ client.on(Events.GuildBanRemove, async (user) => {
       },
       {
         name: "Admin:",
-        value: executor.tag || "unknown",
+        value: `<@${executor.id}>` || "unknown",
         inline: false,
       }
     );

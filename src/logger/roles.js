@@ -16,6 +16,7 @@ client.on(Events.GuildRoleCreate, async (role) => {
     .setTitle("Role Created")
     .addFields(
       { name: "Name:", value: `${role.name}`, inline: false },
+      { name: "Role:", value: `<@&${role.id}>`, inline: false },
       { name: "ID:", value: `${role.id}`, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
@@ -35,6 +36,7 @@ client.on(Events.GuildRoleDelete, async (role) => {
     .setTitle("Role Deleted")
     .addFields(
       { name: "Name:", value: `${role.name}`, inline: false },
+      { name: "Role:", value: `<@&${role.id}>`, inline: false },
       { name: "ID:", value: `${role.id}`, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
@@ -95,7 +97,7 @@ client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
     .setFooter({ text: "FKZ Log System" })
     .addFields(
       { name: "Changes:", value: `${changesText}`, inline: false },
-      { name: "ID:", value: `${newRole.id}`, inline: false }
+      { name: "Role:", value: `<@&${newRole.id}>`, inline: false }
     );
   await auditChannel.send({ embeds: [auditEmbed] });
 });
