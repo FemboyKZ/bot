@@ -1,5 +1,5 @@
-const Audit_Log = require("../Schemas/auditlog.js");
-const { client } = require("../index.js");
+const Audit_Log = require("./Schemas/auditlog.js");
+const { client } = require("./index.js");
 
 client.on("ready", async () => {
   const guild = await client.guilds.cache.get(`${process.env.GUILD_ID}`); // fkz
