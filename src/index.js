@@ -54,6 +54,7 @@ require("./guild-scraper.js");
 require("./modals.js");
 require("./reaction-roles.js");
 require("./tickets.js");
+require("./whitelist-response.js");
 
 require("./logger/automod-rules.js");
 require("./logger/bans.js");

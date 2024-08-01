@@ -1,5 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const whitelistSchema = require("./Schemas/whitelistSchema");
+const whitelistStatusSchema = require("./Schemas/whitelistStatusSchema");
 const mcWhitelistSchema = require("./Schemas/mcWhitelistSchema");
 const unbanSchema = require("./Schemas/unbanSchema");
 const reportSchema = require("./Schemas/reportSchema");
@@ -136,6 +137,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
+
+    whitelistStatusSchema.create({
+      Request: interaction.user.id,
+      Status: null,
+    });
   }
 
   if (interaction.customId === "modalUnban") {

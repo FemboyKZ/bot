@@ -6,6 +6,7 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const whitelistSchema = require("../../Schemas/whitelistSchema");
+const whitelistStatusSchema = require("./Schemas/whitelistStatusSchema");
 
 var timeout = [];
 
@@ -25,6 +26,41 @@ module.exports = {
       });
 
     try {
+      const statusDataTrue = await whitelistStatusSchema.findOne({
+        Request: interaction.user.id,
+        Status: true,
+      });
+      const statusDataFalse = await whitelistStatusSchema.findOne({
+        Request: interaction.user.id,
+        Status: false,
+      });
+      const statusDataNull = await whitelistStatusSchema.findOne({
+        Request: interaction.user.id,
+        Status: null,
+      });
+
+      if (statusDataFalse) {
+        return await interaction.reply({
+          content:
+            "Unfortunately your whitelist request has been denied, you will not be whitelisted.",
+          ephemeral: true,
+        });
+      }
+
+      if (statusDataTrue) {
+        return await interaction.reply({
+          content: "You have already been whitelisted.",
+          ephemeral: true,
+        });
+      }
+
+      if (statusDataNull) {
+        return await interaction.reply({
+          content: "You have already requested, please check again later.",
+          ephemeral: true,
+        });
+      }
+
       const data = await whitelistSchema.findOne({
         Guild: interaction.guild.id,
       });
