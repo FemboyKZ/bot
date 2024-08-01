@@ -25,7 +25,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
       );
       await member.roles.add(role);
       await member.roles.remove(oldRole);
-    } else if (reaction.emoji.name === ":thumbsdown:") {
+    } else if (reaction.emoji.name === "👎") {
       await whitelistStatusSchema.findOneAndUpdate(
         { Request: user.id, Status: null },
         { Status: false }
