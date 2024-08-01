@@ -79,5 +79,5 @@ async function checkUnprocessedMembers() {
       }
     }
   }
-  setTimeout(checkUnprocessedMembers, 60000);
+  setTimeout(checkUnprocessedMembers, 120000);
 }
