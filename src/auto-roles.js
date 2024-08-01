@@ -37,8 +37,18 @@ client.on("ready", async () => {
 async function checkUnprocessedMembers() {
   const guilds = await client.guilds.fetch();
 
+  if (!guilds) {
+    console.log("No guilds found");
+    return;
+  }
+
   for (const guild of guilds.values()) {
-    const members = await guild.members.cache?.fetch();
+    const members = await guild.members?.fetch();
+
+    if (!members) {
+      console.log("No members found in guild:", guild.id);
+      continue;
+    }
 
     for (const member of members.values()) {
       if (member.user.bot) continue;
