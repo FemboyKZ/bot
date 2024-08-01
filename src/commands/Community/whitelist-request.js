@@ -6,7 +6,7 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const whitelistSchema = require("../../Schemas/whitelistSchema");
-const whitelistStatusSchema = require("./Schemas/whitelistStatusSchema");
+const whitelistStatusSchema = require("../../Schemas/whitelistStatusSchema");
 
 var timeout = [];
 
