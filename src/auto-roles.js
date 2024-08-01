@@ -38,7 +38,7 @@ async function checkUnprocessedMembers() {
   const guilds = await client.guilds.fetch();
 
   for (const guild of guilds.values()) {
-    const members = await guild.members.fetch();
+    const members = await guild.members.cache?.fetch();
 
     for (const member of members.values()) {
       if (member.user.bot) continue;
