@@ -3,7 +3,10 @@ const whitelistStatusSchema = require("./Schemas/whitelistStatusSchema");
 const { client } = require("./index.js");
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
-  if (user.bot) return;
+  if (user.bot || !reaction.message.guild) return;
+  if (user.partial) await user.fetch();
+  if (reaction.message.partial) await reaction.message.fetch();
+  if (reaction.partial) await reaction.fetch();
   if (!user.PermissionsBitFields.has(PermissionsBitField.Flags.Administrator))
     return;
   const data = await whitelistStatusSchema.findOne({
