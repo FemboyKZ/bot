@@ -1,0 +1,45 @@
+
+name: Bump bot dev version
+
+on:
+    push:
+      branches: [misc-dev]
+      paths-ignore:
+        - LICENSE
+        - README.md
+        - .gitignore
+        - '.github/*'
+    pull_request:
+      branches: [misc-dev]
+      paths-ignore:
+        - LICENSE
+        - README.md
+        - .gitignore
+        - '.github/*'
+  
+    workflow_dispatch:
+  
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+  
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install dependencies
+        run: npm version patch
