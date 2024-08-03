@@ -21,12 +21,6 @@ on:
   
 permissions:
     contents: read
-    pages: write
-    id-token: write
-  
-concurrency:
-    group: pages
-    cancel-in-progress: false
 
 jobs:
   build:
@@ -41,5 +35,11 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - name: Install dependencies
-        run: npm version patch
+      - name: Bump version
+        run: |
+          npm version patch
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add package.json
+          git commit -m "Bump version"
+          git push
