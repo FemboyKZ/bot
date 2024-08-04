@@ -8,14 +8,14 @@ on:
         - LICENSE
         - README.md
         - .gitignore
-        - '.github/*'
+        - '.github/'
     pull_request:
       branches: [misc-dev]
       paths-ignore:
         - LICENSE
         - README.md
         - .gitignore
-        - '.github/*'
+        - '.github/'
   
     workflow_dispatch:
   
