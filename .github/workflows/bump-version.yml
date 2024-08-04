@@ -21,7 +21,6 @@ on:
   
 permissions:
     contents: write
-    actions: write
 
 jobs:
   build:
@@ -41,4 +40,4 @@ jobs:
           git config user.email "action@github.com"
           git config user.name "GitHub Actions"
           npm version patch
-          git push --force origin misc-dev
+          git push origin misc-dev
