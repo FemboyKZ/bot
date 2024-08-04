@@ -37,9 +37,9 @@ jobs:
           cache: npm
       - name: Bump version
         run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Actions"
           npm version patch
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
           git add package.json
           git commit -m "Bump version"
           git push
