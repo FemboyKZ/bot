@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const unbanSchema = require("../../Schemas/unbanSchema");
+const unbanSchema = require("../../Schemas/unbans");
 
 module.exports = {
   data: new SlashCommandBuilder()

@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const reactions = require("./Schemas/reactionrs");
+const reactions = require("./Schemas/reactionrole.js");
 const { client } = require("./index.js");
 
 let lastOnlineTime = Date.now();

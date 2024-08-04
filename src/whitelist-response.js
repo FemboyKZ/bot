@@ -1,5 +1,5 @@
 const { PermissionFlagsBits, Events } = require("discord.js");
-const whitelistStatusSchema = require("./Schemas/whitelistStatusSchema");
+const whitelistStatusSchema = require("./Schemas/whitelistStatus.js");
 const { client } = require("./index.js");
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {

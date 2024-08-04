@@ -3,8 +3,8 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const ghostSchema = require("../../Schemas/ghostpingSchema");
-const numSchema = require("../../Schemas/ghostnumSchema");
+const ghostSchema = require("../../Schemas/ghostping");
+const numSchema = require("../../Schemas/ghostnum");
 
 module.exports = {
   data: new SlashCommandBuilder()

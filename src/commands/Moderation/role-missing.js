@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const reactions = require("../../Schemas/reactionrs");
+const reactions = require("../../Schemas/reactionrole");
 
 module.exports = {
   data: new SlashCommandBuilder()

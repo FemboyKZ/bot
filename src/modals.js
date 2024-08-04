@@ -1,9 +1,9 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const whitelistSchema = require("./Schemas/whitelistSchema");
-const whitelistStatusSchema = require("./Schemas/whitelistStatusSchema");
-const mcWhitelistSchema = require("./Schemas/mcWhitelistSchema");
-const unbanSchema = require("./Schemas/unbanSchema");
-const reportSchema = require("./Schemas/reportSchema");
+const whitelistSchema = require("./Schemas/whitelist.js");
+const whitelistStatusSchema = require("./Schemas/whitelistStatus.js");
+const mcWhitelistSchema = require("./Schemas/mcWhitelist.js");
+const unbanSchema = require("./Schemas/unbans.js");
+const reportSchema = require("./Schemas/reports.js");
 const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {

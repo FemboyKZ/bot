@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const whitelistSchema = require("../../Schemas/whitelistSchema");
+const whitelistSchema = require("../../Schemas/whitelist");
 
 module.exports = {
   data: new SlashCommandBuilder()

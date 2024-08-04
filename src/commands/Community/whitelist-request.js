@@ -5,8 +5,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const whitelistSchema = require("../../Schemas/whitelistSchema");
-const whitelistStatusSchema = require("../../Schemas/whitelistStatusSchema");
+const whitelistSchema = require("../../Schemas/whitelist");
+const whitelistStatusSchema = require("../../Schemas/whitelistStatus");
 require("dotenv").config();
 
 const whitelistRole = process.env.WHITELIST_ROLE;

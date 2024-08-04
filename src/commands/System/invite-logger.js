@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const inviteSchema = require("../../Schemas/inviteSchema");
+const inviteSchema = require("../../Schemas/invitelog");
 
 module.exports = {
   data: new SlashCommandBuilder()
