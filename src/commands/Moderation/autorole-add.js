@@ -9,6 +9,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("autorole-add")
     .setDescription("[Admin] Set the autoroles for this Server!")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addRoleOption((option) =>
       option
         .setName("role")

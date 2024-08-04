@@ -1,6 +1,12 @@
 const { Events } = require("discord.js");
-const reactions = require("./Schemas/reactionrs");
+const reactions = require("./Schemas/reactionrole.js");
 const { client } = require("./index.js");
+
+let lastOnlineTime = Date.now();
+
+client.on("ready", () => {
+  lastOnlineTime = Date.now();
+});
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (!reaction || !reaction.message || !reaction.message.guildId || user.bot) {
@@ -34,6 +40,16 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     }
 
     await member.roles.add(data.Role);
+
+    const now = Date.now();
+    const offlineTime = lastOnlineTime;
+    const reactionTime = reaction.createdTimestamp;
+    const offlineDuration = now - offlineTime;
+    const reactionDuration = reactionTime - offlineTime;
+
+    if (reactionDuration > offlineDuration) {
+      await member.roles.add(data.Role);
+    }
   } catch (e) {
     console.error(e);
   }
@@ -71,6 +87,16 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
     }
 
     await member.roles.remove(data.Role);
+
+    const now = Date.now();
+    const offlineTime = lastOnlineTime;
+    const reactionTime = reaction.createdTimestamp;
+    const offlineDuration = now - offlineTime;
+    const reactionDuration = reactionTime - offlineTime;
+
+    if (reactionDuration > offlineDuration) {
+      await member.roles.remove(data.Role);
+    }
   } catch (e) {
     console.error(e);
   }

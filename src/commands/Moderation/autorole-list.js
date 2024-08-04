@@ -8,7 +8,8 @@ const autorole = require("../../Schemas/autorole");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("autorole-list")
-    .setDescription("[Admin] List all autoroles"),
+    .setDescription("[Admin] List all autoroles")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   async execute(interaction) {
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)

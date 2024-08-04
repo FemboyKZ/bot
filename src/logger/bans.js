@@ -11,7 +11,8 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
   const logID = data.Channel;
   if (!logID) return;
 
-  const banInfo = await guild.fetchBan(user);
+  const bans = await user.guild.bans.fetch();
+  const banInfo = bans.get(user.id);
   if (!banInfo) return;
 
   const { reason, executor } = banInfo;
@@ -62,7 +63,8 @@ client.on(Events.GuildBanRemove, async (user) => {
   const logID = data.Channel;
   if (!logID) return;
 
-  const banInfo = await user.guild.fetchBan(user);
+  const bans = await user.guild.bans.fetch();
+  const banInfo = bans.get(user.id);
   if (!banInfo) return;
 
   const { executor } = banInfo;

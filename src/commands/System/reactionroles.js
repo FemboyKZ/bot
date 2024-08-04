@@ -3,12 +3,13 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const reaction = require("../../Schemas/reactionrs");
+const reaction = require("../../Schemas/reactionrole");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("reaction-roles")
     .setDescription("[Admin] Setup the reaction roles")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((command) =>
       command
         .setName("add")

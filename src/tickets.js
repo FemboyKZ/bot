@@ -10,7 +10,7 @@ const {
   TextInputStyle,
   ChannelType,
 } = require("discord.js");
-const ticketSchema = require("./Schemas/ticketSchema");
+const ticketSchema = require("./Schemas/tickets.js");
 const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {

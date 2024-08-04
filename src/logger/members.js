@@ -121,6 +121,7 @@ client.on("ready", async () => {
       }
 
       if (oldMember.avatar !== newMember.avatar) {
+        if (oldMember.avatar === null || newMember.avatar === null) return;
         auditEmbed.setImage(`${newMember.avatarURL({ size: 128 })}`).addFields({
           name: `Profile picture updated`,
           value: `[Old Pfp](<${oldMember.avatarURL({
@@ -132,6 +133,8 @@ client.on("ready", async () => {
       }
 
       if (oldMember.user.avatar !== newMember.user.avatar) {
+        if (oldMember.user.avatar === null || newMember.user.avatar === null)
+          return;
         auditEmbed
           .setImage(`${newMember.user.avatarURL({ size: 128 })}`)
           .addFields({
@@ -145,6 +148,8 @@ client.on("ready", async () => {
       }
 
       if (oldMember.user.banner !== newMember.user.banner) {
+        if (oldMember.user.banner === null || newMember.user.banner === null)
+          return;
         auditEmbed
           .setImage(`${newMember.user.bannerURL({ size: 128 })}`)
           .addFields({

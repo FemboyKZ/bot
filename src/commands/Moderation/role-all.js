@@ -8,6 +8,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("role-all")
     .setDescription("[Admin] Give a role to everyone in the server")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addRoleOption((option) =>
       option
         .setName("role")

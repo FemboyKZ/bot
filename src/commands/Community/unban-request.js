@@ -5,7 +5,7 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const unbanSchema = require("../../Schemas/unbanSchema");
+const unbanSchema = require("../../Schemas/unbans");
 
 var timeout = [];
 

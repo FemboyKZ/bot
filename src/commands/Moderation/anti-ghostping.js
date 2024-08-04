@@ -3,13 +3,14 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const ghostSchema = require("../../Schemas/ghostpingSchema");
-const numSchema = require("../../Schemas/ghostnumSchema");
+const ghostSchema = require("../../Schemas/ghostping");
+const numSchema = require("../../Schemas/ghostnum");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("anti-ghostping")
     .setDescription("[Admin] Setup the anti-ghostping system")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((command) =>
       command
         .setName("setup")

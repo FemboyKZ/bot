@@ -9,6 +9,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("mc-server-info-embed")
     .setDescription("[Admin] Posts the embeds the for MC-Sever-Info channel")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addChannelOption((option) =>
       option
         .setName("channel")

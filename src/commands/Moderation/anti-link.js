@@ -3,12 +3,13 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const linkSchema = require("../../Schemas/linkSchema");
+const linkSchema = require("../../Schemas/anti-link");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("anti-link")
     .setDescription("[Admin] Setup/Disable the anti-link system")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((command) =>
       command
         .setName("setup")

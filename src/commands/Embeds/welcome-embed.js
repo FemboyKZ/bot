@@ -9,6 +9,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("welcome-embed")
     .setDescription("[Admin] Posts the embeds the for Welcome channel")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addChannelOption((option) =>
       option
         .setName("channel")

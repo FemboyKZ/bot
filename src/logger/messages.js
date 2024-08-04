@@ -25,7 +25,6 @@ client.on(Events.MessageDelete, async (message) => {
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
         .setTitle("Very Long Message Deleted")
-        .setAuthor({ name: "Message:" })
         .setDescription("Message too long to display in audit log.")
         .addFields(
           {
@@ -53,12 +52,12 @@ client.on(Events.MessageDelete, async (message) => {
       .setTimestamp()
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Message Deleted")
-      .setAuthor({ name: "Message:" })
-      .setDescription(message.content)
-      .addFields(
+      .setDescription(`\`\`\`\n${message.content}\n\`\`\``);
+    if (fullMessage.content) {
+      auditEmbed.addFields(
         {
           name: "FullMsg:",
-          value: `${fullMessage.content}` || "None",
+          value: `\`\`\`\n${fullMessage.content}\n\`\`\``,
           inline: false,
         },
         {
@@ -77,7 +76,25 @@ client.on(Events.MessageDelete, async (message) => {
           inline: false,
         }
       );
-
+    } else {
+      auditEmbed.addFields(
+        {
+          name: "Author:",
+          value: `${message.author}`,
+          inline: false,
+        },
+        {
+          name: "Channel:",
+          value: `${message.channel}`,
+          inline: false,
+        },
+        {
+          name: "MessageID:",
+          value: `${message.id}`,
+          inline: false,
+        }
+      );
+    }
     await auditChannel.send({ embeds: [auditEmbed] });
   } catch (err) {
     console.log(err);
@@ -109,7 +126,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
         .setTitle("Very Long Message Edited")
-        .setAuthor({ name: "Message:" })
         .setDescription("Message too long to display in audit log.")
         .addFields(
           {
@@ -135,9 +151,9 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     const changes = [];
     if (oldMessage.content !== newMessage.content) {
       changes.push(
-        `Message: \`${oldMessage.content || "None"}\` → \`${
-          newMessage.content || "None"
-        }\``
+        `**Message:**\n \`\`\`\n${
+          oldMessage.content || "None"
+        }\`\`\`\n→\n\`\`\`\n${newMessage.content || "None"}\n\`\`\``
       );
 
       if (
@@ -156,8 +172,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
         .setTitle("Message Edited")
-        .setAuthor({ name: "Edit:" })
-        .setDescription(changesText)
+        .setDescription(`${changesText}`)
         .addFields(
           {
             name: "Author:",

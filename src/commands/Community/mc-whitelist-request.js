@@ -5,7 +5,7 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const mcWhitelistSchema = require("../../Schemas/mcWhitelistSchema");
+const mcWhitelistSchema = require("../../Schemas/mcWhitelist");
 
 var timeout = [];
 
