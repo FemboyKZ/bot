@@ -41,4 +41,4 @@ jobs:
           git config user.email "action@github.com"
           git config user.name "GitHub Actions"
           npm version patch
-          git push origin misc-dev
+          git push --force origin misc-dev
