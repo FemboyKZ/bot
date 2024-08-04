@@ -7,7 +7,9 @@ const {
 } = require("discord.js");
 const whitelistSchema = require("../../Schemas/whitelistSchema");
 const whitelistStatusSchema = require("../../Schemas/whitelistStatusSchema");
+require("dotenv").config();
 
+const whitelistRole = process.env.WHITELIST_ROLE;
 var timeout = [];
 
 module.exports = {
@@ -43,6 +45,13 @@ module.exports = {
         return await interaction.reply({
           content:
             "Unfortunately your whitelist request has been denied, you will not be whitelisted.",
+          ephemeral: true,
+        });
+      }
+
+      if (interaction.member.roles.cache.has(whitelistRole)) {
+        return await interaction.reply({
+          content: "You have already been whitelisted.",
           ephemeral: true,
         });
       }
