@@ -8,14 +8,14 @@ on:
         - LICENSE
         - README.md
         - .gitignore
-        - '.github/'
+        - '.github/*'
     pull_request:
       branches: [misc-dev]
       paths-ignore:
         - LICENSE
         - README.md
         - .gitignore
-        - '.github/'
+        - '.github/*'
   
     workflow_dispatch:
   
@@ -39,6 +39,7 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Actions"
+          git fetch
           npm version patch
           git add package.json
           git commit -m "Bump version"
