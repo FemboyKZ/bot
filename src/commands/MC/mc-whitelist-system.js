@@ -4,17 +4,17 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const schema = require("../../Schemas/whitelist");
+const schema = require("../../Schemas/mcWhitelist");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("whitelist-system")
-    .setDescription("[Admin] Setup the whitelist system")
+    .setName("mc-whitelist-system")
+    .setDescription("[Admin] Setup the Minecraft whitelist system")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((command) =>
       command
         .setName("setup")
-        .setDescription("[Admin] Setup the whitelist system")
+        .setDescription("[Admin] Setup the minecraft whitelist system")
         .addChannelOption((option) =>
           option
             .setName("channel")
@@ -26,7 +26,7 @@ module.exports = {
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the whitelist system")
+        .setDescription("[Admin] Disable the minecraft whitelist system")
     ),
   async execute(interaction, client) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
@@ -38,10 +38,10 @@ module.exports = {
     const { guild, options } = interaction;
     const channel = options.getChannel("channel");
     const sub = options.getSubcommand();
-    const data = await schema.findOne({ Guild: guild });
+    const data = await schema.findOne({ Guild: guild, Channel: channel.id });
 
     const embed = new EmbedBuilder()
-      .setTitle("Whitelist System Setup")
+      .setTitle("Minecraft Whitelist System Setup")
       .setColor("#ff00b3")
       .setTimestamp();
 
@@ -50,7 +50,7 @@ module.exports = {
         try {
           if (!data) {
             embed.setDescription(
-              `All submitted wl requests will be sent in ${channel}`
+              `All submitted whitelists requests will be sent in ${channel}`
             );
             await schema.create({
               Guild: guild,
@@ -78,9 +78,7 @@ module.exports = {
             embed.setDescription(`The whitelist system is already disabled.`);
           } else if (data) {
             embed.setDescription(`The whitelist system has been disabled.`);
-            await schema.deleteMany({
-              Guild: guild,
-            });
+            await schema.deleteMany({ Guild: guild });
           }
 
           return await interaction.reply({ embeds: [embed], ephemeral: true });

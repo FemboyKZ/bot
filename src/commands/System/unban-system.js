@@ -71,9 +71,7 @@ module.exports = {
             ephemeral: true,
           });
         }
-    }
 
-    switch (sub) {
       case "disable":
         try {
           if (!data) {
