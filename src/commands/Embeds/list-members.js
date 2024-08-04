@@ -16,6 +16,7 @@ module.exports = {
     .setDescription(
       "[Admin] Posts a TXT file with all members of a selected Steam Group"
     )
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
         .setName("group-url")

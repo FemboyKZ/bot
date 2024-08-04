@@ -10,6 +10,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("anti-ghostping")
     .setDescription("[Admin] Setup the anti-ghostping system")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((command) =>
       command
         .setName("setup")

@@ -9,6 +9,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("autorole-remove")
     .setDescription("[Admin] Remove a role from the autoroles")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addRoleOption((option) =>
       option
         .setName("role")

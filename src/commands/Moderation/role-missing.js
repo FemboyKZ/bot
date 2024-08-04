@@ -4,7 +4,8 @@ const reactions = require("../../Schemas/reactionrole");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("role-missing")
-    .setDescription("[Admin] Add missing reaction roles to members"),
+    .setDescription("[Admin] Add missing reaction roles to members")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction) {
     try {
