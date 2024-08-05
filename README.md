@@ -27,7 +27,7 @@ If you wish to help with this feel free to open prs.
 - Slash command handling
 - Event handling
 - Basic crash/error handling
-- Varables in .env
+- Secret variables in .env
 
 ### Auditlog (not reliable lol)
 
