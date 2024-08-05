@@ -85,6 +85,11 @@ module.exports = {
           value:
             "If you wish to purchase VIP or VIP+, you can do so here:\n\n**<https://femboy.kz/shop>**\n\nAll the needed info can be found there.",
         },
+        {
+          name: "**How to Claim VIP/VIP+**",
+          value:
+            "To claim your perks, use the command **/claim-vip** in any of this server's channels.\n\nIf you wish to gift instead, use the command **/gift-vip** in any of this server's channels.",
+        },
       ]);
     const embedClassic = new EmbedBuilder()
       .setTitle("FKZ ClassicCounter")
