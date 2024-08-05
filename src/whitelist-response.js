@@ -1,5 +1,5 @@
 const { PermissionFlagsBits, Events } = require("discord.js");
-const whitelistStatusSchema = require("./Schemas/whitelistStatus.js");
+const whitelistStatus = require("./Schemas/whitelistStatus.js");
 const { client } = require("./index.js");
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -11,7 +11,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (!member.permissions.has(PermissionFlagsBits.Administrator)) return;
 
   try {
-    const data = await whitelistStatusSchema.findOne({
+    const data = await whitelistStatus.findOne({
       Request: user.id,
     });
     if (!data) return;
@@ -23,14 +23,14 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
       (role) => role.name === "Wannabe Fem"
     );
     if (reaction.emoji.name === "👍") {
-      await whitelistStatusSchema.findOneAndUpdate(
+      await whitelistStatus.findOneAndUpdate(
         { Request: user.id },
         { Status: true }
       );
       if (!role) await member.roles.add(role);
       if (oldRole) await member.roles.remove(oldRole);
     } else if (reaction.emoji.name === "👎") {
-      await whitelistStatusSchema.findOneAndUpdate(
+      await whitelistStatus.findOneAndUpdate(
         { Request: user.id },
         { Status: false }
       );
