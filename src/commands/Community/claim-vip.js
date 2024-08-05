@@ -65,6 +65,20 @@ module.exports = {
         });
       }
 
+      if (!code || !steamId) {
+        return await interaction.reply({
+          content: "Please enter both a code and a SteamID.",
+          ephemeral: true,
+        });
+      }
+
+      if (code.length > 40 || steamId.length > 50) {
+        return await interaction.reply({
+          content: "Please enter a valid code and SteamID.",
+          ephemeral: true,
+        });
+      }
+
       if (!perkSystem) {
         return await interaction.reply({
           content:
@@ -141,10 +155,10 @@ module.exports = {
             role
           );
         } else {
-          embed.setDescription(
-            `Something you entered is invalid, please try again.`
-          );
-          await interaction.reply({ embeds: [embed], ephemeral: true });
+          await interaction.reply({
+            content: `Something you entered is invalid, please try again.`,
+            ephemeral: true,
+          });
         }
       } else if (perkStatus) {
         if (
@@ -152,19 +166,17 @@ module.exports = {
           code !== vipPlusCode &&
           code !== contributorCode
         ) {
-          embed.setDescription(
-            `You've attempted to claim perks with a code that is invalid.`
-          );
-          return await interaction.reply({ embeds: [embed], ephemeral: true });
+          return await interaction.reply({
+            content: `You've attempted to claim perks with a code that is invalid.`,
+            ephemeral: true,
+          });
         }
         if (perkStatus.Type === "vip" && perkStatus.Status === true) {
           if (code === vipCode) {
-            embed.setDescription(`You've already claimed your VIP perks.`);
-            logEmbed.setDescription(
-              `${user} attempted to claim VIP, but they already had VIP perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({
+              content: `You've already claimed those perks. If you want to gift, use the \`/gift\` command.`,
+              ephemeral: true,
+            });
           } else if (code === vipPlusCode) {
             let role = await guild.roles.fetch(vipPlusRole);
             let perkType = "vip+";
@@ -190,17 +202,17 @@ module.exports = {
               role
             );
           } else {
-            embed.setDescription(
-              `Something you entered is invalid, please try again.`
-            );
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({
+              content: `Something you entered is invalid, please try again.`,
+              ephemeral: true,
+            });
           }
         } else if (perkStatus.Type === "vip+" && perkStatus.Status === true) {
           if (code === vipCode || code === vipPlusCode) {
-            embed.setDescription(
-              `You've already claimed your VIP+ perks. If you want to gift, use the \`/gift\` command.`
-            );
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({
+              content: `You've already claimed those perks. If you want to gift, use the \`/gift\` command.`,
+              ephemeral: true,
+            });
           } else if (code === contributorCode) {
             let role = await guild.roles.fetch(contributorRole);
             let perkType = "contributor";
@@ -214,10 +226,10 @@ module.exports = {
               role
             );
           } else {
-            embed.setDescription(
-              `Something you entered is invalid, please try again.`
-            );
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({
+              content: `Something you entered is invalid, please try again.`,
+              ephemeral: true,
+            });
           }
         } else if (
           perkStatus.Type === "contributor" &&
@@ -228,21 +240,21 @@ module.exports = {
             code === vipPlusCode ||
             code === contributorCode
           ) {
-            embed.setDescription(
-              `You've already claimed your Contributor perks. If you want to gift, use the \`/gift\` command.`
-            );
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({
+              content: `You've already claimed your perks. If you want to gift, use the \`/gift\` command.`,
+              ephemeral: true,
+            });
           } else {
-            embed.setDescription(
-              `Something you entered is invalid, please try again.`
-            );
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({
+              content: `Something you entered is invalid, please try again.`,
+              ephemeral: true,
+            });
           }
         } else {
-          embed.setDescription(
-            `Something you entered is invalid, please try again.`
-          );
-          await interaction.reply({ embeds: [embed], ephemeral: true });
+          await interaction.reply({
+            content: `Something you entered is invalid, please try again.`,
+            ephemeral: true,
+          });
         }
       }
     } catch (error) {

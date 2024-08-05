@@ -170,28 +170,25 @@ module.exports = {
             code !== contributorCode
           ) {
             return await interaction.reply({
-              content: "That code is not valid.",
+              content: "You've entered an invalid code.",
               ephemeral: true,
             });
           }
           if (vipCode.Uses > 0 && code === vipCode) {
-            embed.setDescription(`The code you entered has been used already.`);
             return await interaction.reply({
-              embeds: [embed],
+              content: `The code you entered has been used already.`,
               ephemeral: true,
             });
           }
           if (vipPlusCode.Uses > 0 && code === vipPlusCode) {
-            embed.setDescription(`The code you entered has been used already.`);
             return await interaction.reply({
-              embeds: [embed],
+              content: `The code you entered has been used already.`,
               ephemeral: true,
             });
           }
           if (contributorCode.Uses > 0 && code === contributorCode) {
-            embed.setDescription(`The code you entered has been used already.`);
             return await interaction.reply({
-              embeds: [embed],
+              content: `The code you entered has been used already.`,
               ephemeral: true,
             });
           }
@@ -239,115 +236,81 @@ module.exports = {
                 role
               );
             } else {
-              embed.setDescription(
-                `Something went wrong, please try again later.`
-              );
-              logEmbed.setDescription(
-                `${user} attempted to gift perks, but something went wrong.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-              );
-              await perkSystem.Channel.send({ embeds: [logEmbed] });
-              await interaction.reply({ embeds: [embed], ephemeral: true });
+              await interaction.reply({
+                content: `Something went wrong, please try again later.`,
+                ephemeral: true,
+              });
             }
           } else if (targetStatus) {
             if (targetStatus.Type === "vip" && targetStatus.Status === true) {
               let role = await guild.roles.fetch(vipRole);
               if (code === vipCode || member.roles.cache.has(role)) {
-                embed.setDescription(`The user already has VIP perms.`);
-                logEmbed.setDescription(
-                  `${user} attempted to gift VIP, but ${target} already had VIP perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
-                await interaction.reply({ embeds: [embed], ephemeral: true });
+                return await interaction.reply({
+                  content: `${target} already has VIP perms.`,
+                  ephemeral: true,
+                });
               } else if (code === vipPlusCode) {
                 let role = await guild.roles.fetch(vipPlusRole);
                 let perkType = "vip+";
                 if (member.roles.cache.has(role)) {
-                  embed.setDescription(`The user already has VIP+ perms.`);
-                  logEmbed.setDescription(
-                    `${user} attempted to gift VIP+ perks, but ${target} already had VIP+ role.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-                  );
-                  await perkSystem.Channel.send({ embeds: [logEmbed] });
                   return await interaction.reply({
-                    embeds: [embed],
+                    content: `${target} already has VIP+ perms.`,
                     ephemeral: true,
                   });
+                } else {
+                  await handleCodeExisting(
+                    interaction,
+                    perkSystem,
+                    target,
+                    user,
+                    embed,
+                    logEmbed,
+                    steamId,
+                    perkType,
+                    role
+                  );
                 }
-                await handleCodeExisting(
-                  interaction,
-                  perkSystem,
-                  target,
-                  user,
-                  embed,
-                  logEmbed,
-                  steamId,
-                  perkType,
-                  role
-                );
               } else if (code === contributorCode) {
                 let role = await guild.roles.fetch(contributorRole);
                 let perkType = "contributor";
                 if (member.roles.cache.has(role)) {
-                  embed.setDescription(
-                    `The user already has Contributor perms.`
-                  );
-                  logEmbed.setDescription(
-                    `${user} attempted to gift Contributor perks, but ${target} already had Contributor role.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-                  );
-                  await perkSystem.Channel.send({ embeds: [logEmbed] });
                   return await interaction.reply({
-                    embeds: [embed],
+                    content: `${target} already has Contributor perms.`,
                     ephemeral: true,
                   });
+                } else {
+                  await handleCodeExisting(
+                    interaction,
+                    perkSystem,
+                    target,
+                    user,
+                    embed,
+                    logEmbed,
+                    steamId,
+                    perkType,
+                    role
+                  );
                 }
-                await handleCodeExisting(
-                  interaction,
-                  perkSystem,
-                  target,
-                  user,
-                  embed,
-                  logEmbed,
-                  steamId,
-                  perkType,
-                  role
-                );
               } else {
-                embed.setDescription(
-                  `Something went wrong, please try again later.`
-                );
-                logEmbed.setDescription(
-                  `${user} attempted to gift perks, but something went wrong.\nCode: \`${code}\`SteamID: \`${steamId}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
-                await interaction.reply({ embeds: [embed], ephemeral: true });
+                await interaction.reply({
+                  content: `Something went wrong, please try again later.`,
+                  ephemeral: true,
+                });
               }
             } else if (
               perkStatus.Type === "vip+" &&
               perkStatus.Status === true
             ) {
-              if (code === vipCode || code === vipPlusCode) {
-                embed.setDescription(`${target} already has VIP+ perks.`);
-                logEmbed.setDescription(
-                  `${user} attempted to gift VIP/VIP+, but ${target} already had VIP+ perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
-                return await interaction.reply({
-                  embeds: [embed],
-                  ephemeral: true,
-                });
-              }
               let role = await guild.roles.fetch(vipRole);
               let role2 = await guild.roles.fetch(vipPlusRole);
               if (
+                code === vipCode ||
+                code === vipPlusCode ||
                 member.roles.cache.has(role) ||
                 member.roles.cache.has(role2)
               ) {
-                embed.setDescription(`${target} already has VIP+ perks.`);
-                logEmbed.setDescription(
-                  `${user} attempted to gift VIP+, but ${target} already had VIP+ perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
                 return await interaction.reply({
-                  embeds: [embed],
+                  content: `${target} already has VIP+ perks.`,
                   ephemeral: true,
                 });
               }
@@ -355,98 +318,59 @@ module.exports = {
                 let role = await guild.roles.fetch(contributorRole);
                 let perkType = "contributor";
                 if (member.roles.cache.has(role)) {
-                  embed.setDescription(
-                    `The user already has Contributor perms.`
-                  );
-                  logEmbed.setDescription(
-                    `${user} attempted to gift Contributor perks, but ${target} already had Contributor perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-                  );
-                  await perkSystem.Channel.send({ embeds: [logEmbed] });
                   return await interaction.reply({
-                    embeds: [embed],
+                    content: `${target} already has Contributor perks.`,
                     ephemeral: true,
                   });
+                } else {
+                  await handleCodeExisting(
+                    interaction,
+                    perkSystem,
+                    target,
+                    user,
+                    embed,
+                    logEmbed,
+                    steamId,
+                    perkType,
+                    role
+                  );
                 }
-                await handleCodeExisting(
-                  interaction,
-                  perkSystem,
-                  target,
-                  user,
-                  embed,
-                  logEmbed,
-                  steamId,
-                  perkType,
-                  role
-                );
               } else {
-                embed.setDescription(
-                  `Something went wrong, please try again later.`
-                );
-                logEmbed.setDescription(
-                  `${user} attempted to gift perks to ${target}, but something went wrong.\nCode: \`${code}\`SteamID: \`${steamId}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
-                await interaction.reply({ embeds: [embed], ephemeral: true });
+                await interaction.reply({
+                  content: `Something went wrong, please try again later.`,
+                  ephemeral: true,
+                });
               }
             } else if (
               perkStatus.Type === "contributor" &&
               perkStatus.Status === true
             ) {
-              if (
-                code === vipCode ||
-                code === vipPlusCode ||
-                code === contributorCode
-              ) {
-                embed.setDescription(
-                  `${target} already has Contributor perks.`
-                );
-                logEmbed.setDescription(
-                  `${user} attempted to gift, but ${target} already had Contributor perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
-                return await interaction.reply({
-                  embeds: [embed],
-                  ephemeral: true,
-                });
-              }
               let role = await guild.roles.fetch(vipRole);
               let role2 = await guild.roles.fetch(vipPlusRole);
               let role3 = await guild.roles.fetch(contributorRole);
               if (
+                code === vipCode ||
+                code === vipPlusCode ||
+                code === contributorCode ||
                 member.roles.cache.has(role) ||
                 member.roles.cache.has(role2) ||
                 member.roles.cache.has(role3)
               ) {
-                embed.setDescription(
-                  `${target} already has Contributor perks.`
-                );
-                logEmbed.setDescription(
-                  `${user} attempted to gift, but ${target} already had Contributor perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
                 return await interaction.reply({
-                  embeds: [embed],
+                  content: `${target} already has Contributor perks.`,
                   ephemeral: true,
                 });
               } else {
-                embed.setDescription(
-                  `Something you entered is invalid, please try again.`
-                );
-                logEmbed.setDescription(
-                  `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\``
-                );
-                await perkSystem.Channel.send({ embeds: [logEmbed] });
-                await interaction.reply({ embeds: [embed], ephemeral: true });
+                await interaction.reply({
+                  content: `Something went wrong, please try again later.`,
+                  ephemeral: true,
+                });
               }
             } else {
-              embed.setDescription(
-                `Something you entered is invalid, please try again.`
-              );
-              logEmbed.setDescription(
-                `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\``
-              );
-              await perkSystem.Channel.send({ embeds: [logEmbed] });
-              await interaction.reply({ embeds: [embed], ephemeral: true });
+              await interaction.reply({
+                content: `Something went wrong, please try again later.`,
+                ephemeral: true,
+              });
             }
           }
           break;
