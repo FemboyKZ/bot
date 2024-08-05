@@ -124,7 +124,6 @@ module.exports = {
 
         if (code === vipCode && perkType === "vip") {
           let role = await guild.roles.fetch(vipRole);
-          vipCodeUses + 1;
           await handleClaim(
             interaction,
             perkSystem,
@@ -394,25 +393,33 @@ module.exports = {
     logEmbed.setDescription(
       `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
     );
-    await perkSystem.Channel.send({ embeds: [logEmbed] });
-    await vipStatus.create({
-      Claimer: user,
-      Status: true,
-      Type: perkType,
-      Gifted: null,
-      Steam: steamId,
-      Date: new Date(),
-    });
-    await vipUses.findOneAndUpdate(
-      { Guild: perkSystem.Guild, Type: perkType },
-      { Uses: 1 }
-    );
-    await user.roles.add(role);
-    if (perkType === "vip+" || perkType === "contributor") {
-      let role2 = await guild.roles.fetch(vipRole);
-      await user.roles.add(role2);
+    try {
+      await perkSystem.Channel.send({ embeds: [logEmbed] });
+      await vipStatus.create({
+        Claimer: user,
+        Status: true,
+        Type: perkType,
+        Gifted: null,
+        Steam: steamId,
+        Date: new Date(),
+      });
+      await vipUses.findOneAndUpdate(
+        { Guild: perkSystem.Guild, Type: perkType },
+        { Uses: 1 }
+      );
+      await user.roles.add(role);
+      if (perkType === "vip+" || perkType === "contributor") {
+        let role2 = await guild.roles.fetch(vipRole);
+        await user.roles.add(role2);
+      }
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (error) {
+      console.error(error);
+      return await interaction.reply({
+        content: "An error occurred while processing your request.",
+        ephemeral: true,
+      });
     }
-    await interaction.reply({ embeds: [embed], ephemeral: true });
   },
 
   async handleExistingClaim(
@@ -430,22 +437,30 @@ module.exports = {
     logEmbed.setDescription(
       `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
     );
-    await perkSystem.Channel.send({ embeds: [logEmbed] });
-    await vipStatus.findOneAndUpdate(
-      {
-        Claimer: user,
-      },
-      {
-        Status: true,
-        Type: perkType,
-        Date: new Date(),
-      }
-    );
-    await vipUses.findOneAndUpdate(
-      { Guild: perkSystem.Guild, Type: perkType },
-      { Uses: 1 }
-    );
-    await user.roles.add(role);
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    try {
+      await perkSystem.Channel.send({ embeds: [logEmbed] });
+      await vipStatus.findOneAndUpdate(
+        {
+          Claimer: user,
+        },
+        {
+          Status: true,
+          Type: perkType,
+          Date: new Date(),
+        }
+      );
+      await vipUses.findOneAndUpdate(
+        { Guild: perkSystem.Guild, Type: perkType },
+        { Uses: 1 }
+      );
+      await user.roles.add(role);
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+    } catch (error) {
+      console.error(error);
+      return await interaction.reply({
+        content: "An error occurred while processing your request.",
+        ephemeral: true,
+      });
+    }
   },
 };
