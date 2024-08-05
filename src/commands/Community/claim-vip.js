@@ -1,15 +1,12 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const vip = require("../../Schemas/vip");
+const vipUses = require("../../Schemas/vipUses");
 const vipStatus = require("../../Schemas/vipStatus");
 require("dotenv").config();
 
 const vipRole = process.env.VIP_ROLE;
 const vipPlusRole = process.env.VIP_PLUS_ROLE;
 const contributorRole = process.env.CONTRIBUTOR_ROLE;
-
-const vipCode = process.env.VIP_CODE;
-const vipPlusCode = process.env.VIP_PLUS_CODE;
-const contributorCode = process.env.CONTRIBUTOR_CODE;
 
 var timeout = [];
 
@@ -57,6 +54,12 @@ module.exports = {
     const code = options.getString("code");
     const perkStatus = await vipStatus.findOne({ Claimer: user });
     const perkSystem = await vip.findOne({ Guild: guild });
+    const vipCode = await vipUses.findOne({ Guild: guild, Type: "vip" });
+    const vipPlusCode = await vipUses.findOne({ Guild: guild, Type: "vip+" });
+    const contributorCode = await vipUses.findOne({
+      Guild: guild,
+      Type: "vip+",
+    });
 
     const embed = new EmbedBuilder()
       .setTitle("Perks Claimed!")
@@ -84,6 +87,14 @@ module.exports = {
         });
       }
 
+      if (!vipCode || !vipPlusCode || !contributorCode) {
+        return await interaction.reply({
+          content:
+            "The perk claim system is currently disabled, please try again later.",
+          ephemeral: true,
+        });
+      }
+
       if (!perkStatus) {
         if (
           code !== vipCode &&
@@ -98,8 +109,22 @@ module.exports = {
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
+        if (vipCode.Uses > 0 && code === vipCode) {
+          embed.setDescription(`The code you entered has been used already.`);
+          return await interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+        if (vipPlusCode.Uses > 0 && code === vipPlusCode) {
+          embed.setDescription(`The code you entered has been used already.`);
+          return await interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+        if (contributorCode.Uses > 0 && code === contributorCode) {
+          embed.setDescription(`The code you entered has been used already.`);
+          return await interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
         if (code === vipCode && perkType === "vip") {
           let role = await guild.roles.fetch(vipRole);
+          vipCodeUses + 1;
           await handleClaim(
             interaction,
             perkSystem,
@@ -378,6 +403,10 @@ module.exports = {
       Steam: steamId,
       Date: new Date(),
     });
+    await vipUses.findOneAndUpdate(
+      { Guild: perkSystem.Guild, Type: perkType },
+      { Uses: +1 }
+    );
     await user.roles.add(role);
     if (perkType === "vip+" || perkType === "contributor") {
       let role2 = await guild.roles.fetch(vipRole);
@@ -411,6 +440,10 @@ module.exports = {
         Type: perkType,
         Date: new Date(),
       }
+    );
+    await vipUses.findOneAndUpdate(
+      { Guild: perkSystem.Guild, Type: perkType },
+      { Uses: +1 }
     );
     await user.roles.add(role);
     await interaction.reply({ embeds: [embed], ephemeral: true });
