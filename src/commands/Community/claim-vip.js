@@ -405,7 +405,7 @@ module.exports = {
     });
     await vipUses.findOneAndUpdate(
       { Guild: perkSystem.Guild, Type: perkType },
-      { Uses: +1 }
+      { Uses: 1 }
     );
     await user.roles.add(role);
     if (perkType === "vip+" || perkType === "contributor") {
@@ -443,7 +443,7 @@ module.exports = {
     );
     await vipUses.findOneAndUpdate(
       { Guild: perkSystem.Guild, Type: perkType },
-      { Uses: +1 }
+      { Uses: 1 }
     );
     await user.roles.add(role);
     await interaction.reply({ embeds: [embed], ephemeral: true });
