@@ -16,23 +16,11 @@ module.exports = {
     .setDescription("Claim your VIP, VIP+ or Contributor perks.")
     .addStringOption((option) =>
       option
-        .setName("type")
-        .setDescription("The type of perks you want to claim.")
-        .setRequired(true)
-        .addChoices(
-          { name: "Vip", value: "vip" },
-          { name: "Vip+", value: "vip+" },
-          { name: "Contributor", value: "contributor" }
-        )
-    )
-    .addStringOption((option) =>
-      option
         .setName("steamid")
         .setDescription(
           "The SteamID of the account you want to claim perks for."
         )
         .setRequired(true)
-        .setAutocomplete(false)
     )
     .addStringOption((option) =>
       option
@@ -41,7 +29,6 @@ module.exports = {
           "The code you got in a TXT file after purchasing the Upgrade."
         )
         .setRequired(true)
-        .setAutocomplete(false)
     ),
   async execute(interaction) {
     if (!interaction || !interaction.user || !interaction.guild) {
@@ -49,7 +36,6 @@ module.exports = {
     }
 
     const { guild, options, user } = interaction;
-    const perkType = options.getString("type");
     const steamId = options.getString("steamid");
     const code = options.getString("code");
     const perkStatus = await vipStatus.findOne({ Claimer: user });
@@ -102,10 +88,6 @@ module.exports = {
           code !== contributorCode
         ) {
           embed.setDescription(`The code you entered is invalid.`);
-          logEmbed.setDescription(
-            `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\`\n\nType: \`${perkType}\``
-          );
-          await perkSystem.Channel.send({ embeds: [logEmbed] });
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
@@ -122,8 +104,9 @@ module.exports = {
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        if (code === vipCode && perkType === "vip") {
+        if (code === vipCode) {
           let role = await guild.roles.fetch(vipRole);
+          let perkType = "vip";
           await handleClaim(
             interaction,
             perkSystem,
@@ -133,8 +116,9 @@ module.exports = {
             perkType,
             role
           );
-        } else if (code === vipPlusCode && perkType === "vip+") {
+        } else if (code === vipPlusCode) {
           let role = await guild.roles.fetch(vipPlusRole);
+          let perkType = "vip+";
           await handleClaim(
             interaction,
             perkSystem,
@@ -144,8 +128,9 @@ module.exports = {
             perkType,
             role
           );
-        } else if (code === contributorCode && perkType === "contributor") {
+        } else if (code === contributorCode) {
           let role = await guild.roles.fetch(contributorRole);
+          let perkType = "contributor";
           await handleClaim(
             interaction,
             perkSystem,
@@ -155,27 +140,10 @@ module.exports = {
             perkType,
             role
           );
-        } else if (
-          code === vipCode ||
-          code === vipPlusCode ||
-          code === contributorCode
-        ) {
-          embed.setDescription(
-            `The code you entered is valid, but the type you entered is invalid.`
-          );
-          logEmbed.setDescription(
-            `${user} has entered a valid code, but entered an invalid type.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-          );
-          await perkSystem.Channel.send({ embeds: [logEmbed] });
-          await interaction.reply({ embeds: [embed], ephemeral: true });
         } else {
           embed.setDescription(
             `Something you entered is invalid, please try again.`
           );
-          logEmbed.setDescription(
-            `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\`\n\nType: \`${perkType}\``
-          );
-          await perkSystem.Channel.send({ embeds: [logEmbed] });
           await interaction.reply({ embeds: [embed], ephemeral: true });
         }
       } else if (perkStatus) {
@@ -187,22 +155,19 @@ module.exports = {
           embed.setDescription(
             `You've attempted to claim perks with a code that is invalid.`
           );
-          logEmbed.setDescription(
-            `${user} attempted to claim VIP, but they already had VIP perms and they entered an invalid code.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-          );
-          await perkSystem.Channel.send({ embeds: [logEmbed] });
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
         if (perkStatus.Type === "vip" && perkStatus.Status === true) {
-          if (code === vipCode && perkType === "vip") {
+          if (code === vipCode) {
             embed.setDescription(`You've already claimed your VIP perks.`);
             logEmbed.setDescription(
-              `${user} attempted to claim VIP, but they already had VIP perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
+              `${user} attempted to claim VIP, but they already had VIP perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\``
             );
             await perkSystem.Channel.send({ embeds: [logEmbed] });
             await interaction.reply({ embeds: [embed], ephemeral: true });
-          } else if (code === vipPlusCode && perkType === "vip+") {
+          } else if (code === vipPlusCode) {
             let role = await guild.roles.fetch(vipPlusRole);
+            let perkType = "vip+";
             await handleExistingClaim(
               interaction,
               perkSystem,
@@ -212,8 +177,9 @@ module.exports = {
               perkType,
               role
             );
-          } else if (code === contributorCode && perkType === "contributor") {
+          } else if (code === contributorCode) {
             let role = await guild.roles.fetch(contributorRole);
+            let perkType = "contributor";
             await handleEixistingClaim(
               interaction,
               perkSystem,
@@ -223,50 +189,21 @@ module.exports = {
               perkType,
               role
             );
-          } else if (
-            code === vipCode ||
-            code === vipPlusCode ||
-            code === contributorCode
-          ) {
-            embed.setDescription(
-              `The code you entered is valid, but the type you entered is invalid.`
-            );
-            logEmbed.setDescription(
-              `${user} has entered a valid code, but entered an invalid type.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
           } else {
             embed.setDescription(
               `Something you entered is invalid, please try again.`
             );
-            logEmbed.setDescription(
-              `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\`\n\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
             await interaction.reply({ embeds: [embed], ephemeral: true });
           }
         } else if (perkStatus.Type === "vip+" && perkStatus.Status === true) {
-          if (code === vipCode && perkType === "vip") {
+          if (code === vipCode || code === vipPlusCode) {
             embed.setDescription(
               `You've already claimed your VIP+ perks. If you want to gift, use the \`/gift\` command.`
             );
-            logEmbed.setDescription(
-              `${user} attempted to claim VIP, but they already had VIP+ perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
             await interaction.reply({ embeds: [embed], ephemeral: true });
-          } else if (code === vipPlusCode && perkType === "vip+") {
-            embed.setDescription(
-              `You've already claimed your VIP+ perks. If you want to gift, use the \`/gift\` command.`
-            );
-            logEmbed.setDescription(
-              `${user} attempted to claim VIP+, but they already had VIP+ perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
-          } else if (code === contributorCode && perkType === "contributor") {
+          } else if (code === contributorCode) {
             let role = await guild.roles.fetch(contributorRole);
+            let perkType = "contributor";
             await handleEixistingClaim(
               interaction,
               perkSystem,
@@ -276,91 +213,35 @@ module.exports = {
               perkType,
               role
             );
-          } else if (
-            code === vipCode ||
-            code === vipPlusCode ||
-            code === contributorCode
-          ) {
-            embed.setDescription(
-              `The code you entered is valid, but the type you entered is invalid.`
-            );
-            logEmbed.setDescription(
-              `${user} has entered a valid code, but entered an invalid type.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
           } else {
             embed.setDescription(
               `Something you entered is invalid, please try again.`
             );
-            logEmbed.setDescription(
-              `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\`\n\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
             await interaction.reply({ embeds: [embed], ephemeral: true });
           }
         } else if (
           perkStatus.Type === "contributor" &&
           perkStatus.Status === true
         ) {
-          if (code === vipCode && perkType === "vip") {
-            embed.setDescription(
-              `You've already claimed your Contributor perks. If you want to gift, use the \`/gift\` command.`
-            );
-            logEmbed.setDescription(
-              `${user} attempted to claim VIP, but they already had Contributor perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
-          } else if (code === vipPlusCode && perkType === "vip+") {
-            embed.setDescription(
-              `You've already claimed your Contributor perks. If you want to gift, use the \`/gift\` command.`
-            );
-            logEmbed.setDescription(
-              `${user} attempted to claim VIP+, but they already had Contributor perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
-          } else if (code === contributorCode && perkType === "contributor") {
-            embed.setDescription(
-              `You've already claimed your Contributor perks. If you want to gift, use the \`/gift\` command.`
-            );
-            logEmbed.setDescription(
-              `${user} attempted to claim Contributor, but they already had Contributor perms.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
-            await interaction.reply({ embeds: [embed], ephemeral: true });
-          } else if (
+          if (
             code === vipCode ||
             code === vipPlusCode ||
             code === contributorCode
           ) {
             embed.setDescription(
-              `The code you entered is valid, but the type you entered is invalid.`
+              `You've already claimed your Contributor perks. If you want to gift, use the \`/gift\` command.`
             );
-            logEmbed.setDescription(
-              `${user} has entered a valid code, but entered an invalid type.\nCode: \`${code}\`\nSteamID: \`${steamId}\`\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
             await interaction.reply({ embeds: [embed], ephemeral: true });
           } else {
             embed.setDescription(
               `Something you entered is invalid, please try again.`
             );
-            logEmbed.setDescription(
-              `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\`\n\nType: \`${perkType}\``
-            );
-            await perkSystem.Channel.send({ embeds: [logEmbed] });
             await interaction.reply({ embeds: [embed], ephemeral: true });
           }
         } else {
           embed.setDescription(
             `Something you entered is invalid, please try again.`
           );
-          logEmbed.setDescription(
-            `${user} has entered an invalid code.\nCode: \`${code}\`SteamID: \`${steamId}\`\n\nType: \`${perkType}\``
-          );
-          await perkSystem.Channel.send({ embeds: [logEmbed] });
           await interaction.reply({ embeds: [embed], ephemeral: true });
         }
       }
