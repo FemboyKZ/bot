@@ -71,6 +71,7 @@ module.exports = {
             ephemeral: true,
           });
         }
+        break;
 
       case "disable":
         try {

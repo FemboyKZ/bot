@@ -104,6 +104,7 @@ module.exports = {
           await interaction.reply({ embeds: [embed], ephemeral: true });
         }
         break;
+
       case "remove":
         if (!data) {
           return await interaction.reply({
