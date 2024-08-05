@@ -13,11 +13,11 @@ var timeout = [];
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("claim-vip")
-    .setDescription("Claim your Vip, Vip+ or Contributor perms.")
+    .setDescription("Claim your VIP, VIP+ or Contributor perks.")
     .addStringOption((option) =>
       option
         .setName("type")
-        .setDescription("The type of Vip perms you want to claim.")
+        .setDescription("The type of perks you want to claim.")
         .setRequired(true)
         .addChoices(
           { name: "Vip", value: "vip" },
@@ -29,7 +29,7 @@ module.exports = {
       option
         .setName("steamid")
         .setDescription(
-          "The SteamID of the account you want to claim Vip perms for."
+          "The SteamID of the account you want to claim perks for."
         )
         .setRequired(true)
         .setAutocomplete(false)
