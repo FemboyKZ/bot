@@ -36,7 +36,6 @@ module.exports = {
         )
         .setRequired(true)
         .setAutocomplete(false)
-        .max_length(60)
     )
     .addStringOption((option) =>
       option
@@ -46,8 +45,6 @@ module.exports = {
         )
         .setRequired(true)
         .setAutocomplete(false)
-        .min_length(30)
-        .max_length(30)
     ),
   async execute(interaction) {
     if (!interaction || !interaction.user || !interaction.guild) {
