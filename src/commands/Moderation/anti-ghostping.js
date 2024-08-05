@@ -64,7 +64,6 @@ module.exports = {
 
           await interaction.reply({ embeds: [embed] });
         }
-
         break;
 
       case "disable":
@@ -84,7 +83,6 @@ module.exports = {
 
           await interaction.reply({ embeds: [embed] });
         }
-
         break;
 
       case "number-reset":

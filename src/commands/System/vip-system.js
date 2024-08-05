@@ -4,21 +4,21 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const schema = require("../../Schemas/reports");
+const schema = require("../../Schemas/vip");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("report-system")
-    .setDescription("[Admin] Setup the report/suggestions system")
+    .setName("vip-system")
+    .setDescription("[Admin] Setup the vip system")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((command) =>
       command
         .setName("setup")
-        .setDescription("[Admin] Setup the report/suggestions system")
+        .setDescription("[Admin] Setup the vip claim system")
         .addChannelOption((option) =>
           option
             .setName("channel")
-            .setDescription("The channel for reports/suggestions")
+            .setDescription("The channel for vip claims")
             .setRequired(true)
             .addChannelTypes(ChannelType.GuildText)
         )
@@ -26,7 +26,7 @@ module.exports = {
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the report/suggestions system")
+        .setDescription("[Admin] Disable the vip claim system")
     ),
   async execute(interaction, client) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
@@ -38,11 +38,10 @@ module.exports = {
     const { guild, options } = interaction;
     const channel = options.getChannel("channel");
     const sub = options.getSubcommand();
-
     const data = await schema.findOne({ Guild: guild });
 
     const embed = new EmbedBuilder()
-      .setTitle("Report Setup")
+      .setTitle("Vip Claim System Setup")
       .setColor("#ff00b3")
       .setTimestamp();
 
@@ -51,7 +50,7 @@ module.exports = {
         try {
           if (!data) {
             embed.setDescription(
-              `All submitted reports/suggestions requests will be sent in ${channel}`
+              `All submitted vip claims will be sent in ${channel}`
             );
             await schema.create({
               Guild: guild,
@@ -60,7 +59,7 @@ module.exports = {
           } else if (data) {
             const existingChannel = client.channels.cache.get(data.Channel);
             embed.setDescription(
-              `Your reports/suggestions channel has already been set to ${existingChannel}`
+              `Your claim channel has already been set to ${existingChannel}`
             );
           }
 
@@ -78,13 +77,13 @@ module.exports = {
         try {
           if (!data) {
             embed.setDescription(
-              `The reports/suggestions system has already been disabled.`
+              `The vip claim system is already disabled, or was never setup.`
             );
           } else if (data) {
-            embed.setDescription(
-              `The reports/suggestions system has been disabled.`
-            );
-            await schema.deleteMany({ Guild: guild });
+            embed.setDescription(`The vip claim system has been disabled.`);
+            await schema.deleteMany({
+              Guild: guild,
+            });
           }
 
           return await interaction.reply({ embeds: [embed], ephemeral: true });

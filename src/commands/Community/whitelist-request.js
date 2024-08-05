@@ -28,20 +28,11 @@ module.exports = {
       });
 
     try {
-      const statusDataTrue = await whitelistStatusSchema.findOne({
+      const statusData = await whitelistStatusSchema.findOne({
         Request: interaction.user.id,
-        Status: true,
-      });
-      const statusDataFalse = await whitelistStatusSchema.findOne({
-        Request: interaction.user.id,
-        Status: false,
-      });
-      const statusDataNull = await whitelistStatusSchema.findOne({
-        Request: interaction.user.id,
-        Status: null,
       });
 
-      if (statusDataFalse) {
+      if (statusData.Status === false) {
         return await interaction.reply({
           content:
             "Unfortunately your whitelist request has been denied, you will not be whitelisted.",
@@ -56,14 +47,14 @@ module.exports = {
         });
       }
 
-      if (statusDataTrue) {
+      if (statusData.Status === true) {
         return await interaction.reply({
           content: "You have already been whitelisted.",
           ephemeral: true,
         });
       }
 
-      if (statusDataNull) {
+      if (statusData.Status === null) {
         return await interaction.reply({
           content: "You have already requested, please check again later.",
           ephemeral: true,
