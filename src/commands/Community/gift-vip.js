@@ -157,6 +157,13 @@ module.exports = {
           break;
 
         case "code":
+          if (!vipCode || !vipPlusCode || !contributorCode) {
+            return await interaction.reply({
+              content:
+                "The perk claim system is currently disabled, please try again later.",
+              ephemeral: true,
+            });
+          }
           if (
             code !== vipCode &&
             code !== vipPlusCode &&
