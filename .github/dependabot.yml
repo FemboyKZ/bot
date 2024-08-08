@@ -6,7 +6,7 @@ updates:
       interval: "weekly"
       day: "sunday"
       time: "15:00"
-      timezon: "Europe/Helsinki"
+      timezone: "Europe/Helsinki"
     assignees: "jvnipers"
     commit-message:
       prefix: "npm"
