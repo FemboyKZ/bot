@@ -24,14 +24,14 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
       (role) => role.name === "Wannabe Fem"
     );
     if (reaction.emoji.name === "👍") {
-      await whitelistStatus.findOneAndUpdate(
+      await schema.findOneAndUpdate(
         { User: user.id, Type: "Whitelist" },
         { Status: true }
       );
       if (!role) await member.roles.add(role);
       if (oldRole) await member.roles.remove(oldRole);
     } else if (reaction.emoji.name === "👎") {
-      await whitelistStatus.findOneAndUpdate(
+      await schema.findOneAndUpdate(
         { User: user.id, Type: "Whitelist" },
         { Status: false }
       );
