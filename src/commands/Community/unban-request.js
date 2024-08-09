@@ -6,6 +6,7 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const schema = require("../../Schemas/base-system.js");
+const status = require("../../Schemas/request-status.js");
 
 var timeout = [];
 
@@ -27,6 +28,33 @@ module.exports = {
     }
 
     try {
+      const statusData = await status.findOne({
+        User: interaction.user.id,
+        Type: "unban",
+      });
+
+      if (statusData.Status === false) {
+        return await interaction.reply({
+          content:
+            "Unfortunately your unban request has been denied, you can request again later.",
+          ephemeral: true,
+        });
+      }
+
+      if (statusData.Status === true) {
+        return await interaction.reply({
+          content: "You have already been unbanned.",
+          ephemeral: true,
+        });
+      }
+
+      if (statusData.Status === null) {
+        return await interaction.reply({
+          content: "You have already requested, please check again later.",
+          ephemeral: true,
+        });
+      }
+
       const data = await schema.findOne({
         Guild: interaction.guild.id,
         ID: "unban",

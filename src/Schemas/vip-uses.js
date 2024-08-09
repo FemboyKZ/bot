@@ -1,10 +1,10 @@
 const { model, Schema } = require("mongoose");
 
-let vipUsesSchema = new Schema({
+let vipCodes = new Schema({
   Guild: String,
   Code: String,
   Type: String,
   Uses: Number,
 });
 
-module.exports = model("vipUsesSchema", vipUsesSchema);
+module.exports = model("vipCodes", vipCodes);

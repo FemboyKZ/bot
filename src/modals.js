@@ -1,6 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("./Schemas/base-system.js");
-const status = require("./Schemas/whitelistStatus.js");
+const status = require("./Schemas/request-status.js");
 const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -69,6 +69,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
+    status.create({
+      User: interaction.user.id,
+      Type: "mc-whitelist",
+      Status: null,
+    });
   }
 
   if (interaction.customId === "modalWhitelist") {
@@ -134,9 +139,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
-
     status.create({
-      Request: interaction.user.id,
+      User: interaction.user.id,
+      Type: "whitelist",
       Status: null,
     });
   }
@@ -204,6 +209,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
+    status.create({
+      User: interaction.user.id,
+      Type: "unban",
+      Status: null,
+    });
   }
 
   if (interaction.customId === "modalReport") {
@@ -269,5 +279,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
+    status.create({
+      User: interaction.user.id,
+      Type: "report",
+      Status: null,
+    });
   }
 });

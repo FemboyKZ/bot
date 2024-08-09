@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const vip = require("../../Schemas/base-system.js");
-const vipUses = require("../../Schemas/vipUses.js");
-const vipStatus = require("../../Schemas/vipStatus.js");
+const uses = require("../../Schemas/vip-uses.js");
+const status = require("../../Schemas/vip-status.js");
 require("dotenv").config();
 
 const vipRole = process.env.VIP_ROLE;
@@ -38,14 +38,14 @@ module.exports = {
     const { guild, options, user } = interaction;
     const steamId = options.getString("steamid");
     const code = options.getString("code");
-    const perkStatus = await vipStatus.findOne({ Claimer: user });
+    const perkStatus = await status.findOne({ Claimer: user });
     const perkSystem = await vip.findOne({ Guild: guild.id, ID: "vip" });
-    const vipCode = await vipUses.findOne({ Guild: guild.id, Type: "vip" });
-    const vipPlusCode = await vipUses.findOne({
+    const vipCode = await uses.findOne({ Guild: guild.id, Type: "vip" });
+    const vipPlusCode = await uses.findOne({
       Guild: guild.id,
       Type: "vip+",
     });
-    const contributorCode = await vipUses.findOne({
+    const contributorCode = await uses.findOne({
       Guild: guild.id,
       Type: "vip+",
     });
@@ -298,7 +298,7 @@ module.exports = {
     );
     try {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await vipStatus.create({
+      await status.create({
         Claimer: user.id,
         Status: true,
         Type: perkType,
@@ -306,7 +306,7 @@ module.exports = {
         Steam: steamId,
         Date: new Date(),
       });
-      await vipUses.findOneAndUpdate(
+      await uses.findOneAndUpdate(
         { Guild: perkSystem.Guild, Type: perkType },
         { Uses: 1 }
       );
@@ -343,7 +343,7 @@ module.exports = {
     );
     try {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await vipStatus.findOneAndUpdate(
+      await status.findOneAndUpdate(
         {
           Claimer: user.id,
         },
@@ -353,7 +353,7 @@ module.exports = {
           Date: new Date(),
         }
       );
-      await vipUses.findOneAndUpdate(
+      await uses.findOneAndUpdate(
         { Guild: perkSystem.Guild, Type: perkType },
         { Uses: 1 }
       );

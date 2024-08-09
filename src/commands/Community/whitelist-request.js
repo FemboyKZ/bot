@@ -6,7 +6,7 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const schema = require("../../Schemas/base-system.js");
-const status = require("../../Schemas/whitelistStatus.js");
+const status = require("../../Schemas/request-status.js");
 require("dotenv").config();
 
 const whitelistRole = process.env.WHITELIST_ROLE;
@@ -29,7 +29,8 @@ module.exports = {
 
     try {
       const statusData = await status.findOne({
-        Request: interaction.user.id,
+        User: interaction.user.id,
+        Type: "whitelist",
       });
 
       if (statusData.Status === false) {

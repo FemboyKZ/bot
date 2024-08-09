@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const schema = require("../../Schemas/vipUses.js");
+const schema = require("../../Schemas/vip-uses.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
