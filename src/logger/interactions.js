@@ -14,10 +14,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const serverID = interaction.guild?.id;
     const user = interaction.user?.username;
     const userID = interaction.user?.id;
-    const iChannel = interaction.channel?.name;
-    const iChannelID = interaction.channel?.id;
 
-    if (!server || !serverID || !user || !userID || !iChannel || !iChannelID) {
+    if (!server || !serverID || !user || !userID) {
       console.error("Null or undefined value encountered");
       return;
     }
@@ -38,7 +36,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         },
         {
           name: "Command & User Input",
-          value: `${interaction}`,
+          value: `\`${interaction}\``,
         },
       ]);
 
