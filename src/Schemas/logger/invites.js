@@ -6,6 +6,7 @@ let invites = new Schema({
   User: String, // creator
   Permanent: Boolean,
   Expires: Date,
+  Created: Date,
   Code: String,
 });
 
