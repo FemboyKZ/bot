@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const schema = require("./Schemas/anti-link.js");
+const schema = require("./Schemas/moderation/anti-link.js");
 const { client } = require("./index.js");
 
 client.on(Events.MessageCreate, async (message) => {

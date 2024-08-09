@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const vip = require("../../Schemas/base-system.js");
-const uses = require("../../Schemas/vip-uses.js");
-const status = require("../../Schemas/vip-status.js");
+const uses = require("../../Schemas/vip/vip-uses.js");
+const status = require("../../Schemas/vip/vip-status.js");
 require("dotenv").config();
 
 const vipRole = process.env.VIP_ROLE;
