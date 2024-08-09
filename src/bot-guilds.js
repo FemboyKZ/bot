@@ -7,18 +7,10 @@ client.on(Events.GuildCreate, async (guild) => {
     Guild: guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const name = guild.name;
-  const serverID = guild.id;
-  const memberCount = guild.memberCount;
-
-  const ownerID = guild.ownerId;
-  const owner = await client.users.cache.get(ownerID);
-  const ownerName = owner.username;
+  const owner = await client.users.cache.get(guild.ownerId);
 
   const embed = new EmbedBuilder()
     .setColor("Green")
@@ -26,15 +18,15 @@ client.on(Events.GuildCreate, async (guild) => {
     .addFields([
       {
         name: "Server",
-        value: `> ${name} / ${serverID}`,
+        value: `> ${guild.name}`,
       },
       {
         name: "Server Membercount",
-        value: `> ${memberCount}`,
+        value: `> ${guild.memberCount}`,
       },
       {
         name: "Server Owner",
-        value: `> ${ownerName} / ${ownerID}`,
+        value: `> ${owner.username} / ${guild.ownerId}`,
       },
       {
         name: "Server Age",
@@ -42,8 +34,12 @@ client.on(Events.GuildCreate, async (guild) => {
       },
     ])
     .setTimestamp()
-    .setFooter({ text: "Guild Join" });
-  await auditChannel.send({ embeds: [embed] });
+    .setFooter({ text: `Guild Joined - ${guild.id}` });
+  try {
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.error("Error in GuildCreate event:", error);
+  }
 });
 
 client.on(Events.GuildDelete, async (guild) => {
@@ -51,18 +47,10 @@ client.on(Events.GuildDelete, async (guild) => {
     Guild: guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const name = guild.name;
-  const serverID = guild.id;
-  const memberCount = guild.memberCount;
-
-  const ownerID = guild.ownerId;
-  const owner = await client.users.cache.get(ownerID);
-  const ownerName = owner.username;
+  const owner = await client.users.cache.get(guild.ownerId);
 
   const embed = new EmbedBuilder()
     .setColor("Red")
@@ -70,15 +58,15 @@ client.on(Events.GuildDelete, async (guild) => {
     .addFields([
       {
         name: "Server",
-        value: `> ${name} / ${serverID}`,
+        value: `> ${guild.name}`,
       },
       {
         name: "Server Membercount",
-        value: `> ${memberCount}`,
+        value: `> ${guild.memberCount}`,
       },
       {
         name: "Server Owner",
-        value: `> ${ownerName} / ${ownerID}`,
+        value: `> ${owner.username} / ${guild.ownerId}`,
       },
       {
         name: "Server Age",
@@ -86,6 +74,10 @@ client.on(Events.GuildDelete, async (guild) => {
       },
     ])
     .setTimestamp()
-    .setFooter({ text: "Guild Leave" });
-  await channel.send({ embeds: [embed] });
+    .setFooter({ text: `Guild Left - ${guild.id}` });
+  try {
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.error("Error in GuildDelete event:", error);
+  }
 });
