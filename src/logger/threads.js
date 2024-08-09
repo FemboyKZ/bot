@@ -7,12 +7,10 @@ client.on(Events.ThreadCreate, async (thread) => {
     Guild: thread.guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -44,7 +42,7 @@ client.on(Events.ThreadCreate, async (thread) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });
 
 client.on(Events.ThreadDelete, async (thread) => {
@@ -52,12 +50,10 @@ client.on(Events.ThreadDelete, async (thread) => {
     Guild: thread.guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -89,7 +85,7 @@ client.on(Events.ThreadDelete, async (thread) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });
 
 client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
@@ -97,10 +93,8 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
     Guild: oldThread.guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
   const changes = [];
 
@@ -126,7 +120,7 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
   if (changes.length === 0) return;
   const changesText = changes.join("\n");
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .addFields(
@@ -158,5 +152,5 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
     )
     .setTitle("Thread Edited")
     .setFooter({ text: "FKZ Log System" });
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });

@@ -10,21 +10,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       Guild: interaction.guild.id,
       ID: "audit-logs",
     });
-    if (!data) return;
-
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-
-    const server = interaction.guild?.name;
-    const serverID = interaction.guild?.id;
-    const user = interaction.user?.username;
-    const userID = interaction.user?.id;
-
-    if (!server || !serverID || !user || !userID) {
-      console.error("Null or undefined value encountered");
-      return;
-    }
+    const channel = client.channels.cache.get(data.Channel);
+    if (!data || !data.Channel || !channel) return;
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -34,7 +21,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .addFields([
         {
           name: "User",
-          value: `${user} / <@${userID}>`,
+          value: `${interaction.user?.username} / <@${interaction.user?.id}>`,
         },
         {
           name: "Command & User Input",
@@ -43,7 +30,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       ]);
 
     try {
-      await auditChannel.send({ embeds: [embed] });
+      await channel.send({ embeds: [embed] });
     } catch (error) {
       console.error("Error sending message:", error);
     }

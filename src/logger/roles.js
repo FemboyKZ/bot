@@ -7,12 +7,10 @@ client.on(Events.GuildRoleCreate, async (role) => {
     Guild: role.guild?.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -22,7 +20,7 @@ client.on(Events.GuildRoleCreate, async (role) => {
       { name: "Role:", value: `<@&${role.id}>`, inline: false },
       { name: "ID:", value: `${role.id}`, inline: false }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });
 
 client.on(Events.GuildRoleDelete, async (role) => {
@@ -30,12 +28,10 @@ client.on(Events.GuildRoleDelete, async (role) => {
     Guild: role.guild?.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -45,7 +41,7 @@ client.on(Events.GuildRoleDelete, async (role) => {
       { name: "Role:", value: `<@&${role.id}>`, inline: false },
       { name: "ID:", value: `${role.id}`, inline: false }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });
 
 client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
@@ -53,10 +49,8 @@ client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
     Guild: newRole.guild?.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
   const changes = [];
 
@@ -99,7 +93,7 @@ client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
   if (changes.length === 0) return;
   const changesText = changes.join("\n");
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setTitle("Role Updated")
@@ -108,5 +102,5 @@ client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
       { name: "Changes:", value: `${changesText}`, inline: false },
       { name: "Role:", value: `<@&${newRole.id}>`, inline: false }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });

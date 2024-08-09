@@ -8,20 +8,14 @@ client.on(Events.MessageDelete, async (message) => {
     Guild: message.guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  if (!logID) return;
-  if (!message.author) return;
-  if (message.author.bot) return;
-  if (message.author.id !== client.user.id) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
+
+  const fullMessage = await message.fetch();
 
   try {
-    const auditChannel = client.channels.cache.get(logID);
-    const fullMessage = await message.fetch();
-    if (!auditChannel) return;
-
     if (message.content.length >= 3072 || fullMessage.content.length >= 3072) {
-      const auditEmbed = new EmbedBuilder()
+      const embed = new EmbedBuilder()
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
@@ -44,18 +38,18 @@ client.on(Events.MessageDelete, async (message) => {
             inline: false,
           }
         );
-      await auditChannel.send({ embeds: [auditEmbed] });
+      await channel.send({ embeds: [embed] });
       return;
     }
 
-    const auditEmbed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Message Deleted")
       .setDescription(`\`\`\`\n${message.content}\n\`\`\``);
     if (fullMessage.content) {
-      auditEmbed.addFields(
+      embed.addFields(
         {
           name: "FullMsg:",
           value: `\`\`\`\n${fullMessage.content}\n\`\`\``,
@@ -78,7 +72,7 @@ client.on(Events.MessageDelete, async (message) => {
         }
       );
     } else {
-      auditEmbed.addFields(
+      embed.addFields(
         {
           name: "Author:",
           value: `${message.author}`,
@@ -96,7 +90,7 @@ client.on(Events.MessageDelete, async (message) => {
         }
       );
     }
-    await auditChannel.send({ embeds: [auditEmbed] });
+    await channel.send({ embeds: [embed] });
   } catch (err) {
     console.log(err);
   }
@@ -108,22 +102,17 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     Guild: newMessage.guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  if (!logID) return;
-  if (!oldMessage.author) return;
-  if (oldMessage.author.bot) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
+
+  const fullOldMessage = await oldMessage.fetch();
 
   try {
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    const fullOldMessage = await oldMessage.fetch();
-
     if (
       oldMessage.content.length >= 1536 ||
       fullOldMessage.content.length >= 1536
     ) {
-      const auditEmbed = new EmbedBuilder()
+      const embed = new EmbedBuilder()
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
@@ -146,7 +135,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
             inline: false,
           }
         );
-      await auditChannel.send({ embeds: [auditEmbed] });
+      await channel.send({ embeds: [embed] });
       return;
     }
 
@@ -169,7 +158,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
       const changesText = changes.join("\n");
 
-      const auditEmbed = new EmbedBuilder()
+      const embed = new EmbedBuilder()
         .setColor("#ff00b3")
         .setTimestamp()
         .setFooter({ text: "FKZ Log System" })
@@ -191,7 +180,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
             value: `${oldMessage.id}`,
           }
         );
-      await auditChannel.send({ embeds: [auditEmbed] });
+      await channel.send({ embeds: [embed] });
     }
   } catch (err) {
     console.log(err);

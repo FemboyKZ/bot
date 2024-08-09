@@ -7,12 +7,10 @@ client.on(Events.InviteCreate, async (invite) => {
     Guild: invite.guild?.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -29,7 +27,7 @@ client.on(Events.InviteCreate, async (invite) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });
 
 client.on(Events.InviteDelete, async (invite) => {
@@ -37,12 +35,10 @@ client.on(Events.InviteDelete, async (invite) => {
     Guild: invite.guild?.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -74,5 +70,5 @@ client.on(Events.InviteDelete, async (invite) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });

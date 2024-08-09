@@ -8,16 +8,15 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
       Guild: emoji.guild.id,
       ID: "audit-logs",
     });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    let image = emoji.imageURL({ size: 64 });
+    const channel = client.channels.cache.get(data.Channel);
+    if (!data || !data.Channel || !channel) return;
 
-    const auditEmbed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setImage(image || "https://femboy.kz/images/wide.png")
+      .setImage(
+        emoji.imageURL({ size: 64 }) || "https://femboy.kz/images/wide.png"
+      )
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Emoji Added")
       .addFields(
@@ -42,7 +41,7 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
           inline: false,
         }
       );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error(error);
   }
@@ -54,16 +53,15 @@ client.on(Events.GuildEmojiDelete, async (emoji) => {
       Guild: emoji.guild.id,
       ID: "audit-logs",
     });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    let image = emoji.imageURL({ size: 64 });
+    const channel = client.channels.cache.get(data.Channel);
+    if (!data || !data.Channel || !channel) return;
 
-    const auditEmbed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setImage(image || "https://femboy.kz/images/wide.png")
+      .setImage(
+        emoji.imageURL({ size: 64 }) || "https://femboy.kz/images/wide.png"
+      )
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Emoji Deleted")
       .addFields(
@@ -88,7 +86,7 @@ client.on(Events.GuildEmojiDelete, async (emoji) => {
           inline: false,
         }
       );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error(error);
   }
@@ -100,10 +98,9 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
       Guild: newEmoji.guild.id,
       ID: "audit-logs",
     });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
+    const channel = client.channels.cache.get(data.Channel);
+    if (!data || !data.Channel || !channel) return;
+
     const changes = [];
 
     if (oldEmoji.name !== newEmoji.name) {
@@ -114,12 +111,13 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
 
     if (changes.length === 0) return;
     const changesText = changes.join("\n");
-    let image = newEmoji.imageURL({ size: 64 });
 
-    const auditEmbed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setImage(image || "https://femboy.kz/images/wide.png")
+      .setImage(
+        newEmoji.imageURL({ size: 64 }) || "https://femboy.kz/images/wide.png"
+      )
       .setFooter({ text: "FKZ Log System" })
       .setTitle("Emoji Edited")
       .addFields(
@@ -139,7 +137,7 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
           inline: false,
         }
       );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error(error);
   }

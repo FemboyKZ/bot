@@ -7,10 +7,8 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
     Guild: guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-
-  const logID = data.Channel;
-  if (!logID) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
   const bans = await user.guild.bans.fetch();
   const banInfo = bans.get(user.id);
@@ -18,9 +16,6 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
 
   const { reason, executor } = banInfo;
   let reasons = JSON.stringify(reason);
-
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
 
   const fullUser = await user.fetch();
   let banUser;
@@ -30,7 +25,7 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
   } else {
     banUser = user.id;
   }
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -52,7 +47,7 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });
 
 client.on(Events.GuildBanRemove, async (user) => {
@@ -60,10 +55,8 @@ client.on(Events.GuildBanRemove, async (user) => {
     Guild: user.guild.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-
-  const logID = data.Channel;
-  if (!logID) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !channel) return;
 
   const bans = await user.guild.bans.fetch();
   const banInfo = bans.get(user.id);
@@ -71,11 +64,8 @@ client.on(Events.GuildBanRemove, async (user) => {
 
   const { executor } = banInfo;
 
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
-
   const fullUser = await user.fetch();
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -92,5 +82,5 @@ client.on(Events.GuildBanRemove, async (user) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await channel.send({ embeds: [embed] });
 });

@@ -8,14 +8,13 @@ client.on(Events.GuildStickerCreate, async (sticker) => {
       Guild: sticker.guild.id,
       ID: "audit-logs",
     });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
+    const channel = client.channels.cache.get(data.Channel);
+    if (!data || !data.Channel || !channel) return;
+
     let image =
       sticker.imageURL({ size: 64 }) || "https://femboy.kz/images/wide.png";
 
-    const auditEmbed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
       .setImage(image)
@@ -43,7 +42,7 @@ client.on(Events.GuildStickerCreate, async (sticker) => {
           inline: false,
         }
       );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error(error);
   }
@@ -55,14 +54,13 @@ client.on(Events.GuildStickerDelete, async (sticker) => {
       Guild: sticker.guild.id,
       ID: "audit-logs",
     });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
+    const channel = client.channels.cache.get(data.Channel);
+    if (!data || !data.Channel || !channel) return;
+
     let image =
       sticker.url({ size: 128 }) || "https://femboy.kz/images/wide.png";
 
-    const auditEmbed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
       .setImage(image)
@@ -72,7 +70,7 @@ client.on(Events.GuildStickerDelete, async (sticker) => {
         { name: "Name:", value: `${sticker.name}`, inline: false },
         { name: "ID:", value: `${sticker.id}`, inline: false }
       );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error(error);
   }
@@ -84,10 +82,9 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
       Guild: newSticker.guild.id,
       ID: "audit-logs",
     });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
+    const channel = client.channels.cache.get(data.Channel);
+    if (!data || !data.Channel || !channel) return;
+
     const changes = [];
 
     if (oldSticker.name !== newSticker.name) {
@@ -106,7 +103,7 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
     let image =
       newSticker.url({ size: 128 }) || "https://femboy.kz/images/wide.png";
 
-    const auditEmbed = new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
       .setImage(image)
@@ -116,7 +113,7 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
         { name: "Changes:", value: `${changesText}`, inline: false },
         { name: "ID:", value: `${newSticker.id}`, inline: false }
       );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error(error);
   }

@@ -7,12 +7,10 @@ client.on(Events.ChannelCreate, async (channel) => {
     Guild: channel.guild?.id,
     ID: "audit-logs",
   });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const auditChannel = client.channels.cache.get(data.Channel);
+  if (!data || !data.Channel || !auditChannel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -39,7 +37,7 @@ client.on(Events.ChannelCreate, async (channel) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await auditChannel.send({ embeds: [embed] });
 });
 
 client.on(Events.ChannelDelete, async (channel) => {
@@ -52,7 +50,7 @@ client.on(Events.ChannelDelete, async (channel) => {
   const auditChannel = client.channels.cache.get(logID);
   if (!auditChannel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -79,7 +77,7 @@ client.on(Events.ChannelDelete, async (channel) => {
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await auditChannel.send({ embeds: [embed] });
 });
 
 client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
@@ -116,7 +114,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
   if (changes.length === 0) return;
   const changesText = changes.join("\n");
 
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: "FKZ Log System" })
@@ -125,5 +123,5 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       { name: "Changes:", value: `${changesText}`, inline: false },
       { name: "ID:", value: `<#${newChannel.id}>`, inline: false }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  await auditChannel.send({ embeds: [embed] });
 });
