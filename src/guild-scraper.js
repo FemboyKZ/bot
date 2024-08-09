@@ -48,6 +48,7 @@ client.on("ready", async () => {
         Guild: guild.id,
         Name: rule.name,
         Rule: rule.id,
+        User: rule.creatorId,
         Trigger: rule.triggerType,
         Action: rule.actions[0].type,
         Enabled: rule.enabled,
