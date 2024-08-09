@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const schema = require("../../Schemas/tickets.js");
+const schema = require("../../Schemas/moderation/tickets.js");
 
 module.exports = {
   data: new SlashCommandBuilder()

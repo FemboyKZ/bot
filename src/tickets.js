@@ -10,8 +10,10 @@ const {
   TextInputStyle,
   ChannelType,
 } = require("discord.js");
-const schema = require("./Schemas/tickets.js");
+const schema = require("./Schemas/moderation/tickets.js");
 const { client } = require("./index.js");
+
+// could be integrated to modals.js
 
 client.on(Events.InteractionCreate, async (interaction) => {
   if (interaction.isButton()) return;
