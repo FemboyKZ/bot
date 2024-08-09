@@ -3,7 +3,6 @@ const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction) return;
   if (!interaction.isChatInputCommand()) return;
   else {
     const data = await schema.findOne({
@@ -16,7 +15,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("Chat Command Executed.")
-      .setFooter({ text: `FKZ • ${serverID}` })
+      .setFooter({ text: `FKZ • ${interaction.guild.id}` })
       .setTimestamp()
       .addFields([
         {
