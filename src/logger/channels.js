@@ -1,9 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 client.on(Events.ChannelCreate, async (channel) => {
-  const data = await Audit_Log.findOne({ Guild: channel.guild?.id });
+  const data = await schema.findOne({
+    Guild: channel.guild?.id,
+    ID: "audit-logs",
+  });
   if (!data) return;
   const logID = data.Channel;
   const auditChannel = client.channels.cache.get(logID);
@@ -40,7 +43,10 @@ client.on(Events.ChannelCreate, async (channel) => {
 });
 
 client.on(Events.ChannelDelete, async (channel) => {
-  const data = await Audit_Log.findOne({ Guild: channel.guild?.id });
+  const data = await schema.findOne({
+    Guild: channel.guild?.id,
+    ID: "audit-logs",
+  });
   if (!data) return;
   const logID = data.Channel;
   const auditChannel = client.channels.cache.get(logID);
@@ -77,7 +83,7 @@ client.on(Events.ChannelDelete, async (channel) => {
 });
 
 client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
-  const data = await Audit_Log.findOne({ Guild: oldChannel.guild?.id });
+  const data = await schema.findOne({ Guild: oldChannel.guild?.id });
   if (!data) return;
   const logID = data.Channel;
   const auditChannel = client.channels.cache.get(logID);

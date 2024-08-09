@@ -1,4 +1,4 @@
-const Audit_Log = require("./Schemas/auditlog.js");
+const schema = require("./Schemas/auditlog.js");
 const { client } = require("./index.js");
 
 client.on("ready", async () => {
@@ -12,7 +12,7 @@ client.on("ready", async () => {
   const roles = await guild.roles.fetch();
 
   members.forEach(async (member) => {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Member: member.id,
     });
@@ -20,12 +20,12 @@ client.on("ready", async () => {
     if (data) {
       await data.updateOne({ Member: member.id });
     } else {
-      await Audit_Log.create({ Guild: guild.id, Member: member.id });
+      await schema.create({ Guild: guild.id, Member: member.id });
     }
   });
 
   channels.forEach(async (channel) => {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Channel: channel.id,
     });
@@ -33,12 +33,12 @@ client.on("ready", async () => {
     if (data) {
       await data.updateOne({ Channel: channel.id });
     } else {
-      await Audit_Log.create({ Guild: guild.id, Channel: channel.id });
+      await schema.create({ Guild: guild.id, Channel: channel.id });
     }
   });
 
   invites.forEach(async (invite) => {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Invite: invite.code,
     });
@@ -46,12 +46,12 @@ client.on("ready", async () => {
     if (data) {
       await data.updateOne({ Invite: invite.code });
     } else {
-      await Audit_Log.create({ Guild: guild.id, Invite: invite.code });
+      await schema.create({ Guild: guild.id, Invite: invite.code });
     }
   });
 
   bans.forEach(async (ban) => {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Ban: ban.user.id,
     });
@@ -59,12 +59,12 @@ client.on("ready", async () => {
     if (data) {
       await data.updateOne({ Ban: ban.user.id });
     } else {
-      await Audit_Log.create({ Guild: guild.id, Ban: ban.user.id });
+      await schema.create({ Guild: guild.id, Ban: ban.user.id });
     }
   });
 
   emojis.forEach(async (emoji) => {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Emoji: emoji.id,
     });
@@ -72,12 +72,12 @@ client.on("ready", async () => {
     if (data) {
       await data.updateOne({ Emoji: emoji.id });
     } else {
-      await Audit_Log.create({ Guild: guild.id, Emoji: emoji.id });
+      await schema.create({ Guild: guild.id, Emoji: emoji.id });
     }
   });
 
   stickers.forEach(async (sticker) => {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Sticker: sticker.id,
     });
@@ -85,12 +85,12 @@ client.on("ready", async () => {
     if (data) {
       await data.updateOne({ Sticker: sticker.id });
     } else {
-      await Audit_Log.create({ Guild: guild.id, Sticker: sticker.id });
+      await schema.create({ Guild: guild.id, Sticker: sticker.id });
     }
   });
 
   roles.forEach(async (role) => {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Role: role.id,
     });
@@ -98,7 +98,7 @@ client.on("ready", async () => {
     if (data) {
       await data.updateOne({ Role: role.id });
     } else {
-      await Audit_Log.create({ Guild: guild.id, Role: role.id });
+      await schema.create({ Guild: guild.id, Role: role.id });
     }
   });
 });

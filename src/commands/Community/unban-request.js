@@ -5,7 +5,7 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const unbanSchema = require("../../Schemas/unbans");
+const schema = require("../../Schemas/base-system.js");
 
 var timeout = [];
 
@@ -27,7 +27,10 @@ module.exports = {
     }
 
     try {
-      const data = await unbanSchema.findOne({ Guild: interaction.guild.id });
+      const data = await schema.findOne({
+        Guild: interaction.guild.id,
+        ID: "unban",
+      });
       if (!data) {
         await interaction.reply({
           content: "The unban requests are currently disabled.",

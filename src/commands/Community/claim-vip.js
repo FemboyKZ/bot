@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const vip = require("../../Schemas/vip");
-const vipUses = require("../../Schemas/vipUses");
-const vipStatus = require("../../Schemas/vipStatus");
+const vip = require("../../Schemas/base-system.js");
+const vipUses = require("../../Schemas/vipUses.js");
+const vipStatus = require("../../Schemas/vipStatus.js");
 require("dotenv").config();
 
 const vipRole = process.env.VIP_ROLE;
@@ -39,11 +39,14 @@ module.exports = {
     const steamId = options.getString("steamid");
     const code = options.getString("code");
     const perkStatus = await vipStatus.findOne({ Claimer: user });
-    const perkSystem = await vip.findOne({ Guild: guild });
-    const vipCode = await vipUses.findOne({ Guild: guild, Type: "vip" });
-    const vipPlusCode = await vipUses.findOne({ Guild: guild, Type: "vip+" });
+    const perkSystem = await vip.findOne({ Guild: guild.id, ID: "vip" });
+    const vipCode = await vipUses.findOne({ Guild: guild.id, Type: "vip" });
+    const vipPlusCode = await vipUses.findOne({
+      Guild: guild.id,
+      Type: "vip+",
+    });
     const contributorCode = await vipUses.findOne({
-      Guild: guild,
+      Guild: guild.id,
       Type: "vip+",
     });
 
@@ -123,6 +126,7 @@ module.exports = {
           let perkType = "vip";
           await handleClaim(
             interaction,
+            user,
             perkSystem,
             embed,
             logEmbed,
@@ -135,6 +139,7 @@ module.exports = {
           let perkType = "vip+";
           await handleClaim(
             interaction,
+            user,
             perkSystem,
             embed,
             logEmbed,
@@ -147,6 +152,7 @@ module.exports = {
           let perkType = "contributor";
           await handleClaim(
             interaction,
+            user,
             perkSystem,
             embed,
             logEmbed,
@@ -182,6 +188,7 @@ module.exports = {
             let perkType = "vip+";
             await handleExistingClaim(
               interaction,
+              user,
               perkSystem,
               embed,
               logEmbed,
@@ -194,6 +201,7 @@ module.exports = {
             let perkType = "contributor";
             await handleEixistingClaim(
               interaction,
+              user,
               perkSystem,
               embed,
               logEmbed,
@@ -218,6 +226,7 @@ module.exports = {
             let perkType = "contributor";
             await handleEixistingClaim(
               interaction,
+              user,
               perkSystem,
               embed,
               logEmbed,
@@ -273,6 +282,7 @@ module.exports = {
 
   async handleClaim(
     interaction,
+    user,
     perkSystem,
     embed,
     logEmbed,
@@ -289,7 +299,7 @@ module.exports = {
     try {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
       await vipStatus.create({
-        Claimer: user,
+        Claimer: user.id,
         Status: true,
         Type: perkType,
         Gifted: null,
@@ -317,6 +327,7 @@ module.exports = {
 
   async handleExistingClaim(
     interaction,
+    user,
     perkSystem,
     embed,
     logEmbed,
@@ -334,7 +345,7 @@ module.exports = {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
       await vipStatus.findOneAndUpdate(
         {
-          Claimer: user,
+          Claimer: user.id,
         },
         {
           Status: true,

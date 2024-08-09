@@ -1,9 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const whitelistSchema = require("./Schemas/whitelist.js");
-const whitelistStatusSchema = require("./Schemas/whitelistStatus.js");
-const mcWhitelistSchema = require("./Schemas/mcWhitelist.js");
-const unbanSchema = require("./Schemas/unbans.js");
-const reportSchema = require("./Schemas/reports.js");
+const schema = require("./Schemas/base-system.js");
+const status = require("./Schemas/whitelistStatus.js");
 const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -50,8 +47,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    mcWhitelistSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "mc-whitelist" })
       .then(async (data) => {
         if (!data) return;
 
@@ -115,8 +112,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    whitelistSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "whitelist" })
       .then(async (data) => {
         if (!data) return;
 
@@ -138,7 +135,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         });
       });
 
-    whitelistStatusSchema.create({
+    status.create({
       Request: interaction.user.id,
       Status: null,
     });
@@ -185,8 +182,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    unbanSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "unban" })
       .then(async (data) => {
         if (!data) return;
 
@@ -250,8 +247,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    reportSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "report" })
       .then(async (data) => {
         if (!data) return;
 

@@ -5,7 +5,7 @@ const {
   Events,
 } = require("discord.js");
 require("dotenv").config();
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 const invites = new Collection();
@@ -32,8 +32,9 @@ client.on("ready", async () => {
 
   client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     try {
-      const data = await Audit_Log.findOne({
+      const data = await schema.findOne({
         Guild: oldMember.guild.id,
+        ID: "audit-logs",
       });
       if (!data) return;
 
@@ -171,8 +172,9 @@ client.on("ready", async () => {
 
 client.on(Events.GuildMemberAdd, async (member) => {
   try {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: member.guild.id,
+      ID: "audit-logs",
     });
 
     if (!data) return;
@@ -214,8 +216,9 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
 client.on(Events.GuildMemberRemove, async (member) => {
   try {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: member.guild.id,
+      ID: "audit-logs",
     });
 
     if (!data) return;
@@ -240,8 +243,9 @@ client.on(Events.GuildMemberRemove, async (member) => {
 });
 
 client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
-  const data = await Audit_Log.findOne({
+  const data = await schema.findOne({
     Guild: oldMember.guild.id,
+    ID: "audit-logs",
   });
 
   if (!data) return;

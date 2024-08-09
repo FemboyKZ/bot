@@ -1,13 +1,17 @@
 const { EmbedBuilder, Events } = require("discord.js");
-require("dotenv").config();
+const schema = require("./Schemas/base-system.js");
 const { client } = require("./index.js");
 
-// bot join/leave logger, useless feature
-// doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.GuildCreate, async (guild) => {
-  const channel = await client.channels.cache.get(
-    `${process.env.LOGS_CHAT_ID}`
-  );
+  const data = await schema.findOne({
+    Guild: guild.id,
+    ID: "audit-logs",
+  });
+  if (!data) return;
+  const logID = data.Channel;
+  const auditChannel = client.channels.cache.get(logID);
+  if (!auditChannel) return;
+
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;
@@ -39,13 +43,19 @@ client.on(Events.GuildCreate, async (guild) => {
     ])
     .setTimestamp()
     .setFooter({ text: "Guild Join" });
-  await channel.send({ embeds: [embed] });
+  await auditChannel.send({ embeds: [embed] });
 });
 
 client.on(Events.GuildDelete, async (guild) => {
-  const channel = await client.channels.cache.get(
-    `${process.env.LOGS_CHAT_ID}`
-  );
+  const data = await schema.findOne({
+    Guild: guild.id,
+    ID: "audit-logs",
+  });
+  if (!data) return;
+  const logID = data.Channel;
+  const auditChannel = client.channels.cache.get(logID);
+  if (!auditChannel) return;
+
   const name = guild.name;
   const serverID = guild.id;
   const memberCount = guild.memberCount;

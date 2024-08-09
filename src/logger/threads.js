@@ -1,10 +1,11 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 client.on(Events.ThreadCreate, async (thread) => {
-  const data = await Audit_Log.findOne({
+  const data = await schema.findOne({
     Guild: thread.guild.id,
+    ID: "audit-logs",
   });
   if (!data) return;
   const logID = data.Channel;
@@ -47,8 +48,9 @@ client.on(Events.ThreadCreate, async (thread) => {
 });
 
 client.on(Events.ThreadDelete, async (thread) => {
-  const data = await Audit_Log.findOne({
+  const data = await schema.findOne({
     Guild: thread.guild.id,
+    ID: "audit-logs",
   });
   if (!data) return;
   const logID = data.Channel;
@@ -91,8 +93,9 @@ client.on(Events.ThreadDelete, async (thread) => {
 });
 
 client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
-  const data = await Audit_Log.findOne({
+  const data = await schema.findOne({
     Guild: oldThread.guild.id,
+    ID: "audit-logs",
   });
   if (!data) return;
   const logID = data.Channel;

@@ -5,8 +5,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const whitelistSchema = require("../../Schemas/whitelist");
-const whitelistStatusSchema = require("../../Schemas/whitelistStatus");
+const schema = require("../../Schemas/base-system.js");
+const status = require("../../Schemas/whitelistStatus.js");
 require("dotenv").config();
 
 const whitelistRole = process.env.WHITELIST_ROLE;
@@ -28,7 +28,7 @@ module.exports = {
       });
 
     try {
-      const statusData = await whitelistStatusSchema.findOne({
+      const statusData = await status.findOne({
         Request: interaction.user.id,
       });
 
@@ -61,8 +61,9 @@ module.exports = {
         });
       }
 
-      const data = await whitelistSchema.findOne({
+      const data = await schema.findOne({
         Guild: interaction.guild.id,
+        ID: "whitelist",
       });
       if (!data) {
         return await interaction.reply({

@@ -1,10 +1,13 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 client.on(Events.GuildStickerCreate, async (sticker) => {
   try {
-    const data = await Audit_Log.findOne({ Guild: sticker.guild.id });
+    const data = await schema.findOne({
+      Guild: sticker.guild.id,
+      ID: "audit-logs",
+    });
     if (!data) return;
     const logID = data.Channel;
     const auditChannel = client.channels.cache.get(logID);
@@ -48,7 +51,10 @@ client.on(Events.GuildStickerCreate, async (sticker) => {
 
 client.on(Events.GuildStickerDelete, async (sticker) => {
   try {
-    const data = await Audit_Log.findOne({ Guild: sticker.guild.id });
+    const data = await schema.findOne({
+      Guild: sticker.guild.id,
+      ID: "audit-logs",
+    });
     if (!data) return;
     const logID = data.Channel;
     const auditChannel = client.channels.cache.get(logID);
@@ -74,7 +80,10 @@ client.on(Events.GuildStickerDelete, async (sticker) => {
 
 client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
   try {
-    const data = await Audit_Log.findOne({ Guild: newSticker.guild.id });
+    const data = await schema.findOne({
+      Guild: newSticker.guild.id,
+      ID: "audit-logs",
+    });
     if (!data) return;
     const logID = data.Channel;
     const auditChannel = client.channels.cache.get(logID);

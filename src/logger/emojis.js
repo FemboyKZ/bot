@@ -1,11 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 client.on(Events.GuildEmojiCreate, async (emoji) => {
   try {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: emoji.guild.id,
+      ID: "audit-logs",
     });
     if (!data) return;
     const logID = data.Channel;
@@ -49,8 +50,9 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
 
 client.on(Events.GuildEmojiDelete, async (emoji) => {
   try {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: emoji.guild.id,
+      ID: "audit-logs",
     });
     if (!data) return;
     const logID = data.Channel;
@@ -94,8 +96,9 @@ client.on(Events.GuildEmojiDelete, async (emoji) => {
 
 client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
   try {
-    const data = await Audit_Log.findOne({
+    const data = await schema.findOne({
       Guild: newEmoji.guild.id,
+      ID: "audit-logs",
     });
     if (!data) return;
     const logID = data.Channel;

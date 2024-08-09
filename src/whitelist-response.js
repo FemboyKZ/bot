@@ -1,5 +1,5 @@
 const { PermissionFlagsBits, Events } = require("discord.js");
-const whitelistStatus = require("./Schemas/whitelistStatus.js");
+const schema = require("./Schemas/whitelistStatus.js");
 const { client } = require("./index.js");
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -11,7 +11,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (!member.permissions.has(PermissionFlagsBits.Administrator)) return;
 
   try {
-    const data = await whitelistStatus.findOne({
+    const data = await schema.findOne({
       Request: user.id,
     });
     if (!data) return;

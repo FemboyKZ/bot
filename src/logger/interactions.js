@@ -1,14 +1,20 @@
 const { EmbedBuilder, Events } = require("discord.js");
-require("dotenv").config();
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
-// doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction) return;
   if (!interaction.isChatInputCommand()) return;
   else {
-    const channel = await client.channels.cache.get(process.env.LOGS_CHAT_ID);
-    if (!channel) return;
+    const data = await schema.findOne({
+      Guild: interaction.guild.id,
+      ID: "audit-logs",
+    });
+    if (!data) return;
+
+    const logID = data.Channel;
+    const auditChannel = client.channels.cache.get(logID);
+    if (!auditChannel) return;
 
     const server = interaction.guild?.name;
     const serverID = interaction.guild?.id;
@@ -27,10 +33,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .setTimestamp()
       .addFields([
         {
-          name: "Channel",
-          value: `${iChannel} / <#${iChannelID}>`,
-        },
-        {
           name: "User",
           value: `${user} / <@${userID}>`,
         },
@@ -41,7 +43,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       ]);
 
     try {
-      await channel.send({ embeds: [embed] });
+      await auditChannel.send({ embeds: [embed] });
     } catch (error) {
       console.error("Error sending message:", error);
     }

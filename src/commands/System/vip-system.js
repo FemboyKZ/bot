@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const schema = require("../../Schemas/vip");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -38,7 +38,10 @@ module.exports = {
     const { guild, options } = interaction;
     const channel = options.getChannel("channel");
     const sub = options.getSubcommand();
-    const data = await schema.findOne({ Guild: guild });
+    const data = await schema.findOne({
+      Guild: guild.id,
+      ID: "vip",
+    });
 
     const embed = new EmbedBuilder()
       .setTitle("Vip Claim System Setup")
@@ -53,8 +56,9 @@ module.exports = {
               `All submitted vip claims will be sent in ${channel}`
             );
             await schema.create({
-              Guild: guild,
+              Guild: guild.id,
               Channel: channel.id,
+              ID: "vip",
             });
           } else if (data) {
             const existingChannel = client.channels.cache.get(data.Channel);
@@ -82,7 +86,8 @@ module.exports = {
           } else if (data) {
             embed.setDescription(`The vip claim system has been disabled.`);
             await schema.deleteMany({
-              Guild: guild,
+              Guild: guild.id,
+              ID: "vip",
             });
           }
 

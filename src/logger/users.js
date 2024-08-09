@@ -1,12 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 require("dotenv").config();
 
 client.on(Events.UserUpdate, async (oldUser, newUser) => {
   try {
     const logGuild = await client.guilds.fetch(process.env.GUILD_ID);
-    const data = await Audit_Log.findOne({ Guild: logGuild }); // can't fetch guild this way?
+    const data = await schema.findOne({ Guild: logGuild, ID: "audit-logs" }); // can't fetch guild this way?
     const logID = data ? data.Channel : null;
     if (
       !logID ||

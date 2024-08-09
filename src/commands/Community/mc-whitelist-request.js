@@ -5,7 +5,7 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const mcWhitelistSchema = require("../../Schemas/mcWhitelist");
+const schema = require("../../Schemas/base-system.js");
 
 var timeout = [];
 
@@ -26,8 +26,9 @@ module.exports = {
     }
 
     try {
-      const data = await mcWhitelistSchema.findOne({
+      const data = await schema.findOne({
         Guild: interaction.guild.id,
+        ID: "mc-whitelist",
       });
       if (!data) {
         return await interaction.reply({

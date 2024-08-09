@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const Schema = require("../../Schemas/auditlog");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -39,8 +39,9 @@ module.exports = {
     const channel = options.getChannel("channel");
     const sub = options.getSubcommand();
 
-    const data = await Schema.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
+      ID: "audit-logs",
     });
 
     const embed = new EmbedBuilder()
@@ -55,9 +56,10 @@ module.exports = {
             embed.setDescription("You have already a audit log system here!");
           } else if (!data) {
             embed.setDescription(`Your Audit Log has been Setup to ${channel}`);
-            await Schema.create({
+            await schema.create({
               Guild: guild.id,
               Channel: channel.id,
+              ID: "audit-logs",
             });
           }
           return await interaction.reply({
@@ -79,8 +81,9 @@ module.exports = {
             embed.setDescription("You dont have a audit log system here!");
           } else if (data) {
             embed.setDescription(`Your Audit Log has been deleted!`);
-            await Schema.deleteMany({
+            await schema.deleteMany({
               Guild: guild.id,
+              ID: "audit-logs",
             });
           }
           return await interaction.reply({

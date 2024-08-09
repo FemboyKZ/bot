@@ -3,8 +3,8 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const ghostSchema = require("../../Schemas/ghostping");
-const numSchema = require("../../Schemas/ghostnum");
+const schema = require("../../Schemas/ghostping.js");
+const count = require("../../Schemas/ghostnum.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -44,7 +44,7 @@ module.exports = {
 
     const sub = options.getSubcommand();
 
-    const Data = await ghostSchema.findOne({ Guild: interaction.guild.id });
+    const Data = await schema.findOne({ Guild: interaction.guild.id });
 
     switch (sub) {
       case "setup":
@@ -54,7 +54,7 @@ module.exports = {
             ephemeral: true,
           });
         else {
-          await ghostSchema.create({
+          await schema.create({
             Guild: interaction.guild.id,
           });
 
@@ -73,7 +73,7 @@ module.exports = {
             ephemeral: true,
           });
         else {
-          await ghostSchema.deleteMany({
+          await schema.deleteMany({
             Guild: interaction.guild.id,
           });
 
@@ -87,7 +87,7 @@ module.exports = {
 
       case "number-reset":
         const member = options.getUser("user");
-        const data = await numSchema.findOne({
+        const data = await count.findOne({
           Guild: interaction.guild.id,
           User: member.id,
         });

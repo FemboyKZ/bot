@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const schema = require("../../Schemas/reports");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -39,7 +39,7 @@ module.exports = {
     const channel = options.getChannel("channel");
     const sub = options.getSubcommand();
 
-    const data = await schema.findOne({ Guild: guild });
+    const data = await schema.findOne({ Guild: guild.id, ID: "report" });
 
     const embed = new EmbedBuilder()
       .setTitle("Report Setup")
@@ -54,8 +54,9 @@ module.exports = {
               `All submitted reports/suggestions requests will be sent in ${channel}`
             );
             await schema.create({
-              Guild: guild,
+              Guild: guild.id,
               Channel: channel.id,
+              ID: "report",
             });
           } else if (data) {
             const existingChannel = client.channels.cache.get(data.Channel);
@@ -84,7 +85,7 @@ module.exports = {
             embed.setDescription(
               `The reports/suggestions system has been disabled.`
             );
-            await schema.deleteMany({ Guild: guild });
+            await schema.deleteMany({ Guild: guild.id, ID: "report" });
           }
 
           return await interaction.reply({ embeds: [embed], ephemeral: true });

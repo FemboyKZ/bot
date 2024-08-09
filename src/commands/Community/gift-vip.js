@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const vip = require("../../Schemas/vip");
-const vipUses = require("../../Schemas/vipUses");
-const vipStatus = require("../../Schemas/vipStatus");
+const vip = require("../../Schemas/base-system.js");
+const vipUses = require("../../Schemas/vipUses.js");
+const vipStatus = require("../../Schemas/vipStatus.js");
 require("dotenv").config();
 
 const vipRole = process.env.VIP_ROLE;
@@ -73,13 +73,16 @@ module.exports = {
     const steamId = options.getString("steamid");
     const code = options.getString("code");
     const target = options.getUser("user");
-    const perkStatus = await vipStatus.findOne({ Claimer: user });
-    const targetStatus = await vipStatus.findOne({ Claimer: target });
-    const perkSystem = await vip.findOne({ Guild: guild });
-    const vipCode = await vipUses.findOne({ Guild: guild, Type: "vip" });
-    const vipPlusCode = await vipUses.findOne({ Guild: guild, Type: "vip+" });
+    const perkStatus = await vipStatus.findOne({ Claimer: user.id });
+    const targetStatus = await vipStatus.findOne({ Claimer: target.id });
+    const perkSystem = await vip.findOne({ Guild: guild.id, ID: "vip" });
+    const vipCode = await vipUses.findOne({ Guild: guild.id, Type: "vip" });
+    const vipPlusCode = await vipUses.findOne({
+      Guild: guild.id,
+      Type: "vip+",
+    });
     const contributorCode = await vipUses.findOne({
-      Guild: guild,
+      Guild: guild.id,
       Type: "vip+",
     });
     const member = await guild.members.fetch(target.id);
@@ -408,7 +411,7 @@ module.exports = {
     try {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
       await vipStatus.create({
-        Claimer: target,
+        Claimer: target.id,
         Status: true,
         Type: "vip",
         Gifted: null,
@@ -447,7 +450,7 @@ module.exports = {
     await perkSystem.Channel.send({ embeds: [logEmbed] });
     try {
       await vipStatus.create({
-        Claimer: target,
+        Claimer: target.id,
         Status: true,
         Type: perkType,
         Gifted: null,
@@ -494,7 +497,7 @@ module.exports = {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
       await vipStatus.findOneAndUpdate(
         {
-          Claimer: target,
+          Claimer: target.id,
         },
         {
           Status: true,

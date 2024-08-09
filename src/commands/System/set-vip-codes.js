@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const uses = require("../../Schemas/vipUses");
+const schema = require("../../Schemas/vipUses.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -38,29 +38,29 @@ module.exports = {
     const codeVip = interaction.options.getString("code-vip");
     const codeVipPlus = interaction.options.getString("code-vip-plus");
     const codeContributor = interaction.options.getString("code-contributor");
-    const data = await uses.findOne({ Guild: guild });
+    const data = await schema.findOne({ Guild: guild.id });
 
     try {
       if (!data) {
         if (codeVip) {
-          await uses.create({
-            Guild: guild,
+          await schema.create({
+            Guild: guild.id,
             Code: codeVip,
             Type: "vip",
             Uses: 0,
           });
         }
         if (codeVipPlus) {
-          await uses.create({
-            Guild: guild,
+          await schema.create({
+            Guild: guild.id,
             Code: codeVipPlus,
             Type: "vip+",
             Uses: 0,
           });
         }
         if (codeContributor) {
-          await uses.create({
-            Guild: guild,
+          await schema.create({
+            Guild: guild.id,
             Code: codeContributor,
             Type: "contributor",
             Uses: 0,
@@ -78,9 +78,9 @@ module.exports = {
       }
       if (data) {
         if (codeVip) {
-          await uses.findOneAndUpdate(
+          await schema.findOneAndUpdate(
             {
-              Guild: guild,
+              Guild: guild.id,
               Type: "vip",
             },
             {
@@ -90,9 +90,9 @@ module.exports = {
           );
         }
         if (codeVipPlus) {
-          await uses.findOneAndUpdate(
+          await schema.findOneAndUpdate(
             {
-              Guild: guild,
+              Guild: guild.id,
               Type: "vip+",
             },
             {
@@ -102,9 +102,9 @@ module.exports = {
           );
         }
         if (codeContributor) {
-          await uses.findOneAndUpdate(
+          await schema.findOneAndUpdate(
             {
-              Guild: guild,
+              Guild: guild.id,
               Type: "contributor",
             },
             {

@@ -1,10 +1,11 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 client.on(Events.GuildBanAdd, async (guild, user) => {
-  const data = await Audit_Log.findOne({
+  const data = await schema.findOne({
     Guild: guild.id,
+    ID: "audit-logs",
   });
   if (!data) return;
 
@@ -55,8 +56,9 @@ client.on(Events.GuildBanAdd, async (guild, user) => {
 });
 
 client.on(Events.GuildBanRemove, async (user) => {
-  const data = await Audit_Log.findOne({
+  const data = await schema.findOne({
     Guild: user.guild.id,
+    ID: "audit-logs",
   });
   if (!data) return;
 

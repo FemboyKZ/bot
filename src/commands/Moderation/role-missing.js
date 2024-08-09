@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const reactions = require("../../Schemas/reactionrole");
+const schema = require("../../Schemas/reactionrole.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,7 +23,7 @@ module.exports = {
         });
       }
 
-      const reactionsData = await reactions.find({ Guild: guild.id });
+      const reactionsData = await schema.find({ Guild: guild.id });
       if (!reactionsData) {
         throw new Error("No reaction data found");
       }

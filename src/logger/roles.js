@@ -1,9 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
 const { client } = require("../index.js");
 
 client.on(Events.GuildRoleCreate, async (role) => {
-  const data = await Audit_Log.findOne({ Guild: role.guild?.id });
+  const data = await schema.findOne({
+    Guild: role.guild?.id,
+    ID: "audit-logs",
+  });
   if (!data) return;
   const logID = data.Channel;
   const auditChannel = client.channels.cache.get(logID);
@@ -23,7 +26,10 @@ client.on(Events.GuildRoleCreate, async (role) => {
 });
 
 client.on(Events.GuildRoleDelete, async (role) => {
-  const data = await Audit_Log.findOne({ Guild: role.guild?.id });
+  const data = await schema.findOne({
+    Guild: role.guild?.id,
+    ID: "audit-logs",
+  });
   if (!data) return;
   const logID = data.Channel;
   const auditChannel = client.channels.cache.get(logID);
@@ -43,7 +49,10 @@ client.on(Events.GuildRoleDelete, async (role) => {
 });
 
 client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
-  const data = await Audit_Log.findOne({ Guild: newRole.guild?.id });
+  const data = await schema.findOne({
+    Guild: newRole.guild?.id,
+    ID: "audit-logs",
+  });
   if (!data) return;
   const logID = data.Channel;
   const auditChannel = client.channels.cache.get(logID);

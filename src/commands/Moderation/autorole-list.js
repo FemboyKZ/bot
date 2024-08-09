@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const autorole = require("../../Schemas/autorole");
+const schema = require("../../Schemas/autorole.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,7 +20,7 @@ module.exports = {
       });
     }
 
-    const autoroleData = await autorole.findOne({
+    const autoroleData = await schema.findOne({
       Guild: interaction.guild.id,
     });
     const autoroles = autoroleData ? autoroleData.Roles : [];

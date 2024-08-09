@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const autorole = require("../../Schemas/autorole");
+const schema = require("../../Schemas/autorole.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -40,7 +40,7 @@ module.exports = {
 
     const roleIds = roles.map((role) => role.id);
 
-    await autorole.updateOne(
+    await schema.updateOne(
       { Guild: interaction.guild.id },
       { $pull: { Roles: { $each: roleIds } } },
       { upsert: true }
