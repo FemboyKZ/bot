@@ -33,27 +33,31 @@ client.on("ready", async () => {
       Rule: rule.id,
     });
 
-    if (data) {
-      await automodData.findOneAndUpdate(
-        { Guild: guild.id, Rule: rule.id },
-        {
+    try {
+      if (data) {
+        await automodData.findOneAndUpdate(
+          { Guild: guild.id, Rule: rule.id },
+          {
+            Name: rule.name,
+            Trigger: rule.triggerType,
+            Action: rule.actions[0].type,
+            Enabled: rule.enabled,
+          }
+        );
+      } else {
+        await automodData.create({
+          Guild: guild.id,
           Name: rule.name,
+          Rule: rule.id,
+          User: rule.creatorId,
           Trigger: rule.triggerType,
           Action: rule.actions[0].type,
           Enabled: rule.enabled,
-        }
-      );
-    } else {
-      await automodData.create({
-        Guild: guild.id,
-        Name: rule.name,
-        Rule: rule.id,
-        User: rule.creatorId,
-        Trigger: rule.triggerType,
-        Action: rule.actions[0].type,
-        Enabled: rule.enabled,
-        Created: date,
-      });
+          Created: date,
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   });
 
@@ -62,15 +66,18 @@ client.on("ready", async () => {
       Guild: guild.id,
       User: ban.user.id,
     });
-
-    if (!data)
-      await bansData.create({
-        Guild: guild.id,
-        User: ban.user.id,
-        Created: date,
-        Executor: ban.executor.id,
-        Reason: ban.reason || "none",
-      });
+    try {
+      if (!data)
+        await bansData.create({
+          Guild: guild.id,
+          User: ban.user.id,
+          Created: date,
+          Executor: ban.executor.id,
+          Reason: ban.reason || "none",
+        });
+    } catch (err) {
+      console.log(err);
+    }
   });
 
   emojis.forEach(async (emoji) => {
@@ -79,25 +86,29 @@ client.on("ready", async () => {
       User: emoji.id,
     });
 
-    if (data) {
-      await emojisData.findByIdAndUpdate(
-        {
+    try {
+      if (data) {
+        await emojisData.findByIdAndUpdate(
+          {
+            Guild: guild.id,
+            Emoji: emoji.id,
+          },
+          {
+            Name: emoji.name || "none",
+            Animated: emoji.animated || null,
+          }
+        );
+      } else {
+        await emojisData.create({
           Guild: guild.id,
           Emoji: emoji.id,
-        },
-        {
           Name: emoji.name || "none",
           Animated: emoji.animated || null,
-        }
-      );
-    } else {
-      await emojisData.create({
-        Guild: guild.id,
-        Emoji: emoji.id,
-        Name: emoji.name || "none",
-        Animated: emoji.animated || null,
-        Created: date,
-      });
+          Created: date,
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   });
 
@@ -107,24 +118,28 @@ client.on("ready", async () => {
       Channel: channel.id,
     });
 
-    if (data) {
-      await channelsData.findOneAndUpdate(
-        { Guild: guild.id, Channel: channel.id },
-        {
+    try {
+      if (data) {
+        await channelsData.findOneAndUpdate(
+          { Guild: guild.id, Channel: channel.id },
+          {
+            Name: channel.name,
+            Parent: channel.parent.id || null,
+            Type: channel.type,
+          }
+        );
+      } else {
+        await channelsData.create({
+          Guild: guild.id,
+          Channel: channel.id,
           Name: channel.name,
-          Parent: channel.parent.id || null,
+          Parent: channel.parent.id,
           Type: channel.type,
-        }
-      );
-    } else {
-      await channelsData.create({
-        Guild: guild.id,
-        Channel: channel.id,
-        Name: channel.name,
-        Parent: channel.parent.id,
-        Type: channel.type,
-        Created: channel.createdAt,
-      });
+          Created: channel.createdAt,
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   });
 
@@ -134,37 +149,41 @@ client.on("ready", async () => {
       Invite: invite,
     });
 
-    if (data) {
-      await channelsData.findOneAndUpdate(
-        { Guild: guild.id, Invite: invite },
-        {
-          Uses: invite.uses,
-        }
-      );
-    } else {
-      if (invite.maxUses === 0) {
-        await channelsData.create({
-          Guild: guild.id,
-          Invite: invite,
-          User: invite.inviter.id,
-          Uses: invite.uses || null,
-          maxUses: invite.maxUses,
-          Code: invite.code,
-          Permanent: true,
-          Created: invite.createdAt || null,
-        });
+    try {
+      if (data) {
+        await channelsData.findOneAndUpdate(
+          { Guild: guild.id, Invite: invite },
+          {
+            Uses: invite.uses,
+          }
+        );
       } else {
-        await channelsData.create({
-          Guild: guild.id,
-          Invite: invite,
-          User: invite.inviter.id,
-          Uses: invite.uses || null,
-          maxUses: invite.maxUses || null,
-          Code: invite.code,
-          Permanent: false,
-          Created: invite.createdAt || null,
-        });
+        if (invite.maxUses === 0) {
+          await channelsData.create({
+            Guild: guild.id,
+            Invite: invite,
+            User: invite.inviter.id,
+            Uses: invite.uses || null,
+            maxUses: invite.maxUses,
+            Code: invite.code,
+            Permanent: true,
+            Created: invite.createdAt || null,
+          });
+        } else {
+          await channelsData.create({
+            Guild: guild.id,
+            Invite: invite,
+            User: invite.inviter.id,
+            Uses: invite.uses || null,
+            maxUses: invite.maxUses || null,
+            Code: invite.code,
+            Permanent: false,
+            Created: invite.createdAt || null,
+          });
+        }
       }
+    } catch (err) {
+      console.log(err);
     }
   });
 
@@ -175,30 +194,34 @@ client.on("ready", async () => {
     });
     const roles = member.roles.cache.map((role) => role.id);
 
-    if (data) {
-      await membersData.findOneAndUpdate(
-        { Guild: guild.id, User: member.user.id },
-        {
+    try {
+      if (data) {
+        await membersData.findOneAndUpdate(
+          { Guild: guild.id, User: member.user.id },
+          {
+            Joined: member.joinedAt || null,
+            Name: member.user.username,
+            Nickname: member.nickname || null,
+            Avatar: member.user.avatarURL({ size: 512 }) || null,
+            Banner: member.user.bannerURL({ size: 512 }) || null,
+            Roles: roles || [],
+          }
+        );
+      } else {
+        await membersData.create({
+          Guild: guild.id,
+          User: member.user.id,
           Joined: member.joinedAt || null,
+          Created: member.user.createdAt,
           Name: member.user.username,
           Nickname: member.nickname || null,
           Avatar: member.user.avatarURL({ size: 512 }) || null,
           Banner: member.user.bannerURL({ size: 512 }) || null,
           Roles: roles || [],
-        }
-      );
-    } else {
-      await membersData.create({
-        Guild: guild.id,
-        User: member.user.id,
-        Joined: member.joinedAt || null,
-        Created: member.user.createdAt,
-        Name: member.user.username,
-        Nickname: member.nickname || null,
-        Avatar: member.user.avatarURL({ size: 512 }) || null,
-        Banner: member.user.bannerURL({ size: 512 }) || null,
-        Roles: roles || [],
-      });
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   });
 
@@ -208,27 +231,31 @@ client.on("ready", async () => {
       Role: role.id,
     });
 
-    if (data) {
-      await rolesData.findOneAndUpdate(
-        { Guild: guild.id, Role: role.id },
-        {
+    try {
+      if (data) {
+        await rolesData.findOneAndUpdate(
+          { Guild: guild.id, Role: role.id },
+          {
+            Name: role.name,
+            Color: role.hexColor,
+            Hoisted: role.hoist,
+            Created: role.createdAt,
+            Permissions: role.permissions || null,
+          }
+        );
+      } else {
+        await rolesData.create({
+          Guild: guild.id,
+          Role: role.id,
           Name: role.name,
           Color: role.hexColor,
           Hoisted: role.hoist,
           Created: role.createdAt,
           Permissions: role.permissions || null,
-        }
-      );
-    } else {
-      await rolesData.create({
-        Guild: guild.id,
-        Role: role.id,
-        Name: role.name,
-        Color: role.hexColor,
-        Hoisted: role.hoist,
-        Created: role.createdAt,
-        Permissions: role.permissions || null,
-      });
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   });
 
@@ -238,24 +265,28 @@ client.on("ready", async () => {
       Sticker: sticker.id,
     });
 
-    if (data) {
-      await stickersData.findOneAndUpdate(
-        { Guild: guild.id, Sticker: sticker.id },
-        {
+    try {
+      if (data) {
+        await stickersData.findOneAndUpdate(
+          { Guild: guild.id, Sticker: sticker.id },
+          {
+            Name: sticker.name,
+            Description: sticker.description || null,
+            Available: sticker.available || null,
+          }
+        );
+      } else {
+        await stickersData.create({
+          Guild: guild.id,
+          Sticker: sticker.id,
           Name: sticker.name,
+          Created: sticker.createdAt,
           Description: sticker.description || null,
           Available: sticker.available || null,
-        }
-      );
-    } else {
-      await stickersData.create({
-        Guild: guild.id,
-        Sticker: sticker.id,
-        Name: sticker.name,
-        Created: sticker.createdAt,
-        Description: sticker.description || null,
-        Available: sticker.available || null,
-      });
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   });
 });
