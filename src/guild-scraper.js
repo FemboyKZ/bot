@@ -10,6 +10,7 @@ const stickersData = require("./Schemas/logger/stickers.js");
 const threadsData = require("./Schemas/logger/threads.js");
 
 const { client } = require("./index.js");
+require("dotenv").config();
 
 client.on("ready", async () => {
   const guild = await client.guilds.cache.get(`${process.env.GUILD_ID}`); // fkz
