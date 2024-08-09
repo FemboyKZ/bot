@@ -12,6 +12,8 @@ const threadsData = require("./Schemas/logger/threads.js");
 const { client } = require("./index.js");
 require("dotenv").config();
 
+// Only runs on FKZ, no plans on making it work on other guilds
+
 client.on("ready", async () => {
   const guild = await client.guilds.cache.get(`${process.env.GUILD_ID}`); // fkz
   if (!guild) return;
