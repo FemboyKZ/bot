@@ -4,10 +4,10 @@ let automod = new Schema({
   Guild: String,
   Rule: String, // ID
   Name: String,
-  User: String, // creator
   Created: Date,
   Enabled: Boolean,
-  Rules: [Object],
+  Trigger: String,
+  Action: String,
 });
 
 module.exports = model("automod", automod);

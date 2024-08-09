@@ -5,6 +5,7 @@ let stickers = new Schema({
   Sticker: String,
   User: String, // creator
   Created: Date,
+  Description: String,
 });
 
 module.exports = model("stickers", stickers);

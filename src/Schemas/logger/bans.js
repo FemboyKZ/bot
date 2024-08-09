@@ -3,9 +3,9 @@ const { model, Schema } = require("mongoose");
 let bans = new Schema({
   Guild: String,
   User: String,
+  Created: Date,
   Executor: String,
-  Permanent: Boolean,
-  Expires: Date,
+  Expired: Boolean,
   Reason: String,
 });
 

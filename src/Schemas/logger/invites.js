@@ -4,6 +4,8 @@ let invites = new Schema({
   Guild: String,
   Invite: String,
   User: String, // creator
+  Uses: Number,
+  MaxUses: Number,
   Permanent: Boolean,
   Expires: Date,
   Created: Date,
