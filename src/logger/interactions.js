@@ -25,18 +25,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("Chat Command Executed.")
+      .setFooter({ text: `FKZ • ${serverID}` })
       .setTimestamp()
       .addFields([
         {
-          name: "Server / ServerID",
-          value: `${server} / ${serverID}`,
-        },
-        {
-          name: "Channel / ChannelID",
+          name: "Channel",
           value: `${iChannel} / <#${iChannelID}>`,
         },
         {
-          name: "User / UserID",
+          name: "User",
           value: `${user} / <@${userID}>`,
         },
         {
