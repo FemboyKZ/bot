@@ -3,6 +3,8 @@ const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/stickers.js");
 const { client } = require("../index.js");
 
+// guild is commented cuz it can be null and it will throw an error, so it will only work on fkz rn.
+
 client.on(Events.GuildStickerCreate, async (sticker) => {
   const data = await schema.findOne({
     //Guild: sticker.guild.id,
