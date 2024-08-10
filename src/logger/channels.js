@@ -213,9 +213,8 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
 
     if (embed.data().fields.length === 0)
       console.log("Channel Edited, No Fields");
-    if (embed.data().fields.length !== 0) {
-      await auditChannel.send({ embeds: [embed] });
-    }
+
+    await auditChannel.send({ embeds: [embed] });
   } catch (error) {
     console.log("Error in ChannelUpdate event:", error);
   }

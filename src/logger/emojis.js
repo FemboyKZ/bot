@@ -183,12 +183,10 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
       }
     }
 
-    // 1 instead of 0 cuz added 1 before changes
     if (embed.data().fields.length === 1)
       console.log("Emoji Edited, No Fields");
-    if (embed.data().fields.length !== 1) {
-      await channel.send({ embeds: [embed] });
-    }
+
+    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error("Error in EmojiUpdate event:", error);
   }
