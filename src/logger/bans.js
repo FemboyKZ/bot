@@ -42,15 +42,7 @@ client.on(Events.GuildBanAdd, async (ban) => {
       }
     );
   try {
-    if (logData) {
-      await logs.findOneAndUpdate(
-        { Guild: ban.guild.id, User: ban.user.id },
-        {
-          Reason: ban.reason,
-          Created: date,
-        }
-      );
-    } else {
+    if (!logData) {
       await logs.create({
         Guild: ban.guild.id,
         User: ban.user.id,

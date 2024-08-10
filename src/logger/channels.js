@@ -45,16 +45,7 @@ client.on(Events.ChannelCreate, async (channel) => {
       }
     );
   try {
-    if (logData) {
-      await logs.findOneAndUpdate(
-        { Guild: channel.guild.id, Channel: channel.id },
-        {
-          Name: channel.name,
-          Type: channel.type,
-          Parent: channel.parent,
-        }
-      );
-    } else {
+    if (!logData) {
       await logs.create({
         Guild: channel.guild.id,
         Name: channel.name,

@@ -45,17 +45,7 @@ client.on(Events.AutoModerationRuleCreate, async (rule) => {
     );
 
   try {
-    if (logData) {
-      await logs.findOneAndUpdate(
-        { Guild: rule.guild?.id, Rule: rule.id },
-        {
-          Name: rule.name,
-          Trigger: rule.triggerType,
-          Action: rule.actions[0].type,
-          Enabled: rule.enabled,
-        }
-      );
-    } else {
+    if (!logData) {
       await logs.create({
         Guild: rule.guild.id,
         Name: rule.name,
