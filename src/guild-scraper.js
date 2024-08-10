@@ -166,22 +166,20 @@ client.on("ready", async () => {
         if (invite.maxUses === 0) {
           await channelsData.create({
             Guild: guild.id,
-            Invite: invite,
+            Invite: invite.code,
             User: invite.inviter.id,
             Uses: invite.uses || null,
             maxUses: invite.maxUses,
-            Code: invite.code,
             Permanent: true,
             Created: invite.createdAt || null,
           });
         } else {
           await channelsData.create({
             Guild: guild.id,
-            Invite: invite,
+            Invite: invite.code,
             User: invite.inviter.id,
             Uses: invite.uses || null,
             maxUses: invite.maxUses || null,
-            Code: invite.code,
             Permanent: false,
             Created: invite.createdAt || null,
           });
