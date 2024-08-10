@@ -1,9 +1,10 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { EmbedBuilder, Events, DMChannel } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/channels.js");
 const { client } = require("../index.js");
 
 client.on(Events.ChannelCreate, async (channel) => {
+  if (channel === DMChannel) return;
   const data = await schema.findOne({
     Guild: channel.guild.id,
     ID: "audit-logs",
@@ -33,13 +34,13 @@ client.on(Events.ChannelCreate, async (channel) => {
         inline: false,
       },
       {
-        name: "Category",
-        value: `${channel.parent ? logData.Parent : "Unknown"}`,
+        name: "Topic",
+        value: `${channel.topic ? logData.Topic : "None"}`,
         inline: false,
       },
       {
-        name: "Channel",
-        value: `<#${channel.id}>`,
+        name: "Category",
+        value: `${channel.parent ? logData.Parent : "Unknown"}`,
         inline: false,
       }
     );
@@ -69,6 +70,7 @@ client.on(Events.ChannelCreate, async (channel) => {
 });
 
 client.on(Events.ChannelDelete, async (channel) => {
+  if (channel === DMChannel) return;
   const data = await schema.findOne({
     Guild: channel.guild.id,
     ID: "audit-logs",
@@ -88,23 +90,23 @@ client.on(Events.ChannelDelete, async (channel) => {
     .setTitle("Channel Deleted")
     .addFields(
       {
-        name: "Name:",
-        value: `${channel.name || "?"}`,
+        name: "Name",
+        value: `${channel.name ? logData.Name : "Unknown"}`,
         inline: false,
       },
       {
-        name: "Type:",
+        name: "Type",
         value: `${channel.type}`,
         inline: false,
       },
       {
-        name: "Category:",
-        value: `${channel.parent || "No Category"}`,
+        name: "Topic",
+        value: `${channel.topic ? logData.Topic : "No Topic"}`,
         inline: false,
       },
       {
-        name: "ID:",
-        value: `<#${channel.id}>`,
+        name: "Category",
+        value: `${channel.parent ? logData.Parent : "No Category"}`,
         inline: false,
       }
     );
@@ -121,6 +123,7 @@ client.on(Events.ChannelDelete, async (channel) => {
 });
 
 client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
+  if (oldChannel === DMChannel || newChannel === DMChannel) return;
   const data = await schema.findOne({
     Guild: oldChannel.guild.id,
     ID: "audit-logs",
@@ -129,11 +132,9 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
   if (!data || !data.Channel || !auditChannel) return;
 
   const logData = await logs.findOne({
-    Guild: channel.guild.id,
-    Channel: channel.id,
+    Guild: oldChannel.guild.id,
+    Channel: oldChannel.id,
   });
-
-  const changes = [];
 
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
@@ -142,11 +143,13 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
 
   try {
     if (oldChannel.name !== newChannel.name) {
-      changes.push(
-        `Name: \`${oldChannel.name ? logData.Name : "none"}\` → \`${
+      embed.addFields({
+        name: "Name",
+        value: `\`${oldChannel.name ? logData.Name : "none"}\` → \`${
           newChannel.name || "none"
-        }\``
-      );
+        }\``,
+        inline: false,
+      });
       if (logData) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
@@ -157,11 +160,13 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       }
     }
     if (oldChannel.parent !== newChannel.parent) {
-      changes.push(
-        `Category: \`${oldChannel.parent ? logData.Parent : "none"}\` → \`${
+      embed.addFields({
+        name: "Category",
+        value: `\`${oldChannel.parent ? logData.Parent : "none"}\` → \`${
           newChannel.parent || "none"
-        }\``
-      );
+        }\``,
+        inline: false,
+      });
       if (logData) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
@@ -172,11 +177,13 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       }
     }
     if (oldChannel.topic !== newChannel.topic) {
-      changes.push(
-        `Topic: \`${oldChannel.topic ? logData.Topic : "None"}\` → \`${
-          newChannel.topic || "None"
-        }\``
-      );
+      embed.addFields({
+        name: "Topic",
+        value: `\`${oldChannel.topic ? logData.Topic : "none"}\` → \`${
+          newChannel.topic || "none"
+        }\``,
+        inline: false,
+      });
       if (logData) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
@@ -187,11 +194,13 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       }
     }
     if (oldChannel.type !== newChannel.type) {
-      changes.push(
-        `Topic: \`${oldChannel.type ? logData.Type : "None"}\` → \`${
-          newChannel.type || "None"
-        }\``
-      );
+      embed.addFields({
+        name: "Type",
+        value: `\`${oldChannel.type ? logData.Type : "none"}\` → \`${
+          newChannel.type || "none"
+        }\``,
+        inline: false,
+      });
       if (logData) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
@@ -202,15 +211,9 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       }
     }
 
-    if (changes.length === 0) return;
-    const changesText = changes.join("\n");
-
-    embed.addFields({
-      name: "Changes:",
-      value: `${changesText}`,
-      inline: false,
-    });
-    await auditChannel.send({ embeds: [embed] });
+    if (embed.data().fields.length !== 0) {
+      await auditChannel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.log("Error in ChannelUpdate event:", error);
   }

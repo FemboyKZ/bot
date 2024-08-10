@@ -31,12 +31,12 @@ client.on(Events.GuildBanAdd, async (ban) => {
     .setTitle("Ban Added")
     .addFields(
       {
-        name: "Banned Member:",
+        name: "Banned Member",
         value: `<@${ban.user.id}>` || "unknown",
         inline: false,
       },
       {
-        name: "Ban Reason:",
+        name: "Ban Reason",
         value: `${ban.reason}` || "none",
         inline: false,
       }
@@ -87,17 +87,17 @@ client.on(Events.GuildBanRemove, async (ban) => {
     .setTitle("Ban Removed")
     .addFields(
       {
-        name: "Banned Member:",
+        name: "Banned Member",
         value: `<@${ban.user.id}>` || "unknown",
         inline: false,
       },
       {
-        name: "Ban Reason:",
+        name: "Ban Reason",
         value: `${ban.reason}` || "none",
         inline: false,
       },
       {
-        name: "Ban Created:",
+        name: "Ban Created",
         value: logData.Created || "unknown",
         inline: false,
       }

@@ -24,17 +24,17 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
     .setTitle("Emoji Added")
     .addFields(
       {
-        name: "Name:",
+        name: "Name",
         value: emoji.name ? logData.Name : "Unknown",
         inline: false,
       },
       {
-        name: "Author:",
+        name: "Author",
         value: emoji.author ? logData.User : "Unknown",
         inline: false,
       },
       {
-        name: "Animated?:",
+        name: "Animated?",
         value: emoji.animated ? logData.Animated : "Unknown",
         inline: false,
       }
@@ -88,17 +88,17 @@ client.on(Events.GuildEmojiDelete, async (emoji) => {
     .setTitle("Emoji Deleted")
     .addFields(
       {
-        name: "Name:",
+        name: "Name",
         value: emoji.name ? logData.Name : "Unknown",
         inline: false,
       },
       {
-        name: "Author:",
+        name: "Author",
         value: emoji.author ? logData.User : "Unknown",
         inline: false,
       },
       {
-        name: "Animated?:",
+        name: "Animated?",
         value: emoji.animated ? logData.Animated : "Unknown",
         inline: false,
       }
@@ -126,8 +126,6 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
     Emoji: oldEmoji.id,
   });
 
-  const changes = [];
-
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
@@ -154,11 +152,13 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
     }
 
     if (oldEmoji.name !== newEmoji.name) {
-      changes.push(
-        `Name: \`${oldEmoji.name ? logData.Name : "none"}\` → \`${
-          newEmoji.name || "none"
-        }\``
-      );
+      embed.addFields({
+        name: "Name:",
+        value: `\`${oldEmoji.name ? logData.Name : "none"}\` →\`${
+          newEmoji.name || "Unknown"
+        }\``,
+        inline: false,
+      });
       if (logData) {
         await logs.findOneAndUpdate(
           { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
@@ -168,11 +168,13 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
     }
 
     if (oldEmoji.animated !== newEmoji.animated) {
-      changes.push(
-        `Animated: \`${oldEmoji.animated ? logData.Animated : "none"}\` → \`${
-          newEmoji.animated || "none"
-        }\``
-      );
+      embed.addFields({
+        name: "Animated:",
+        value: `\`${oldEmoji.animated ? logData.Animated : "none"}\` →\`${
+          newEmoji.animated || "Unknown"
+        }\``,
+        inline: false,
+      });
       if (logData) {
         await logs.findOneAndUpdate(
           { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
@@ -181,16 +183,10 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
       }
     }
 
-    if (changes.length === 0) return;
-    const changesText = changes.join("\n");
-
-    embed.addFields({
-      name: "Changes:",
-      value: `${changesText}`,
-      inline: false,
-    });
-
-    await channel.send({ embeds: [embed] });
+    // 1 instead of 0 cuz added 1 before changes
+    if (embed.data().fields.length !== 1) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in EmojiUpdate event:", error);
   }
