@@ -5,6 +5,7 @@ let members = new Schema({
   User: String, // users = members
   Name: String,
   Nickname: String,
+  Displayname: String,
   Avatar: String,
   Banner: String,
   Roles: [String],

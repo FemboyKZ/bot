@@ -195,7 +195,6 @@ client.on("ready", async () => {
       Guild: guild.id,
       User: member.user.id,
     });
-    const roles = member.roles.cache.map((role) => role.id);
 
     try {
       if (data) {
@@ -205,9 +204,10 @@ client.on("ready", async () => {
             Joined: member.joinedAt || null,
             Name: member.user.username,
             Nickname: member.nickname || null,
+            Displayname: member.displayName,
             Avatar: member.user.avatarURL({ size: 512 }) || null,
             Banner: member.user.bannerURL({ size: 512 }) || null,
-            Roles: roles || [],
+            Roles: member.roles.cache.map((role) => role.id) || [],
           }
         );
       } else {
@@ -217,10 +217,11 @@ client.on("ready", async () => {
           Joined: member.joinedAt || null,
           Created: member.user.createdAt,
           Name: member.user.username,
-          Nickname: member.nickname || null,
+          Nickname: member.nickname,
+          Displayname: member.displayName || null,
           Avatar: member.user.avatarURL({ size: 512 }) || null,
           Banner: member.user.bannerURL({ size: 512 }) || null,
-          Roles: roles || [],
+          Roles: member.roles.cache.map((role) => role.id) || [],
         });
       }
     } catch (err) {
