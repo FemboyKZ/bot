@@ -241,9 +241,7 @@ client.on("ready", async () => {
           {
             Name: role.name,
             Color: role.hexColor,
-            Hoisted: role.hoist,
-            Created: role.createdAt,
-            Permissions: role.permissions || null,
+            Permissions: role.permissions.toArray(),
           }
         );
       } else {
@@ -251,10 +249,9 @@ client.on("ready", async () => {
           Guild: guild.id,
           Role: role.id,
           Name: role.name,
+          Permissions: role.permissions.toArray(),
           Color: role.hexColor,
-          Hoisted: role.hoist,
           Created: role.createdAt,
-          Permissions: role.permissions || null,
         });
       }
     } catch (err) {
