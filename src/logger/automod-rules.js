@@ -11,15 +11,38 @@ client.on(Events.AutoModerationRuleCreate, async (rule) => {
   const channel = client.channels.cache.get(data.Channel);
   if (!data || !data.Channel || !channel) return;
 
-  const embed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setTitle("Automod Rule Created");
-
   const logData = await logs.findOne({
     Guild: rule.guild?.id,
     Rule: rule.id,
   });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle("Automod Rule Created")
+    .setFooter({ text: `FKZ • ID: ${rule.id}` })
+    .addFields(
+      {
+        name: "Creator:",
+        value: `<@${rule.creatorId}>`,
+        inline: false,
+      },
+      {
+        name: "Name:",
+        value: rule.name ? logData.Name : "None",
+        inline: false,
+      },
+      {
+        name: "Trigger:",
+        value: rule.triggerType ? logData.Trigger : "None",
+        inline: false,
+      },
+      {
+        name: "Actions:",
+        value: rule.actions[0].type ? logData.Action : "None",
+        inline: false,
+      }
+    );
 
   try {
     if (logData) {
@@ -43,28 +66,6 @@ client.on(Events.AutoModerationRuleCreate, async (rule) => {
         Enabled: rule.enabled,
       });
     }
-    embed.setFooter({ text: `FKZ • ${rule.id}` }).addFields(
-      {
-        name: "Creator:",
-        value: `<@${rule.creatorId}>`,
-        inline: false,
-      },
-      {
-        name: "Name:",
-        value: rule.name ? logData.Name : "None",
-        inline: false,
-      },
-      {
-        name: "Trigger:",
-        value: rule.triggerType ? logData.Trigger : "None",
-        inline: false,
-      },
-      {
-        name: "Actions:",
-        value: rule.actions[0].type ? logData.Action : "None",
-        inline: false,
-      }
-    );
     await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error("Error in AutoModRuleCreate event:", error);
@@ -79,21 +80,17 @@ client.on(Events.AutoModerationRuleDelete, async (rule) => {
   const channel = client.channels.cache.get(data.Channel);
   if (!data || !data.Channel || !channel) return;
 
-  const embed = new EmbedBuilder()
-    .setColor("#ff00b3")
-    .setTimestamp()
-    .setTitle("Automod Rule Deleted");
-
   const logData = await logs.findOne({
     Guild: rule.guild?.id,
     Rule: rule.id,
   });
 
-  try {
-    if (logData) {
-      await logs.deleteMany({ Guild: rule.guild?.id, Rule: rule.id });
-    }
-    embed.setFooter({ text: `FKZ • ${rule.id}` }).addFields(
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle("Automod Rule Deleted")
+    .setFooter({ text: `FKZ • ID: ${rule.id}` })
+    .addFields(
       {
         name: "Creator:",
         value: `<@${rule.creatorId}>`,
@@ -115,6 +112,11 @@ client.on(Events.AutoModerationRuleDelete, async (rule) => {
         inline: false,
       }
     );
+
+  try {
+    if (logData) {
+      await logs.deleteMany({ Guild: rule.guild?.id, Rule: rule.id });
+    }
     await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error("Error in AutoModRuleDelete event:", error);
@@ -134,11 +136,12 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setTitle("Automod Rule Updated");
+    .setTitle("Automod Rule Updated")
+    .setFooter({ text: `FKZ • ID: ${oldRule.id}` });
 
   const logData = await logs.findOne({
-    Guild: rule.guild?.id,
-    Rule: rule.id,
+    Guild: newRule.guild?.id,
+    Rule: newRule.id,
   });
 
   try {
@@ -154,7 +157,6 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
         value: changesText,
       });
       await channel.send({ embeds: [embed] });
-
       await logs.findOneAndUpdate(
         { Guild: newRule.guild?.id, Rule: newRule.id },
         { Name: newRule.name }
@@ -175,7 +177,6 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
         }
       );
       await channel.send({ embeds: [embed] });
-
       await logs.findOneAndUpdate(
         { Guild: newRule.guild?.id, Rule: newRule.id },
         { Action: newRule.actions[0].type }
@@ -191,7 +192,6 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
         inline: false,
       });
       await channel.send({ embeds: [embed] });
-
       await logs.findOneAndUpdate(
         { Guild: newRule.guild?.id, Rule: newRule.id },
         { Enabled: newRule.enabled }
@@ -207,7 +207,6 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
         inline: false,
       });
       await channel.send({ embeds: [embed] });
-
       await logs.findOneAndUpdate(
         { Guild: newRule.guild?.id, Rule: newRule.id },
         { Trigger: newRule.triggerType }
