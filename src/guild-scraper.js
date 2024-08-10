@@ -74,7 +74,6 @@ client.on("ready", async () => {
           Guild: guild.id,
           User: ban.user.id,
           Created: date,
-          Executor: ban.executor.id,
           Reason: ban.reason || "none",
         });
     } catch (err) {
