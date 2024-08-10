@@ -1,5 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
+//const logs = require("../Schemas/logger/messages.js");
 const { client } = require("../index.js");
 
 client.on(Events.MessageDelete, async (message) => {

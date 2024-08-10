@@ -6,6 +6,8 @@ const {
 } = require("discord.js");
 require("dotenv").config();
 const schema = require("../Schemas/base-system.js");
+const logs = require("../Schemas/logger/members.js");
+const inviteLogs = require("../Schemas/logger/invites.js");
 const { client } = require("../index.js");
 
 const invites = new Collection();
