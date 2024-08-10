@@ -64,7 +64,7 @@ client.on(Events.ChannelCreate, async (channel) => {
     }
     await auditChannel.send({ embeds: [embed] });
   } catch (error) {
-    console.log(error);
+    console.log("Error in ChannelCreate event:", error);
   }
 });
 
@@ -116,7 +116,7 @@ client.on(Events.ChannelDelete, async (channel) => {
 
     await auditChannel.send({ embeds: [embed] });
   } catch (error) {
-    console.log(error);
+    console.log("Error in ChannelDelete event:", error);
   }
 });
 
@@ -212,6 +212,6 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     });
     await auditChannel.send({ embeds: [embed] });
   } catch (error) {
-    console.log(error);
+    console.log("Error in ChannelUpdate event:", error);
   }
 });

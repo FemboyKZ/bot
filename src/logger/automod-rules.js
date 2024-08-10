@@ -213,6 +213,6 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
       );
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error in AutoModRuleUpdate event:", error);
   }
 });
