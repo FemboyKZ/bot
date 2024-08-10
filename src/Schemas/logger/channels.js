@@ -6,6 +6,7 @@ let channels = new Schema({
   Name: String,
   Parent: String, // Category
   Type: String, // Text/Voice etc
+  Topic: String,
 });
 
 module.exports = model("channels", channels);

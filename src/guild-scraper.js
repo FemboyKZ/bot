@@ -128,6 +128,7 @@ client.on("ready", async () => {
             Name: channel.name,
             Parent: channel.parent.id || null,
             Type: channel.type,
+            Topic: channel.topic || null,
           }
         );
       } else {
@@ -138,6 +139,7 @@ client.on("ready", async () => {
           Parent: channel.parent.id,
           Type: channel.type,
           Created: channel.createdAt,
+          Topic: channel.topic || null,
         });
       }
     } catch (err) {
