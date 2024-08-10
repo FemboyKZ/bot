@@ -2,7 +2,7 @@ const { model, Schema } = require("mongoose");
 
 let threads = new Schema({
   Guild: String,
-  Channel: String, // ID
+  Thread: String,
   User: String, // creator
   Locked: Boolean,
   Archived: Boolean,

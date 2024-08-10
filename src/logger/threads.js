@@ -11,39 +11,61 @@ client.on(Events.ThreadCreate, async (thread) => {
   const channel = client.channels.cache.get(data.Channel);
   if (!data || !data.Channel || !channel) return;
 
+  const logData = await logs.findOne({
+    Guild: thread.guild.id,
+    Thread: thread.id,
+  });
+
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
+    .setFooter({ text: `FKZ • ID: ${thread.id}` })
     .setTitle("Thread Created")
     .addFields(
       {
-        name: "Name:",
+        name: "Name",
         value: `${thread.name}`,
         inline: false,
       },
       {
-        name: "Creator:",
-        value: `${thread.ownerId || "unknown"}`,
+        name: "Creator",
+        value: `${thread.ownerId ? logData.User : "unknown"}`,
         inline: false,
       },
       {
-        name: "Channel:",
-        value: `${thread.parent || "none"}`,
+        name: "Channel",
+        value: `${thread.parent ? logData.Parent : "none"}`,
         inline: false,
       },
       {
-        name: "Link:",
-        value: `<#${thread.id}>`,
+        name: "Auto Archive Time",
+        value: `${thread.autoArchiveDuration}` || "unknown",
         inline: false,
       },
       {
-        name: "ID:",
-        value: `${thread.id}`,
+        name: "Link",
+        value: `${thread.url}`,
         inline: false,
       }
     );
-  await channel.send({ embeds: [embed] });
+
+  try {
+    if (!logData) {
+      await logs.create({
+        Guild: thread.guild.id,
+        Thread: thread.id,
+        Name: thread.name,
+        User: thread.ownerId,
+        Parent: thread.parent,
+        Auto: thread.autoArchiveDuration,
+        Locked: thread.locked,
+        Archived: thread.archived,
+      });
+    }
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.log("Error in ThreadCreate event:", error);
+  }
 });
 
 client.on(Events.ThreadDelete, async (thread) => {
@@ -54,39 +76,55 @@ client.on(Events.ThreadDelete, async (thread) => {
   const channel = client.channels.cache.get(data.Channel);
   if (!data || !data.Channel || !channel) return;
 
+  const logData = await logs.findOne({
+    Guild: thread.guild.id,
+    Thread: thread.id,
+  });
+
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
+    .setFooter({ text: `FKZ • ID: ${thread.id}` })
     .setTitle("Thread Deleted")
     .addFields(
       {
-        name: "Name:",
+        name: "Name",
         value: `${thread.name}`,
         inline: false,
       },
       {
-        name: "Creator:",
-        value: `${thread.ownerId || "unknown"}`,
+        name: "Creator",
+        value: `${thread.ownerId ? logData.User : "unknown"}`,
         inline: false,
       },
       {
-        name: "Channel:",
-        value: `${thread.parent || "none"}`,
+        name: "Channel",
+        value: `${thread.parent ? logData.Parent : "none"}`,
         inline: false,
       },
       {
-        name: "Link:",
-        value: `<#${thread.id}>`,
+        name: "Auto Archive Time",
+        value: `${thread.autoArchiveDuration ? logData.Auto : "unknown"}`,
         inline: false,
       },
       {
-        name: "ID:",
-        value: `${thread.id}`,
+        name: "Link",
+        value: `${thread.url}`,
         inline: false,
       }
     );
-  await channel.send({ embeds: [embed] });
+
+  try {
+    if (logData) {
+      await logs.deleteMany({
+        Guild: thread.guild.id,
+        Thread: thread.id,
+      });
+    }
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.log("Error in ThreadDelete event:", error);
+  }
 });
 
 client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
@@ -97,61 +135,140 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
   const channel = client.channels.cache.get(data.Channel);
   if (!data || !data.Channel || !channel) return;
 
-  const changes = [];
-
-  if (oldThread.name !== newThread.name) {
-    changes.push(`Name: \`${oldThread.name}\` → \`${newThread.name}\``);
-  }
-
-  if (oldThread.archived !== newThread.archived) {
-    changes.push(
-      `Archived?: \`${oldThread.archived || "None"}\` → \`${
-        newThread.archived || "None"
-      }\``
-    );
-  }
-  if (oldThread.locked !== newThread.locked) {
-    changes.push(
-      `Locked?: \`${oldThread.locked || "None"}\` → \`${
-        newThread.locked || "None"
-      }\``
-    );
-  }
-
-  if (changes.length === 0) return;
-  const changesText = changes.join("\n");
+  const logData = await logs.findOne({
+    Guild: newThread.guild.id,
+    Thread: newThread.id,
+  });
 
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
+    .setFooter({ text: `FKZ • ID: ${newThread.id}` })
     .setTimestamp()
-    .addFields(
-      {
-        name: "Creator:",
-        value: `${newThread.ownerId || "unknown"}`,
+    .setTitle("Thread Edited");
+
+  try {
+    if (!logData) {
+      await logs.create({
+        Guild: newThread.guild.id,
+        Thread: newThread.id,
+        Name: newThread.name,
+        User: newThread.ownerId,
+        Parent: newThread.parent,
+        Auto: newThread.autoArchiveDuration,
+        Locked: newThread.locked,
+        Archived: newThread.archived,
+      });
+    }
+
+    if (oldThread.name !== newThread.name) {
+      embed.addFields({
+        name: "Name",
+        value: `\`${oldThread.name}\` → \`${newThread.name}\``,
         inline: false,
-      },
-      {
-        name: "Channel:",
-        value: `${newThread.parent || "unknown"}`,
-        inline: false,
-      },
-      {
-        name: "Link:",
-        value: `<#${newThread.id}>`,
-        inline: false,
-      },
-      {
-        name: "Changes:",
-        value: `${changesText}`,
-        inline: false,
-      },
-      {
-        name: "ID:",
-        value: `${newThread.id}`,
-        inline: false,
+      });
+      if (logData) {
+        await logs.findOneAndUpdate(
+          {
+            Guild: newThread.guild.id,
+            Thread: newThread.id,
+          },
+          {
+            Name: newThread.name,
+          }
+        );
       }
-    )
-    .setTitle("Thread Edited")
-    .setFooter({ text: "FKZ Log System" });
-  await channel.send({ embeds: [embed] });
+    }
+
+    if (oldThread.archived !== newThread.archived) {
+      if (
+        oldThread.archived === null &&
+        newThread.archived === null &&
+        logData.Archived === null
+      ) {
+        return;
+      }
+
+      embed.addFields({
+        name: "Archived",
+        value: `\`${oldThread.archived ? logData.Archived : "none"}\` → \`${
+          newThread.archived || "none"
+        }\``,
+        inline: false,
+      });
+      if (logData) {
+        await logs.findOneAndUpdate(
+          {
+            Guild: newThread.guild.id,
+            Thread: newThread.id,
+          },
+          {
+            Archived: newThread.archived,
+          }
+        );
+      }
+    }
+
+    if (oldThread.locked !== newThread.locked) {
+      if (
+        oldThread.locked === null &&
+        newThread.locked === null &&
+        logData.Locked === null
+      ) {
+        return;
+      }
+
+      embed.addFields({
+        name: "Locked",
+        value: `\`${oldThread.locked ? logData.Locked : "none"}\` → \`${
+          newThread.locked || "none"
+        }\``,
+        inline: false,
+      });
+      if (logData) {
+        await logs.findOneAndUpdate(
+          {
+            Guild: newThread.guild.id,
+            Thread: newThread.id,
+          },
+          {
+            Locked: newThread.locked,
+          }
+        );
+      }
+    }
+
+    if (oldThread.autoArchiveDuration !== newThread.autoArchiveDuration) {
+      if (
+        oldThread.autoArchiveDuration === null &&
+        newThread.autoArchiveDuration === null &&
+        logData.Auto === null
+      ) {
+        return;
+      }
+
+      embed.addFields({
+        name: "Auto Archive",
+        value: `\`${oldThread.autoArchiveDuration}\` → \`${newThread.autoArchiveDuration}\``,
+        inline: false,
+      });
+      if (logData) {
+        await logs.findOneAndUpdate(
+          {
+            Guild: newThread.guild.id,
+            Thread: newThread.id,
+          },
+          {
+            Auto: newThread.autoArchiveDuration,
+          }
+        );
+      }
+    }
+
+    if (embed.data().fields.length === 0)
+      console.log("Thread Edited, No Fields");
+
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.log("Error in ThreadUpdate event:", error);
+  }
 });
