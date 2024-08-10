@@ -133,6 +133,17 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     .setFooter({ text: `FKZ • ID: ${newChannel.id}` });
 
   try {
+    if (!logData) {
+      await logs.create({
+        Guild: newChannel.guild.id,
+        Channel: newChannel.id,
+        Name: newChannel.name,
+        Type: newChannel.type,
+        Parent: newChannel.parent,
+        Topic: newChannel.topic,
+      });
+    }
+
     if (oldChannel.name !== newChannel.name) {
       embed.addFields({
         name: "Name",

@@ -125,7 +125,7 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
     .setColor("#ff00b3")
     .setTimestamp()
     .setTitle("Automod Rule Updated")
-    .setFooter({ text: `FKZ • ID: ${oldRule.id}` });
+    .setFooter({ text: `FKZ • ID: ${newRule.id}` });
 
   const logData = await logs.findOne({
     Guild: newRule.guild.id,
@@ -133,6 +133,18 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
   });
 
   try {
+    if (!logData) {
+      await logs.create({
+        Guild: newRule.guild.id,
+        Name: newRule.name,
+        Rule: newRule.id,
+        User: newRule.creatorId,
+        Trigger: newRule.triggerType,
+        Action: newRule.actions[0].type,
+        Enabled: newRule.enabled,
+      });
+    }
+
     if (oldRule.name !== newRule.name) {
       embed.addFields({
         name: "Name",
