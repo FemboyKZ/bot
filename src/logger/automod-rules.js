@@ -204,6 +204,8 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
       );
     }
 
+    if (embed.data().fields.length === 0)
+      console.log("Automod Rule Edited, No Fields");
     if (embed.data().fields.length !== 0) {
       await channel.send({ embeds: [embed] });
     }
