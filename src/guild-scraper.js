@@ -97,6 +97,7 @@ client.on("ready", async () => {
           {
             Name: emoji.name || "none",
             Animated: emoji.animated || null,
+            Image: emoji.imageURL({ size: 128 }),
           }
         );
       } else {
@@ -105,7 +106,8 @@ client.on("ready", async () => {
           Emoji: emoji.id,
           Name: emoji.name || "none",
           Animated: emoji.animated || null,
-          Created: date,
+          Created: emoji.createdAt,
+          Image: emoji.imageURL({ size: 128 }),
         });
       }
     } catch (err) {
