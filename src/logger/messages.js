@@ -11,7 +11,11 @@ client.on(Events.MessageDelete, async (message) => {
   if (settingsData.Messages === false) return;
   if (settingsData.Store === false && settingsData.Post === false) return;
 
-  if (message.partial === true) await message.fetch();
+  try {
+    if (message.partial === true) await message.fetch();
+  } catch (error) {
+    console.log(error);
+  }
 
   if (!message.guild) return;
   if (message.webhookId !== null || message.author === client.user) return;
@@ -140,8 +144,12 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   if (settingsData.Messages === false) return;
   if (settingsData.Store === false && settingsData.Post === false) return;
 
-  if (newMessage.partial === true) await newMessage.fetch();
-  if (oldMessage.partial === true) await oldMessage.fetch();
+  try {
+    if (newMessage.partial === true) await newMessage.fetch();
+    if (oldMessage.partial === true) await oldMessage.fetch();
+  } catch (error) {
+    console.log(error);
+  }
 
   if (!newMessage.guild) return;
   if (oldMessage.webhookId !== null || newMessage.webhookId !== null) return;
