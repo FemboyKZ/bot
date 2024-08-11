@@ -16,8 +16,9 @@ client.on(Events.ChannelCreate, async (channel) => {
     Guild: channel.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const auditChannel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !auditChannel) return;
+  if (!auditChannel) return;
 
   const logData = await logs.findOne({
     Guild: channel.guild.id,
@@ -92,8 +93,9 @@ client.on(Events.ChannelDelete, async (channel) => {
     Guild: channel.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const auditChannel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !auditChannel) return;
+  if (!auditChannel) return;
 
   const logData = await logs.findOne({
     Guild: channel.guild.id,
@@ -153,8 +155,9 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     Guild: oldChannel.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const auditChannel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !auditChannel) return;
+  if (!auditChannel) return;
 
   const logData = await logs.findOne({
     Guild: oldChannel.guild.id,

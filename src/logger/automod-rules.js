@@ -15,8 +15,9 @@ client.on(Events.AutoModerationRuleCreate, async (rule) => {
     Guild: rule.guild?.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: rule.guild.id,
@@ -83,8 +84,9 @@ client.on(Events.AutoModerationRuleDelete, async (rule) => {
     Guild: rule.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: rule.guild.id,
@@ -143,8 +145,9 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
     Guild: newRule.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")

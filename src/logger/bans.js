@@ -16,8 +16,9 @@ client.on(Events.GuildBanAdd, async (ban) => {
     Guild: ban.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: ban.guild.id,
@@ -80,8 +81,9 @@ client.on(Events.GuildBanRemove, async (ban) => {
     Guild: ban.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: ban.guild.id,

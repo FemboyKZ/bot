@@ -15,8 +15,9 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
     Guild: emoji.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: emoji.guild.id,
@@ -88,8 +89,9 @@ client.on(Events.GuildEmojiDelete, async (emoji) => {
     Guild: emoji.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: emoji.guild.id,
@@ -142,8 +144,9 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
     Guild: newEmoji.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: oldEmoji.guild.id,

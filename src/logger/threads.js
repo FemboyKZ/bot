@@ -15,8 +15,9 @@ client.on(Events.ThreadCreate, async (thread) => {
     Guild: thread.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: thread.guild.id,
@@ -88,8 +89,9 @@ client.on(Events.ThreadDelete, async (thread) => {
     Guild: thread.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: thread.guild.id,
@@ -155,8 +157,9 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
     Guild: oldThread.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: newThread.guild.id,

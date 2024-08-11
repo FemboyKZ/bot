@@ -15,8 +15,9 @@ client.on(Events.GuildRoleCreate, async (role) => {
     Guild: role.guild?.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: role.guild.id,
@@ -64,8 +65,9 @@ client.on(Events.GuildRoleDelete, async (role) => {
     Guild: role.guild?.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: role.guild.id,
@@ -106,8 +108,9 @@ client.on(Events.GuildRoleUpdate, async (oldRole, newRole) => {
     Guild: oldRole.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: oldRole.guild.id,

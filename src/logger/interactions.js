@@ -16,8 +16,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
     Guild: interaction.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")

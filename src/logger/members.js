@@ -32,6 +32,8 @@ client.on("ready", async () => {
     );
   });
 
+  // guild is commented cuz it can be null and it will throw an error, so it will only work on fkz rn.
+
   client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     const settingsData = await settings.findOne({
       Guild: newMember.guild.id,
@@ -43,9 +45,9 @@ client.on("ready", async () => {
       //Guild: oldMember.guild.id,
       ID: "audit-logs",
     });
-
+    if (!data || !data.Channel) return;
     const channel = client.channels.cache.get(data.Channel);
-    if (!data || !data.Channel || !channel) return;
+    if (!channel) return;
 
     const logData = await logs.findOne({
       //Guild: oldMember.guild.id,
@@ -277,8 +279,9 @@ client.on(Events.GuildMemberAdd, async (member) => {
     Guild: member.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: member.guild.id,
@@ -380,8 +383,9 @@ client.on(Events.GuildMemberRemove, async (member) => {
     Guild: member.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: member.guild.id,
@@ -427,8 +431,9 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     Guild: newMember.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   if (oldMember.partial) await oldMember.fetch();
 

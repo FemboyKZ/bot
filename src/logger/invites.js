@@ -15,8 +15,9 @@ client.on(Events.InviteCreate, async (invite) => {
     Guild: invite.guild?.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: invite.guild.id,
@@ -114,8 +115,9 @@ client.on(Events.InviteDelete, async (invite) => {
     Guild: invite.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     Guild: invite.guild.id,

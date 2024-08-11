@@ -17,8 +17,9 @@ client.on(Events.GuildStickerCreate, async (sticker) => {
     //Guild: sticker.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     //Guild: sticker.guild.id,
@@ -78,8 +79,9 @@ client.on(Events.GuildStickerDelete, async (sticker) => {
     //Guild: sticker.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     //Guild: sticker.guild.id,
@@ -125,8 +127,9 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
     //Guild: newSticker.guild.id,
     ID: "audit-logs",
   });
+  if (!data || !data.Channel) return;
   const channel = client.channels.cache.get(data.Channel);
-  if (!data || !data.Channel || !channel) return;
+  if (!channel) return;
 
   const logData = await logs.findOne({
     //Guild: newSticker.guild.id,
