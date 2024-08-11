@@ -190,6 +190,6 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
 
     await channel.send({ embeds: [embed] });
   } catch (error) {
-    console.error(error);
+    console.error("Error in StickerUpdate event:", error);
   }
 });
