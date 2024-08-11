@@ -1,4 +1,4 @@
-const { EmbedBuilder, Events, Webhook } = require("discord.js");
+const { EmbedBuilder, Events, isWebhookMessage } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/messages.js");
 const settings = require("../Schemas/logger/settings.js");
@@ -13,6 +13,7 @@ client.on(Events.MessageDelete, async (message) => {
 
   const fullMessage = await message.fetch();
   if (!message.guild || !fullMessage.guild) return;
+  if (message.webhookId !== null || message.author === client.user) return;
 
   const data = await schema.findOne({
     Guild: message.guild.id,
@@ -159,7 +160,6 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   const fullOldMessage = await oldMessage.fetch();
 
   if (!newMessage.guild) return;
-  if (oldMessage.isWebhookMessage() || newMessage.isWebhookMessage()) return;
   if (oldMessage.webhookId !== null || newMessage.webhookId !== null) return;
   if (oldMessage.author === client.user || newMessage.author === client.user)
     return;
