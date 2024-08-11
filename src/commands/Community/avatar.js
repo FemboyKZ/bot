@@ -18,39 +18,27 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    if (!interaction) {
-      throw new Error("Interaction is null or undefined.");
-    }
-
-    const { channel, client, options, member } = interaction;
-    let user = interaction.options.getUser("user");
-    if (!user) {
-      if (!member) {
-        throw new Error("Member is null or undefined.");
-      }
-      user = member;
-    }
+    const { channel, options } = interaction;
+    const requestedUser = options.getUser("user");
 
     try {
-      let userAvatar = await user.displayAvatarURL({ size: 512 });
+      const userToShow = requestedUser || interaction.member.user;
+      const avatarUrl = userToShow.avatarURL({ size: 512 });
 
       const embed = new EmbedBuilder()
         .setColor("#ff00b3")
-        .setTitle(`${user.tag}'s Avatar`)
-        .setImage(userAvatar)
+        .setTitle(`${userToShow.tag}'s Avatar`)
+        .setImage(avatarUrl)
         .setTimestamp();
 
       const button = new ButtonBuilder()
         .setLabel("Avatar Link")
         .setStyle(ButtonStyle.Link)
-        .setURL(user.avatarURL({ size: 512 }));
+        .setURL(avatarUrl);
 
-      const row = new ActionRowBuilder().addComponents(button);
+      const actionRow = new ActionRowBuilder().addComponents(button);
 
-      await interaction.reply({
-        embeds: [embed],
-        components: [row],
-      });
+      await channel.send({ embeds: [embed], components: [actionRow] });
     } catch (error) {
       console.error(error);
       await interaction.reply({
