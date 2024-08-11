@@ -8,6 +8,7 @@ require("dotenv").config();
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/members.js");
 const inviteLogs = require("../Schemas/logger/invites.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 const invites = new Collection();
@@ -32,6 +33,12 @@ client.on("ready", async () => {
   });
 
   client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
+    const settingsData = await settings.findOne({
+      Guild: newMember.guild.id,
+    });
+    if (settingsData.Members === false) return;
+    if (settingsData.Store === false && settingsData.Post === false) return;
+
     const data = await schema.findOne({
       //Guild: oldMember.guild.id,
       ID: "audit-logs",
@@ -62,7 +69,7 @@ client.on("ready", async () => {
       );
 
     try {
-      if (!logData) {
+      if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: newMember.guild.id,
           User: newMember.user.id,
@@ -85,13 +92,16 @@ client.on("ready", async () => {
           }\``,
           inline: false,
         });
-        if (logData) {
+        if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Nickname: newMember.nickname,
             }
           );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
 
@@ -103,13 +113,16 @@ client.on("ready", async () => {
           }\``,
           inline: false,
         });
-        if (logData) {
+        if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Displayname: newMember.displayName,
             }
           );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
 
@@ -121,13 +134,16 @@ client.on("ready", async () => {
           }\``,
           inline: false,
         });
-        if (logData) {
+        if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Name: newMember.user.username,
             }
           );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
 
@@ -152,13 +168,16 @@ client.on("ready", async () => {
             }>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`,
             inline: false,
           });
-        if (logData) {
+        if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Avatar: newMember.avatarURL({ size: 512 }),
             }
           );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
       */
@@ -183,13 +202,16 @@ client.on("ready", async () => {
             }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`,
             inline: false,
           });
-        if (logData) {
+        if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Avatar: newMember.user.avatarURL({ size: 512 }),
             }
           );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
 
@@ -215,7 +237,7 @@ client.on("ready", async () => {
             })}>)`,
             inline: false,
           });
-        if (logData) {
+        if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
@@ -223,10 +245,13 @@ client.on("ready", async () => {
             }
           );
         }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
       }
 
       if (oldMember.roles.cache.size !== newMember.roles.cache.size) {
-        if (logData) {
+        if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
@@ -235,10 +260,6 @@ client.on("ready", async () => {
           );
         }
       }
-
-      if (embed.data().fields.length === 0)
-        console.log("Member/User Edited, No Fields");
-      await channel.send({ embeds: [embed] });
     } catch (error) {
       console.error("Error in MemberUpdate event:", error);
     }
@@ -246,6 +267,12 @@ client.on("ready", async () => {
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
+  const settingsData = await settings.findOne({
+    Guild: member.guild.id,
+  });
+  if (settingsData.Members === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: member.guild.id,
     ID: "audit-logs",
@@ -311,7 +338,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     );
   }
   try {
-    if (inviteData) {
+    if (inviteData && settingsData.Store === true) {
       await invites.findOneAndUpdate(
         { Guild: member.guild.id, Invite: invite.code },
         {
@@ -319,7 +346,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
         }
       );
     }
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: member.guild.id,
         User: member.user.id,
@@ -333,13 +360,22 @@ client.on(Events.GuildMemberAdd, async (member) => {
         Created: member.user.createdAt,
       });
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in MemberAdd event:", error);
   }
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {
+  const settingsData = await settings.findOne({
+    Guild: member.guild.id,
+  });
+  if (settingsData.Members === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: member.guild.id,
     ID: "audit-logs",
@@ -366,19 +402,27 @@ client.on(Events.GuildMemberRemove, async (member) => {
     );
 
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({
         Guild: member.guild.id,
         User: member.user.id,
       });
     }
-    await channel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error(`Error in MemberRemove event:`, error);
   }
 });
 
 client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
+  const settingsData = await settings.findOne({
+    Guild: newMember.guild.id,
+  });
+  if (settingsData.Members === false) return;
+  if (settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: newMember.guild.id,
     ID: "audit-logs",

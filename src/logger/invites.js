@@ -1,9 +1,16 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/invites.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.InviteCreate, async (invite) => {
+  const settingsData = await settings.findOne({
+    Guild: invite.guild.id,
+  });
+  if (settingsData.Invites === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: invite.guild?.id,
     ID: "audit-logs",
@@ -62,7 +69,7 @@ client.on(Events.InviteCreate, async (invite) => {
   }
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       if (invite.maxUses === 0) {
         await logs.create({
           Guild: invite.guild.id,
@@ -87,13 +94,22 @@ client.on(Events.InviteCreate, async (invite) => {
         });
       }
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in InviteCreate event:", error);
   }
 });
 
 client.on(Events.InviteDelete, async (invite) => {
+  const settingsData = await settings.findOne({
+    Guild: invite.guild.id,
+  });
+  if (settingsData.Invites === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: invite.guild.id,
     ID: "audit-logs",
@@ -131,13 +147,16 @@ client.on(Events.InviteDelete, async (invite) => {
       }
     );
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({
         Guild: invite.guild.id,
         Invite: invite.code,
       });
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in InviteDelete event:", error);
   }

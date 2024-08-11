@@ -1,9 +1,16 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/threads.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.ThreadCreate, async (thread) => {
+  const settingsData = await settings.findOne({
+    Guild: thread.guild.id,
+  });
+  if (settingsData.Threads === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: thread.guild.id,
     ID: "audit-logs",
@@ -50,7 +57,7 @@ client.on(Events.ThreadCreate, async (thread) => {
     );
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: thread.guild.id,
         Thread: thread.id,
@@ -62,13 +69,21 @@ client.on(Events.ThreadCreate, async (thread) => {
         Archived: thread.archived,
       });
     }
-    await channel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.log("Error in ThreadCreate event:", error);
   }
 });
 
 client.on(Events.ThreadDelete, async (thread) => {
+  const settingsData = await settings.findOne({
+    Guild: thread.guild.id,
+  });
+  if (settingsData.Threads === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: thread.guild.id,
     ID: "audit-logs",
@@ -115,19 +130,27 @@ client.on(Events.ThreadDelete, async (thread) => {
     );
 
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({
         Guild: thread.guild.id,
         Thread: thread.id,
       });
     }
-    await channel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.log("Error in ThreadDelete event:", error);
   }
 });
 
 client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
+  const settingsData = await settings.findOne({
+    Guild: newThread.guild.id,
+  });
+  if (settingsData.Threads === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: oldThread.guild.id,
     ID: "audit-logs",
@@ -147,7 +170,7 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
     .setTitle("Thread Edited");
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: newThread.guild.id,
         Thread: newThread.id,
@@ -166,7 +189,7 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
         value: `\`${oldThread.name}\` → \`${newThread.name}\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           {
             Guild: newThread.guild.id,
@@ -176,6 +199,9 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
             Name: newThread.name,
           }
         );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
       }
     }
 
@@ -195,7 +221,7 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           {
             Guild: newThread.guild.id,
@@ -205,6 +231,9 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
             Archived: newThread.archived,
           }
         );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
       }
     }
 
@@ -224,7 +253,7 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           {
             Guild: newThread.guild.id,
@@ -234,6 +263,9 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
             Locked: newThread.locked,
           }
         );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
       }
     }
 
@@ -251,7 +283,7 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
         value: `\`${oldThread.autoArchiveDuration}\` → \`${newThread.autoArchiveDuration}\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           {
             Guild: newThread.guild.id,
@@ -262,12 +294,10 @@ client.on(Events.ThreadUpdate, async (oldThread, newThread) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
-
-    if (embed.data().fields.length === 0)
-      console.log("Thread Edited, No Fields");
-
-    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.log("Error in ThreadUpdate event:", error);
   }

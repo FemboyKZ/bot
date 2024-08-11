@@ -1,9 +1,16 @@
 const { EmbedBuilder, Events, DMChannel } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/channels.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.ChannelCreate, async (channel) => {
+  const settingsData = await settings.findOne({
+    Guild: channel.guild.id,
+  });
+  if (settingsData.Channels === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   if (channel === DMChannel) return;
   const data = await schema.findOne({
     Guild: channel.guild.id,
@@ -45,7 +52,17 @@ client.on(Events.ChannelCreate, async (channel) => {
       }
     );
   try {
-    if (!logData) {
+    if (logData && settingsData.Store === true) {
+      await logs.findOneAndUpdate(
+        { Guild: channel.guild.id, Channel: channel.id },
+        {
+          Name: channel.name,
+          Topic: channel.topic,
+          Parent: channel.parent,
+          Type: channel.type,
+        }
+      );
+    } else if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: channel.guild.id,
         Name: channel.name,
@@ -54,13 +71,22 @@ client.on(Events.ChannelCreate, async (channel) => {
         Channel: channel.id,
       });
     }
-    await auditChannel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await auditChannel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.log("Error in ChannelCreate event:", error);
   }
 });
 
 client.on(Events.ChannelDelete, async (channel) => {
+  const settingsData = await settings.findOne({
+    Guild: channel.guild.id,
+  });
+  if (settingsData.Channels === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   if (channel === DMChannel) return;
   const data = await schema.findOne({
     Guild: channel.guild.id,
@@ -103,17 +129,25 @@ client.on(Events.ChannelDelete, async (channel) => {
     );
 
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({ Guild: channel.guild.id, Channel: channel.id });
     }
 
-    await auditChannel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await auditChannel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.log("Error in ChannelDelete event:", error);
   }
 });
 
 client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
+  const settingsData = await settings.findOne({
+    Guild: newChannel.guild.id,
+  });
+  if (settingsData.Channels === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   if (oldChannel === DMChannel || newChannel === DMChannel) return;
   const data = await schema.findOne({
     Guild: oldChannel.guild.id,
@@ -133,7 +167,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     .setFooter({ text: `FKZ • ID: ${newChannel.id}` });
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: newChannel.guild.id,
         Channel: newChannel.id,
@@ -152,7 +186,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
           {
@@ -160,7 +194,11 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
     }
+
     if (oldChannel.parent !== newChannel.parent) {
       embed.addFields({
         name: "Category",
@@ -169,7 +207,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
           {
@@ -177,7 +215,11 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
     }
+
     if (oldChannel.topic !== newChannel.topic) {
       embed.addFields({
         name: "Topic",
@@ -186,7 +228,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
           {
@@ -194,7 +236,11 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
     }
+
     if (oldChannel.type !== newChannel.type) {
       embed.addFields({
         name: "Type",
@@ -203,7 +249,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
           {
@@ -211,12 +257,10 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
     }
-
-    if (embed.data().fields.length === 0)
-      console.log("Channel Edited, No Fields");
-
-    await auditChannel.send({ embeds: [embed] });
   } catch (error) {
     console.log("Error in ChannelUpdate event:", error);
   }

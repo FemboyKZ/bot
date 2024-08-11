@@ -2,9 +2,16 @@ const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/bans.js");
 const member = require("../Schemas/logger/members.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.GuildBanAdd, async (ban) => {
+  const settingsData = await settings.findOne({
+    Guild: ban.guild.id,
+  });
+  if (settingsData.Bans === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: ban.guild.id,
     ID: "audit-logs",
@@ -42,7 +49,7 @@ client.on(Events.GuildBanAdd, async (ban) => {
       }
     );
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: ban.guild.id,
         User: ban.user.id,
@@ -50,16 +57,25 @@ client.on(Events.GuildBanAdd, async (ban) => {
         Created: date,
       });
     }
-    if (memberData) {
+    if (memberData && settingsData.Store === true) {
       await member.deleteMany({ Guild: ban.guild.id, User: ban.user.id });
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in GuildBanAdd event:", error);
   }
 });
 
 client.on(Events.GuildBanRemove, async (ban) => {
+  const settingsData = await settings.findOne({
+    Guild: ban.guild.id,
+  });
+  if (settingsData.Bans === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: ban.guild.id,
     ID: "audit-logs",
@@ -96,10 +112,12 @@ client.on(Events.GuildBanRemove, async (ban) => {
     );
 
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({ Guild: ban.guild.id, User: ban.user.id });
     }
-    await channel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in GuildBanRemove event:", error);
   }

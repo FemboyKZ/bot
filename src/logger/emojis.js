@@ -1,9 +1,16 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/emojis.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.GuildEmojiCreate, async (emoji) => {
+  const settingsData = await settings.findOne({
+    Guild: emoji.guild.id,
+  });
+  if (settingsData.Emojis === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: emoji.guild.id,
     ID: "audit-logs",
@@ -40,7 +47,7 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
       }
     );
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.findOneAndUpdate(
         { Guild: emoji.guild.id, Emoji: emoji.id },
         {
@@ -50,7 +57,7 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
           Image: emoji.imageURL({ size: 128 }),
         }
       );
-    } else {
+    } else if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: emoji.guild.id,
         Emoji: emoji.id,
@@ -61,13 +68,22 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
         Image: emoji.imageURL({ size: 128 }),
       });
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in EmojiCreate event:", error);
   }
 });
 
 client.on(Events.GuildEmojiDelete, async (emoji) => {
+  const settingsData = await settings.findOne({
+    Guild: emoji.guild.id,
+  });
+  if (settingsData.Emojis === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: emoji.guild.id,
     ID: "audit-logs",
@@ -104,16 +120,24 @@ client.on(Events.GuildEmojiDelete, async (emoji) => {
       }
     );
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({ Guild: emoji.guild.id, Emoji: emoji.id });
     }
-    await channel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in EmojiDelete event:", error);
   }
 });
 
 client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
+  const settingsData = await settings.findOne({
+    Guild: newEmoji.guild.id,
+  });
+  if (settingsData.Emojis === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: newEmoji.guild.id,
     ID: "audit-logs",
@@ -139,7 +163,7 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
     });
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: newEmoji.guild.id,
         Emoji: newEmoji.id,
@@ -159,11 +183,14 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
           { Name: newEmoji.name }
         );
+      }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
       }
     }
 
@@ -175,18 +202,16 @@ client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
         }\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
           { Animated: newEmoji.animated }
         );
       }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
     }
-
-    if (embed.data().fields.length === 1)
-      console.log("Emoji Edited, No Fields");
-
-    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error("Error in EmojiUpdate event:", error);
   }

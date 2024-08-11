@@ -1,8 +1,15 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  const settingsData = await settings.findOne({
+    Guild: interaction.guild.id,
+  });
+  if (settingsData.Interactions === false) return;
+  if (settingsData.Post === false) return;
+
   if (!interaction.isChatInputCommand()) return;
 
   const data = await schema.findOne({

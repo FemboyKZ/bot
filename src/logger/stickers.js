@@ -1,11 +1,18 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/stickers.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 // guild is commented cuz it can be null and it will throw an error, so it will only work on fkz rn.
 
 client.on(Events.GuildStickerCreate, async (sticker) => {
+  const settingsData = await settings.findOne({
+    Guild: sticker.guild.id,
+  });
+  if (settingsData.Stickers === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     //Guild: sticker.guild.id,
     ID: "audit-logs",
@@ -41,7 +48,7 @@ client.on(Events.GuildStickerCreate, async (sticker) => {
       }
     );
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: sticker.guild.id,
         Sticker: sticker.id,
@@ -51,13 +58,22 @@ client.on(Events.GuildStickerCreate, async (sticker) => {
         Available: sticker.available,
       });
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in StickerCreate event:", error);
   }
 });
 
 client.on(Events.GuildStickerDelete, async (sticker) => {
+  const settingsData = await settings.findOne({
+    Guild: sticker.guild.id,
+  });
+  if (settingsData.Stickers === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     //Guild: sticker.guild.id,
     ID: "audit-logs",
@@ -84,19 +100,27 @@ client.on(Events.GuildStickerDelete, async (sticker) => {
       }
     );
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({
         Guild: sticker.guild.id,
         Sticker: sticker.id,
       });
     }
-    await channel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in StickerDelete event:", error);
   }
 });
 
 client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
+  const settingsData = await settings.findOne({
+    Guild: newSticker.guild.id,
+  });
+  if (settingsData.Stickers === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     //Guild: newSticker.guild.id,
     ID: "audit-logs",
@@ -116,7 +140,7 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
     .setTitle("Sticker Edited");
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: newSticker.guild.id,
         Sticker: newSticker.id,
@@ -133,7 +157,7 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
         value: `\`${oldSticker.name}\` → \`${newSticker.name}\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           {
             Guild: newSticker.guild.id,
@@ -144,7 +168,11 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
+
     if (oldSticker.description !== newSticker.description) {
       embed.addFields({
         name: "Description",
@@ -153,7 +181,7 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
         }\` → \`${newSticker.description || "none"}\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           {
             Guild: newSticker.guild.id,
@@ -164,6 +192,9 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
 
     if (oldSticker.available !== newSticker.available) {
@@ -172,7 +203,7 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
         value: `\`${oldSticker.available}\` → \`${newSticker.available}\``,
         inline: false,
       });
-      if (logData) {
+      if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           {
             Guild: newSticker.guild.id,
@@ -183,12 +214,10 @@ client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
           }
         );
       }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
-
-    if (embed.data().fields.length === 0)
-      console.log("Sticker Edited, No Fields");
-
-    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error("Error in StickerUpdate event:", error);
   }

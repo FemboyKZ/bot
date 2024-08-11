@@ -1,9 +1,16 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/messages.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.MessageDelete, async (message) => {
+  const settingsData = await settings.findOne({
+    Guild: message.guild.id,
+  });
+  if (settingsData.Messages === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const fullMessage = await message.fetch();
   if (!message.guild || !fullMessage.guild) return;
 
@@ -39,7 +46,7 @@ client.on(Events.MessageDelete, async (message) => {
       message.content.length > 512 ||
       fullMessage.content.length > 512
     ) {
-      if (!logData) {
+      if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: message.guild.id,
           User: message.author.id,
@@ -52,7 +59,7 @@ client.on(Events.MessageDelete, async (message) => {
           Edited: null,
           Edits: 0,
         });
-      } else if (logData) {
+      } else if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: message.guild.id, Message: message.id },
           {
@@ -71,7 +78,7 @@ client.on(Events.MessageDelete, async (message) => {
         inline: false,
       });
     } else {
-      if (!logData) {
+      if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: message.guild.id,
           User: message.author.id,
@@ -95,7 +102,7 @@ client.on(Events.MessageDelete, async (message) => {
           }\`\`\``,
           inline: false,
         });
-      } else if (logData) {
+      } else if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: message.guild.id, Message: message.id },
           {
@@ -131,13 +138,22 @@ client.on(Events.MessageDelete, async (message) => {
         }
       }
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.log("Error in MessageDelete event:", error);
   }
 });
 
 client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+  const settingsData = await settings.findOne({
+    Guild: message.guild.id,
+  });
+  if (settingsData.Messages === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const fullNewMessage = await newMessage.fetch();
   const fullOldMessage = await oldMessage.fetch();
   if (!newMessage.guild) return;
@@ -177,7 +193,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
       fullOldMessage.content.length > 512 ||
       fullNewMessage.content.length > 512
     ) {
-      if (!logData) {
+      if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: newMessage.guild.id,
           User: newMessage.author.id || fullNewMessage.author.id,
@@ -190,7 +206,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
           Deleted: null,
           Edits: 1,
         });
-      } else if (logData) {
+      } else if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newMessage.guild.id, Message: newMessage.id },
           {
@@ -210,7 +226,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         inline: false,
       });
     } else {
-      if (!logData) {
+      if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: newMessage.guild.id,
           User: newMessage.author.id || fullNewMessage.author.id,
@@ -236,7 +252,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
           }\`\`\``,
           inline: false,
         });
-      } else if (logData) {
+      } else if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newMessage.guild.id, Message: newMessage.id },
           {
@@ -265,7 +281,9 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
       }
     }
 
-    await channel.send({ embeds: [embed] });
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.log("Error in MessageEdit event:", error);
   }

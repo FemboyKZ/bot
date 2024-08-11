@@ -1,9 +1,16 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/automod.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.AutoModerationRuleCreate, async (rule) => {
+  const settingsData = await settings.findOne({
+    Guild: rule.guild.id,
+  });
+  if (settingsData.Automod === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: rule.guild?.id,
     ID: "audit-logs",
@@ -45,7 +52,7 @@ client.on(Events.AutoModerationRuleCreate, async (rule) => {
     );
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store) {
       await logs.create({
         Guild: rule.guild.id,
         Name: rule.name,
@@ -56,13 +63,22 @@ client.on(Events.AutoModerationRuleCreate, async (rule) => {
         Enabled: rule.enabled,
       });
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in AutoModRuleCreate event:", error);
   }
 });
 
 client.on(Events.AutoModerationRuleDelete, async (rule) => {
+  const settingsData = await settings.findOne({
+    Guild: rule.guild.id,
+  });
+  if (settingsData.Automod === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: rule.guild.id,
     ID: "audit-logs",
@@ -104,16 +120,25 @@ client.on(Events.AutoModerationRuleDelete, async (rule) => {
     );
 
   try {
-    if (logData) {
+    if (logData && settingsData.Store === true) {
       await logs.deleteMany({ Guild: rule.guild?.id, Rule: rule.id });
     }
-    await channel.send({ embeds: [embed] });
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
     console.error("Error in AutoModRuleDelete event:", error);
   }
 });
 
 client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
+  const settingsData = await settings.findOne({
+    Guild: rule.guild.id,
+  });
+  if (settingsData.Automod === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
   const data = await schema.findOne({
     Guild: newRule.guild.id,
     ID: "audit-logs",
@@ -133,7 +158,7 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
   });
 
   try {
-    if (!logData) {
+    if (!logData && settingsData.Store === true) {
       await logs.create({
         Guild: newRule.guild.id,
         Name: newRule.name,
@@ -153,10 +178,15 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
         }\``,
         inline: false,
       });
-      await logs.findOneAndUpdate(
-        { Guild: newRule.guild?.id, Rule: newRule.id },
-        { Name: newRule.name }
-      );
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Name: newRule.name }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
 
     if (oldRule.actions !== newRule.actions) {
@@ -172,10 +202,15 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
           inline: false,
         }
       );
-      await logs.findOneAndUpdate(
-        { Guild: newRule.guild?.id, Rule: newRule.id },
-        { Action: newRule.actions[0].type }
-      );
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Action: newRule.actions[0].type }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
 
     if (oldRule.enabled !== newRule.enabled) {
@@ -186,10 +221,15 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
         }\``,
         inline: false,
       });
-      await logs.findOneAndUpdate(
-        { Guild: newRule.guild?.id, Rule: newRule.id },
-        { Enabled: newRule.enabled }
-      );
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Enabled: newRule.enabled }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
 
     if (oldRule.triggerType !== newRule.triggerType) {
@@ -200,16 +240,16 @@ client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
         }\``,
         inline: false,
       });
-      await logs.findOneAndUpdate(
-        { Guild: newRule.guild?.id, Rule: newRule.id },
-        { Trigger: newRule.triggerType }
-      );
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Trigger: newRule.triggerType }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
-
-    if (embed.data().fields.length === 0)
-      console.log("Automod Rule Edited, No Fields");
-
-    await channel.send({ embeds: [embed] });
   } catch (error) {
     console.error("Error in AutoModRuleUpdate event:", error);
   }
