@@ -45,6 +45,10 @@ process.on("unhandledRejection", (reason, promise) => {
   console.log("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
+client.on("error", (error) => {
+  console.error("Error occurred:", error);
+});
+
 require("dotenv").config();
 
 require("./anti-link.js");
