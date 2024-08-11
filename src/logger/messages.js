@@ -149,7 +149,7 @@ client.on(Events.MessageDelete, async (message) => {
 
 client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   const settingsData = await settings.findOne({
-    Guild: message.guild.id,
+    Guild: newMessage.guild.id,
   });
   if (settingsData.Messages === false) return;
   if (settingsData.Store === false && settingsData.Post === false) return;
