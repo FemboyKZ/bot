@@ -1,6 +1,6 @@
 const {
   EmbedBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
   Collection,
   Events,
 } = require("discord.js");
@@ -19,8 +19,7 @@ client.on("ready", async () => {
   client.guilds.cache.forEach(async (guild) => {
     const clientMember = guild.members.cache.get(client.user.id);
 
-    if (!clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return;
+    if (!clientMember.permissions.has(PermissionFlagsBits.ManageGuild)) return;
 
     const firstInvites = await guild.invites.fetch().catch((err) => {
       console.log(err);
