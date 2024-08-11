@@ -65,7 +65,7 @@ client.on("ready", async () => {
         inline: false,
       })
       .setImage(
-        member.user.avatarURL({ size: 256 })
+        newMember.user.avatarURL({ size: 256 })
           ? logData.Avatar
           : "https://files.femboy.kz/web/images/avatars/unknown.png"
       );
