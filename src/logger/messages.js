@@ -11,8 +11,9 @@ client.on(Events.MessageDelete, async (message) => {
   if (settingsData.Messages === false) return;
   if (settingsData.Store === false && settingsData.Post === false) return;
 
-  const fullMessage = await message.fetch();
-  if (!message.guild || !fullMessage.guild) return;
+  if (message.partial === true) await message.fetch();
+
+  if (!message.guild) return;
   if (message.webhookId !== null || message.author === client.user) return;
 
   const data = await schema.findOne({
@@ -42,12 +43,7 @@ client.on(Events.MessageDelete, async (message) => {
     });
 
   try {
-    if (
-      message.content.length === 0 ||
-      fullMessage.content.length === 0 ||
-      message.content.length > 512 ||
-      fullMessage.content.length > 512
-    ) {
+    if (message.content.length === 0 || message.content.length > 512) {
       if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: message.guild.id,
@@ -86,11 +82,7 @@ client.on(Events.MessageDelete, async (message) => {
           User: message.author.id,
           Channel: message.channel.id,
           Message: message.id,
-          Content: [
-            message.content
-              ? fullMessage.content
-              : "Deleted Message Failed to Log.",
-          ],
+          Content: [message.content || "Deleted Message Failed to Log."],
           Images: message.attachments.map((attachment) => attachment.url),
           Created: message.createdAt,
           Deleted: date,
@@ -99,9 +91,7 @@ client.on(Events.MessageDelete, async (message) => {
         });
         embed.addFields({
           name: "Deleted Message",
-          value: `\`\`\`${
-            message.content ? fullMessage.content : "Unknown."
-          }\`\`\``,
+          value: `\`\`\`${message.content || "Unknown."}\`\`\``,
           inline: false,
         });
       } else if (logData && settingsData.Store === true) {
@@ -110,11 +100,7 @@ client.on(Events.MessageDelete, async (message) => {
           {
             $push: {
               Content: {
-                $each: [
-                  message.content
-                    ? fullMessage.content
-                    : "Deleted Message Failed to Log.",
-                ],
+                $each: [message.content || "Deleted Message Failed to Log."],
               },
             },
             Deleted: date,
@@ -125,16 +111,14 @@ client.on(Events.MessageDelete, async (message) => {
           embed.addFields({
             name: "Deleted Message",
             value: `\`\`\`${
-              message.content ? fullMessage.content : logData.Content[count]
+              message.content ? logData.Content[count] : "Unknown."
             }\`\`\``,
             inline: false,
           });
         } else {
           embed.addFields({
             name: "Deleted Message",
-            value: `\`\`\`${
-              message.content ? fullMessage.content : logData.Content[0]
-            }\`\`\``,
+            value: `\`\`\`${message.content || "Unknown."}\`\`\``,
             inline: false,
           });
         }
@@ -156,8 +140,8 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   if (settingsData.Messages === false) return;
   if (settingsData.Store === false && settingsData.Post === false) return;
 
-  const fullNewMessage = await newMessage.fetch();
-  const fullOldMessage = await oldMessage.fetch();
+  if (newMessage.partial === true) await newMessage.fetch();
+  if (oldMessage.partial === true) await oldMessage.fetch();
 
   if (!newMessage.guild) return;
   if (oldMessage.webhookId !== null || newMessage.webhookId !== null) return;
@@ -194,23 +178,19 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     if (
       oldMessage.content.length === 0 ||
       newMessage.content.length === 0 ||
-      fullOldMessage.content.length === 0 ||
-      fullNewMessage.content.length === 0 ||
       oldMessage.content.length > 512 ||
-      newMessage.content.length > 512 ||
-      fullOldMessage.content.length > 512 ||
-      fullNewMessage.content.length > 512
+      newMessage.content.length > 512
     ) {
       if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: newMessage.guild.id,
-          User: newMessage.author.id || fullNewMessage.author.id,
+          User: newMessage.author.id,
           Channel: newMessage.channel.id,
           Message: newMessage.id,
           Content: ["Edited Message Too long to Log."],
           Images: oldMessage.attachments.map((attachment) => attachment.url),
-          Created: oldMessage.createdAt || fullOldMessage.createdAt,
-          Edited: newMessage.editedAt ? fullNewMessage.editedAt : date,
+          Created: oldMessage.createdAt,
+          Edited: newMessage.editedAt || date,
           Deleted: null,
           Edits: 1,
         });
@@ -237,26 +217,20 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
       if (!logData && settingsData.Store === true) {
         await logs.create({
           Guild: newMessage.guild.id,
-          User: newMessage.author.id || fullNewMessage.author.id,
+          User: newMessage.author.id,
           Channel: newMessage.channel.id,
           Message: newMessage.id,
-          Content: [
-            oldMessage.content
-              ? fullOldMessage.content
-              : "Edited Message Failed to Log.",
-          ],
+          Content: [oldMessage.content || "Edited Message Failed to Log."],
           Images: oldMessage.attachments.map((attachment) => attachment.url),
-          Created: oldMessage.createdAt || fullOldMessage.createdAt,
-          Edited: newMessage.editedAt ? fullNewMessage.editedAt : date,
+          Created: oldMessage.createdAt,
+          Edited: newMessage.editedAt || date,
           Deleted: null,
           Edits: 1,
         });
         embed.addFields({
           name: "Edited Message",
-          value: `\`\`\`${
-            oldMessage.content ? fullOldMessage.content : "Unknown."
-          }\`\`\` → \`\`\`${
-            newMessage.content ? fullNewMessage.content : "Unknown."
+          value: `\`\`\`${oldMessage.content || "Unknown."}\`\`\` → \`\`\`${
+            newMessage.content || "Unknown."
           }\`\`\``,
           inline: false,
         });
@@ -266,11 +240,7 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
           {
             $push: {
               Content: {
-                $each: [
-                  oldMessage.content
-                    ? fullOldMessage.content
-                    : "Edited Message Failed to Log.",
-                ],
+                $each: [oldMessage.content || "Edited Message Failed to Log."],
               },
             },
             Edited: newMessage.editedAt,
@@ -280,10 +250,8 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         embed.addFields({
           name: "Edited Message",
           value: `\`\`\`${
-            oldMessage.content ? fullOldMessage.content : logData.Content[0]
-          }\`\`\` → \`\`\`${
-            newMessage.content ? fullNewMessage.content : "Unknown."
-          }\`\`\``,
+            oldMessage.content ? logData.Content[0] : "Unknown."
+          }\`\`\` → \`\`\`${newMessage.content || "Unknown."}\`\`\``,
           inline: false,
         });
       }
