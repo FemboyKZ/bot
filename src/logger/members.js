@@ -59,7 +59,7 @@ client.on("ready", async () => {
       .setImage(
         member.user.avatarURL({ size: 256 })
           ? logData.Avatar
-          : "https://files.femboy.kz/web/avatars/unknown.png"
+          : "https://files.femboy.kz/web/images/avatars/unknown.png"
       );
 
     try {
@@ -264,7 +264,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
   const invite = newInvites.find((i) => i.uses > oldInvites.get(i.code));
 
-  const inviteData = await invites.findOne({
+  const inviteData = await inviteLogs.findOne({
     Guild: member.guild.id,
     Invite: invite.code,
   });
@@ -279,7 +279,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setImage(
       member.user.avatarURL({ size: 256 })
         ? logData.Avatar
-        : "https://files.femboy.kz/web/avatars/unknown.png"
+        : "https://files.femboy.kz/web/images/avatars/unknown.png"
     )
     .setFooter({ text: `FKZ • ID: ${member.user.id}` });
 
@@ -363,7 +363,7 @@ client.on(Events.GuildMemberRemove, async (member) => {
     .setImage(
       member.user.avatarURL({ size: 256 })
         ? logData.Avatar
-        : "https://files.femboy.kz/web/avatars/unknown.png"
+        : "https://files.femboy.kz/web/images/avatars/unknown.png"
     );
 
   try {
@@ -402,7 +402,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     .setImage(
       newMember.user.avatarURL({ size: 256 })
         ? logData.Avatar
-        : "https://files.femboy.kz/web/avatars/unknown.png"
+        : "https://files.femboy.kz/web/images/avatars/unknown.png"
     );
 
   try {
