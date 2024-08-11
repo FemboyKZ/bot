@@ -8,6 +8,7 @@ let settings = new Schema({
   Bans: Boolean,
   Channels: Boolean,
   Emojis: Boolean,
+  Info: Boolean, // guild info
   Invites: Boolean,
   Interactions: Boolean,
   Members: Boolean,
