@@ -14,10 +14,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const serverID = interaction.guild?.id;
     const user = interaction.user?.username;
     const userID = interaction.user?.id;
-    const iChannel = interaction.channel?.name;
-    const iChannelID = interaction.channel?.id;
 
-    if (!server || !serverID || !user || !userID || !iChannel || !iChannelID) {
+    if (!server || !serverID || !user || !userID) {
       console.error("Null or undefined value encountered");
       return;
     }
@@ -25,23 +23,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTitle("Chat Command Executed.")
+      .setFooter({ text: `FKZ • ${serverID}` })
       .setTimestamp()
       .addFields([
         {
-          name: "Server / ServerID",
-          value: `${server} / ${serverID}`,
-        },
-        {
-          name: "Channel / ChannelID",
+          name: "Channel",
           value: `${iChannel} / <#${iChannelID}>`,
         },
         {
-          name: "User / UserID",
+          name: "User",
           value: `${user} / <@${userID}>`,
         },
         {
           name: "Command & User Input",
-          value: `${interaction}`,
+          value: `\`${interaction}\``,
         },
       ]);
 
