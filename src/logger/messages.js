@@ -1,4 +1,4 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { EmbedBuilder, Events, Webhook } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
 const logs = require("../Schemas/logger/messages.js");
 const settings = require("../Schemas/logger/settings.js");
@@ -157,7 +157,13 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
   const fullNewMessage = await newMessage.fetch();
   const fullOldMessage = await oldMessage.fetch();
+
   if (!newMessage.guild) return;
+  if (oldMessage.isWebhookMessage() || newMessage.isWebhookMessage()) return;
+  if (oldMessage.webhookId !== null || newMessage.webhookId !== null) return;
+  if (oldMessage.author === client.user || newMessage.author === client.user)
+    return;
+
   const data = await schema.findOne({
     Guild: newMessage.guild.id,
     ID: "audit-logs",
