@@ -8,6 +8,7 @@ const messagesData = require("./Schemas/logger/messages.js");
 const rolesData = require("./Schemas/logger/roles.js");
 const stickersData = require("./Schemas/logger/stickers.js");
 const threadsData = require("./Schemas/logger/threads.js");
+const settings = require("./Schemas/logger/settings.js");
 
 const { client } = require("./index.js");
 require("dotenv").config();
@@ -17,6 +18,32 @@ require("dotenv").config();
 client.on("ready", async () => {
   const guild = client.guilds.cache.get(`${process.env.GUILD_ID}`); // fkz
   if (!guild) return;
+
+  const settingsData = await settings.findOne({
+    Guild: guild.id,
+  });
+  if (!settingsData) {
+    console.warn(
+      `No settings data found for guild ${guild.name} (${guild.id})! Setting default values (Enabled)...`
+    );
+    await settings.create({
+      Guild: guild.id,
+      Post: true,
+      Store: true,
+      Automod: true,
+      Bans: true,
+      Channels: true,
+      Emojis: true,
+      Invites: true,
+      Members: true,
+      Messages: true,
+      Roles: true,
+      Stickers: true,
+      Threads: true,
+    });
+  }
+
+  if (settingsData.Store === false) return;
 
   const automod = await guild.autoModerationRules.fetch();
   const bans = await guild.bans.fetch();
@@ -36,6 +63,7 @@ client.on("ready", async () => {
     });
 
     try {
+      if (settingsData.Automod === false) return;
       if (data) {
         await automodData.findOneAndUpdate(
           { Guild: guild.id, Rule: rule.id },
@@ -69,6 +97,7 @@ client.on("ready", async () => {
       User: ban.user.id,
     });
     try {
+      if (settingsData.Bans === false) return;
       if (!data)
         await bansData.create({
           Guild: guild.id,
@@ -88,6 +117,7 @@ client.on("ready", async () => {
     });
 
     try {
+      if (settingsData.Emojis === false) return;
       if (data) {
         await emojisData.findByIdAndUpdate(
           {
@@ -122,6 +152,7 @@ client.on("ready", async () => {
     });
 
     try {
+      if (settingsData.Channels === false) return;
       if (data) {
         await channelsData.findOneAndUpdate(
           { Guild: guild.id, Channel: channel.id },
@@ -155,6 +186,7 @@ client.on("ready", async () => {
     });
 
     try {
+      if (settingsData.Invites === false) return;
       if (data) {
         await channelsData.findOneAndUpdate(
           { Guild: guild.id, Invite: invite },
@@ -197,6 +229,7 @@ client.on("ready", async () => {
     });
 
     try {
+      if (settingsData.Members === false) return;
       if (data) {
         await membersData.findOneAndUpdate(
           { Guild: guild.id, User: member.user.id },
@@ -236,6 +269,7 @@ client.on("ready", async () => {
     });
 
     try {
+      if (settingsData.Roles === false) return;
       if (data) {
         await rolesData.findOneAndUpdate(
           { Guild: guild.id, Role: role.id },
@@ -267,6 +301,7 @@ client.on("ready", async () => {
     });
 
     try {
+      if (settingsData.Stickers === false) return;
       if (data) {
         await stickersData.findOneAndUpdate(
           { Guild: guild.id, Sticker: sticker.id },
