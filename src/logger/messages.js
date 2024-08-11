@@ -79,6 +79,10 @@ client.on(Events.MessageDelete, async (message) => {
         value: `\`Message Too long to Log.\``,
         inline: false,
       });
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+      return;
     } else {
       if (!logData && settingsData.Store === true) {
         await logs.create({
@@ -98,6 +102,10 @@ client.on(Events.MessageDelete, async (message) => {
           value: `\`\`\`${message.content || "Unknown."}\`\`\``,
           inline: false,
         });
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
+        return;
       } else if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: message.guild.id, Message: message.id },
@@ -119,18 +127,22 @@ client.on(Events.MessageDelete, async (message) => {
             }\`\`\``,
             inline: false,
           });
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+          return;
         } else {
           embed.addFields({
             name: "Deleted Message",
             value: `\`\`\`${message.content || "Unknown."}\`\`\``,
             inline: false,
           });
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+          return;
         }
       }
-    }
-
-    if (settingsData.Post === true) {
-      await channel.send({ embeds: [embed] });
     }
   } catch (error) {
     console.log("Error in MessageDelete event:", error);
@@ -202,6 +214,15 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
           Deleted: null,
           Edits: 1,
         });
+        embed.addFields({
+          name: "Edited Message",
+          value: `\`Message Too Long or null.\``,
+          inline: false,
+        });
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
+        return;
       } else if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newMessage.guild.id, Message: newMessage.id },
@@ -221,6 +242,10 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
         value: `\`Message Too Long or null.\``,
         inline: false,
       });
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+      return;
     } else {
       if (!logData && settingsData.Store === true) {
         await logs.create({
@@ -242,6 +267,10 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
           }\`\`\``,
           inline: false,
         });
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
+        return;
       } else if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newMessage.guild.id, Message: newMessage.id },
@@ -262,11 +291,11 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
           }\`\`\` → \`\`\`${newMessage.content || "Unknown."}\`\`\``,
           inline: false,
         });
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
+        return;
       }
-    }
-
-    if (settingsData.Post === true) {
-      await channel.send({ embeds: [embed] });
     }
   } catch (error) {
     console.log("Error in MessageEdit event:", error);
