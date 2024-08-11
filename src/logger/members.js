@@ -312,34 +312,6 @@ client.on(Events.GuildMemberAdd, async (member) => {
     )
     .setFooter({ text: `FKZ • ID: ${member.user.id}` });
 
-  if (!invite) {
-    embed.addFields(
-      {
-        name: "Inviter",
-        value: "None",
-        inline: false,
-      },
-      {
-        name: "Invite",
-        value: "Unknown / Vanity",
-        inline: false,
-      }
-    );
-  } else {
-    const inviter = await client.users.fetch(invite.inviter.id);
-    embed.addFields(
-      {
-        name: "Inviter",
-        value: `${inviter}`,
-        inline: false,
-      },
-      {
-        name: "Invite",
-        value: `<https://discord.gg/${invite.code}>`,
-        inline: false,
-      }
-    );
-  }
   try {
     if (inviteData && settingsData.Store === true) {
       await invites.findOneAndUpdate(
@@ -365,7 +337,36 @@ client.on(Events.GuildMemberAdd, async (member) => {
     }
 
     if (settingsData.Post === true) {
-      await channel.send({ embeds: [embed] });
+      if (!invite) {
+        embed.addFields(
+          {
+            name: "Inviter",
+            value: "None",
+            inline: false,
+          },
+          {
+            name: "Invite",
+            value: "Unknown / Vanity",
+            inline: false,
+          }
+        );
+        await channel.send({ embeds: [embed] });
+      } else {
+        const inviter = await client.users.fetch(invite.inviter.id);
+        embed.addFields(
+          {
+            name: "Inviter",
+            value: `${inviter}`,
+            inline: false,
+          },
+          {
+            name: "Invite",
+            value: `<https://discord.gg/${invite.code}>`,
+            inline: false,
+          }
+        );
+        await channel.send({ embeds: [embed] });
+      }
     }
   } catch (error) {
     console.error("Error in MemberAdd event:", error);
