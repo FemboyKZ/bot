@@ -23,12 +23,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTitle("Chat Command Executed.")
-    .setFooter({ text: `FKZ • ${interaction.guild.id}` })
+    .setFooter({ text: `FKZ` })
     .setTimestamp()
     .addFields([
       {
         name: "User",
-        value: `${interaction.user?.username} / <@${interaction.user?.id}>`,
+        value: `${interaction.user.username} / <@${interaction.user.id}>`,
       },
       {
         name: "Command & User Input",
