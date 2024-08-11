@@ -29,7 +29,9 @@ If you wish to help with this feel free to open prs.
 - Basic crash/error handling
 - Secret variables in .env
 
-### Auditlog (not reliable lol)
+### Auditlogs
+
+Database(MongoDB) / Discord Embeds
 
 - Interactions (commands, buttons, selects)
 - Automod (rules, actions, enabled/disabled)
