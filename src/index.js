@@ -67,7 +67,6 @@ require("./logger/messages.js");
 require("./logger/roles.js");
 require("./logger/stickers.js");
 require("./logger/threads.js");
-require("./logger/users.js");
 
 const functions = fs
   .readdirSync("./src/functions")
