@@ -43,7 +43,7 @@ client.on("ready", async () => {
     });
   }
 
-  if (settingsData.Store === false) return;
+  if (settingsData && settingsData.Store === false) return;
 
   const automod = await guild.autoModerationRules.fetch();
   const bans = await guild.bans.fetch();
@@ -63,7 +63,7 @@ client.on("ready", async () => {
     });
 
     try {
-      if (settingsData.Automod === false) return;
+      if (settingsData && settingsData.Automod === false) return;
       if (data) {
         await automodData.findOneAndUpdate(
           { Guild: guild.id, Rule: rule.id },
@@ -97,7 +97,7 @@ client.on("ready", async () => {
       User: ban.user.id,
     });
     try {
-      if (settingsData.Bans === false) return;
+      if (settingsData && settingsData.Bans === false) return;
       if (!data)
         await bansData.create({
           Guild: guild.id,
@@ -117,7 +117,7 @@ client.on("ready", async () => {
     });
 
     try {
-      if (settingsData.Emojis === false) return;
+      if (settingsData && settingsData.Emojis === false) return;
       if (data) {
         await emojisData.findByIdAndUpdate(
           {
@@ -152,7 +152,7 @@ client.on("ready", async () => {
     });
 
     try {
-      if (settingsData.Channels === false) return;
+      if (settingsData && settingsData.Channels === false) return;
       if (data) {
         await channelsData.findOneAndUpdate(
           { Guild: guild.id, Channel: channel.id },
@@ -186,7 +186,7 @@ client.on("ready", async () => {
     });
 
     try {
-      if (settingsData.Invites === false) return;
+      if (settingsData && settingsData.Invites === false) return;
       if (data) {
         await channelsData.findOneAndUpdate(
           { Guild: guild.id, Invite: invite },
@@ -229,7 +229,7 @@ client.on("ready", async () => {
     });
 
     try {
-      if (settingsData.Members === false) return;
+      if (settingsData && settingsData.Members === false) return;
       if (data) {
         await membersData.findOneAndUpdate(
           { Guild: guild.id, User: member.user.id },
@@ -269,7 +269,7 @@ client.on("ready", async () => {
     });
 
     try {
-      if (settingsData.Roles === false) return;
+      if (settingsData && settingsData.Roles === false) return;
       if (data) {
         await rolesData.findOneAndUpdate(
           { Guild: guild.id, Role: role.id },
@@ -301,7 +301,7 @@ client.on("ready", async () => {
     });
 
     try {
-      if (settingsData.Stickers === false) return;
+      if (settingsData && settingsData.Stickers === false) return;
       if (data) {
         await stickersData.findOneAndUpdate(
           { Guild: guild.id, Sticker: sticker.id },
