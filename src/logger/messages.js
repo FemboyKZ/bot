@@ -1,10 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../Schemas/base-system.js");
-//const logs = require("../Schemas/logger/messages.js");
+const logs = require("../Schemas/logger/messages.js");
 const { client } = require("../index.js");
 
 client.on(Events.MessageDelete, async (message) => {
-  if (!message.guild) return;
+  const fullMessage = await message.fetch();
+  if (!message.guild || !fullMessage.guild) return;
+
   const data = await schema.findOne({
     Guild: message.guild.id,
     ID: "audit-logs",
@@ -12,92 +14,132 @@ client.on(Events.MessageDelete, async (message) => {
   const channel = client.channels.cache.get(data.Channel);
   if (!data || !data.Channel || !channel) return;
 
-  const fullMessage = await message.fetch();
+  const logData = await logs.findOne({
+    Guild: message.guild.id,
+    Message: message.id,
+  });
+
+  const date = new Date();
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: `FKZ • ID: ${message.id}` })
+    .setTitle("Message Deleted")
+    .addFields({
+      name: "Author",
+      value: `<@${message.author.id}> - \`${message.author.username}\``,
+      inline: true,
+    });
 
   try {
-    if (message.content.length >= 3072 || fullMessage.content.length >= 3072) {
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Very Long Message Deleted")
-        .setDescription("Message too long to display in audit log.")
-        .addFields(
+    if (
+      message.content.length === 0 ||
+      fullMessage.content.length === 0 ||
+      message.content.length > 512 ||
+      fullMessage.content.length > 512
+    ) {
+      if (!logData) {
+        await logs.create({
+          Guild: message.guild.id,
+          User: message.author.id,
+          Channel: message.channel.id,
+          Message: message.id,
+          Content: ["Deleted Message Too long to Log."],
+          Images: message.attachments.map((attachment) => attachment.url),
+          Created: message.createdAt,
+          Deleted: date,
+          Edited: null,
+          Edits: 0,
+        });
+      } else if (logData) {
+        await logs.findOneAndUpdate(
+          { Guild: message.guild.id, Message: message.id },
           {
-            name: "Author:",
-            value: `${message.author}`,
-            inline: false,
-          },
-          {
-            name: "Channel:",
-            value: `${message.channel}`,
-            inline: false,
-          },
-          {
-            name: "MessageID:",
-            value: `${message.id}`,
-            inline: false,
+            $push: {
+              Content: {
+                $each: ["Deleted Message Too long to Log."],
+              },
+            },
+            Deleted: date,
           }
         );
-      await channel.send({ embeds: [embed] });
-      return;
-    }
-
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Message Deleted")
-      .setDescription(`\`\`\`\n${message.content}\n\`\`\``);
-    if (fullMessage.content) {
-      embed.addFields(
-        {
-          name: "FullMsg:",
-          value: `\`\`\`\n${fullMessage.content}\n\`\`\``,
-          inline: false,
-        },
-        {
-          name: "Author:",
-          value: `${message.author}`,
-          inline: false,
-        },
-        {
-          name: "Channel:",
-          value: `${message.channel}`,
-          inline: false,
-        },
-        {
-          name: "MessageID:",
-          value: `${message.id}`,
-          inline: false,
-        }
-      );
+      }
+      embed.addFields({
+        name: "Content",
+        value: `\`Message Too long to Log.\``,
+        inline: false,
+      });
     } else {
-      embed.addFields(
-        {
-          name: "Author:",
-          value: `${message.author}`,
+      if (!logData) {
+        await logs.create({
+          Guild: message.guild.id,
+          User: message.author.id,
+          Channel: message.channel.id,
+          Message: message.id,
+          Content: [
+            message.content
+              ? fullMessage.content
+              : "Deleted Message Failed to Log.",
+          ],
+          Images: message.attachments.map((attachment) => attachment.url),
+          Created: message.createdAt,
+          Deleted: date,
+          Edited: null,
+          Edits: 0,
+        });
+        embed.addFields({
+          name: "Deleted Message",
+          value: `\`\`\`${
+            message.content ? fullMessage.content : "Unknown."
+          }\`\`\``,
           inline: false,
-        },
-        {
-          name: "Channel:",
-          value: `${message.channel}`,
-          inline: false,
-        },
-        {
-          name: "MessageID:",
-          value: `${message.id}`,
-          inline: false,
+        });
+      } else if (logData) {
+        await logs.findOneAndUpdate(
+          { Guild: message.guild.id, Message: message.id },
+          {
+            $push: {
+              Content: {
+                $each: [
+                  message.content
+                    ? fullMessage.content
+                    : "Deleted Message Failed to Log.",
+                ],
+              },
+            },
+            Deleted: date,
+          }
+        );
+        if (logData.Edits > 0) {
+          const count = logData.Edits + 1;
+          embed.addFields({
+            name: "Deleted Message",
+            value: `\`\`\`${
+              message.content ? fullMessage.content : logData.Content[count]
+            }\`\`\``,
+            inline: false,
+          });
+        } else {
+          embed.addFields({
+            name: "Deleted Message",
+            value: `\`\`\`${
+              message.content ? fullMessage.content : logData.Content[0]
+            }\`\`\``,
+            inline: false,
+          });
         }
-      );
+      }
     }
     await channel.send({ embeds: [embed] });
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log("Error in MessageDelete event:", error);
   }
 });
 
 client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
+  const fullNewMessage = await newMessage.fetch();
+  const fullOldMessage = await oldMessage.fetch();
   if (!newMessage.guild) return;
   const data = await schema.findOne({
     Guild: newMessage.guild.id,
@@ -106,84 +148,125 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   const channel = client.channels.cache.get(data.Channel);
   if (!data || !data.Channel || !channel) return;
 
-  const fullOldMessage = await oldMessage.fetch();
+  const logData = await logs.findOne({
+    Guild: newMessage.guild.id,
+    Message: newMessage.id,
+  });
+
+  const date = new Date();
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: `FKZ • ID: ${newMessage.id}` })
+    .setTitle("Message Edited")
+    .addFields({
+      name: "Author",
+      value: `<@${newMessage.author.id}> - \`${newMessage.author.username}\``,
+      inline: true,
+    });
 
   try {
     if (
-      oldMessage.content.length >= 1536 ||
-      fullOldMessage.content.length >= 1536
+      oldMessage.content.length === 0 ||
+      newMessage.content.length === 0 ||
+      fullOldMessage.content.length === 0 ||
+      fullNewMessage.content.length === 0 ||
+      oldMessage.content.length > 512 ||
+      newMessage.content.length > 512 ||
+      fullOldMessage.content.length > 512 ||
+      fullNewMessage.content.length > 512
     ) {
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Very Long Message Edited")
-        .setDescription("Message too long to display in audit log.")
-        .addFields(
+      if (!logData) {
+        await logs.create({
+          Guild: newMessage.guild.id,
+          User: newMessage.author.id || fullNewMessage.author.id,
+          Channel: newMessage.channel.id,
+          Message: newMessage.id,
+          Content: ["Edited Message Too long to Log."],
+          Images: oldMessage.attachments.map((attachment) => attachment.url),
+          Created: oldMessage.createdAt || fullOldMessage.createdAt,
+          Edited: newMessage.editedAt ? fullNewMessage.editedAt : date,
+          Deleted: null,
+          Edits: 1,
+        });
+      } else if (logData) {
+        await logs.findOneAndUpdate(
+          { Guild: newMessage.guild.id, Message: newMessage.id },
           {
-            name: "Author:",
-            value: `${oldMessage.author}`,
-            inline: false,
-          },
-          {
-            name: "Channel:",
-            value: `${oldMessage.channel}`,
-            inline: false,
-          },
-          {
-            name: "MessageID:",
-            value: `${oldMessage.id}`,
-            inline: false,
+            $push: {
+              Content: {
+                $each: ["Edited Message Too long to Log."],
+              },
+            },
+            Edited: newMessage.editedAt,
+            Edits: logData.Edits + 1,
           }
         );
-      await channel.send({ embeds: [embed] });
-      return;
-    }
-
-    const changes = [];
-    if (oldMessage.content !== newMessage.content) {
-      changes.push(
-        `**Message:**\n \`\`\`\n${
-          oldMessage.content || "None"
-        }\`\`\`\n→\n\`\`\`\n${newMessage.content || "None"}\n\`\`\``
-      );
-
-      if (
-        fullOldMessage.content.length >= 1536 ||
-        oldMessage.content?.length >= 1536 ||
-        newMessage.content.length >= 1536 ||
-        changes.length === 0
-      ) {
-        return;
       }
-
-      const changesText = changes.join("\n");
-
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Message Edited")
-        .setDescription(`${changesText}`)
-        .addFields(
+      embed.addFields({
+        name: "Edited Message",
+        value: `\`Message Too Long or null.\``,
+        inline: false,
+      });
+    } else {
+      if (!logData) {
+        await logs.create({
+          Guild: newMessage.guild.id,
+          User: newMessage.author.id || fullNewMessage.author.id,
+          Channel: newMessage.channel.id,
+          Message: newMessage.id,
+          Content: [
+            oldMessage.content
+              ? fullOldMessage.content
+              : "Edited Message Failed to Log.",
+          ],
+          Images: oldMessage.attachments.map((attachment) => attachment.url),
+          Created: oldMessage.createdAt || fullOldMessage.createdAt,
+          Edited: newMessage.editedAt ? fullNewMessage.editedAt : date,
+          Deleted: null,
+          Edits: 1,
+        });
+        embed.addFields({
+          name: "Edited Message",
+          value: `\`\`\`${
+            oldMessage.content ? fullOldMessage.content : "Unknown."
+          }\`\`\` → \`\`\`${
+            newMessage.content ? fullNewMessage.content : "Unknown."
+          }\`\`\``,
+          inline: false,
+        });
+      } else if (logData) {
+        await logs.findOneAndUpdate(
+          { Guild: newMessage.guild.id, Message: newMessage.id },
           {
-            name: "Author:",
-            value: `${oldMessage.author}`,
-            inline: false,
-          },
-          {
-            name: "Channel:",
-            value: `${oldMessage.channel}`,
-            inline: false,
-          },
-          {
-            name: "MessageID:",
-            value: `${oldMessage.id}`,
+            $push: {
+              Content: {
+                $each: [
+                  oldMessage.content
+                    ? fullOldMessage.content
+                    : "Edited Message Failed to Log.",
+                ],
+              },
+            },
+            Edited: newMessage.editedAt,
+            Edits: logData.Edits + 1,
           }
         );
-      await channel.send({ embeds: [embed] });
+        embed.addFields({
+          name: "Edited Message",
+          value: `\`\`\`${
+            oldMessage.content ? fullOldMessage.content : logData.Content[0]
+          }\`\`\` → \`\`\`${
+            newMessage.content ? fullNewMessage.content : "Unknown."
+          }\`\`\``,
+          inline: false,
+        });
+      }
     }
-  } catch (err) {
-    console.log(err);
+
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.log("Error in MessageEdit event:", error);
   }
 });
