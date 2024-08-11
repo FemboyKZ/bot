@@ -5,7 +5,7 @@ const {
   ChannelType,
 } = require("discord.js");
 const schema = require("../../Schemas/base-system.js");
-const settings = require("../../Schemas/audit-logs/settings.js");
+const settings = require("../../Schemas/logger/settings.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
