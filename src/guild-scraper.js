@@ -158,7 +158,7 @@ client.on("ready", async () => {
           { Guild: guild.id, Channel: channel.id },
           {
             Name: channel.name,
-            Parent: channel.parent.id || null,
+            Parent: channel.parentId || null,
             Type: channel.type,
             Topic: channel.topic || null,
           }
@@ -168,7 +168,7 @@ client.on("ready", async () => {
           Guild: guild.id,
           Channel: channel.id,
           Name: channel.name,
-          Parent: channel.parent.id,
+          Parent: channel.parentId,
           Type: channel.type,
           Created: channel.createdAt,
           Topic: channel.topic || null,

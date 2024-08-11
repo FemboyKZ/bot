@@ -47,7 +47,7 @@ client.on(Events.ChannelCreate, async (channel) => {
       },
       {
         name: "Category",
-        value: `${channel.parent ? logData.Parent : "Unknown"}`,
+        value: `${channel.parentId ? logData.Parent : "Unknown"}`,
         inline: false,
       }
     );
@@ -58,7 +58,7 @@ client.on(Events.ChannelCreate, async (channel) => {
         {
           Name: channel.name,
           Topic: channel.topic,
-          Parent: channel.parent,
+          Parent: channel.parentId,
           Type: channel.type,
         }
       );
@@ -67,7 +67,7 @@ client.on(Events.ChannelCreate, async (channel) => {
         Guild: channel.guild.id,
         Name: channel.name,
         Type: channel.type,
-        Parent: channel.parent,
+        Parent: channel.parentId,
         Channel: channel.id,
       });
     }
@@ -123,7 +123,7 @@ client.on(Events.ChannelDelete, async (channel) => {
       },
       {
         name: "Category",
-        value: `${channel.parent ? logData.Parent : "No Category"}`,
+        value: `${channel.parentId ? logData.Parent : "No Category"}`,
         inline: false,
       }
     );
@@ -173,7 +173,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
         Channel: newChannel.id,
         Name: newChannel.name,
         Type: newChannel.type,
-        Parent: newChannel.parent,
+        Parent: newChannel.parentId,
         Topic: newChannel.topic,
       });
     }
@@ -199,11 +199,11 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
       }
     }
 
-    if (oldChannel.parent !== newChannel.parent) {
+    if (oldChannel.parentId !== newChannel.parentId) {
       embed.addFields({
         name: "Category",
-        value: `\`${oldChannel.parent ? logData.Parent : "none"}\` → \`${
-          newChannel.parent || "none"
+        value: `\`${oldChannel.parentId ? logData.Parent : "none"}\` → \`${
+          newChannel.parentId || "none"
         }\``,
         inline: false,
       });
@@ -211,7 +211,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
           {
-            Parent: newChannel.parent,
+            Parent: newChannel.parentId,
           }
         );
       }
