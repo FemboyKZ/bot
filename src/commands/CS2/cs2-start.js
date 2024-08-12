@@ -98,7 +98,7 @@ module.exports = {
     const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
     // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
     if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
     ) {
       embed.setDescription("You don't have perms to use this command.");

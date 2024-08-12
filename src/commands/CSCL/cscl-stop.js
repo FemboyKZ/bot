@@ -67,7 +67,7 @@ module.exports = {
     const { name, user, id } = server;
 
     if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       !interaction.member.roles.cache.has(`${process.env.CSCL_MANAGER_ROLE}`)
     ) {
       embed.setDescription("You don't have perms to use this command.");

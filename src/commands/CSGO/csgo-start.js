@@ -81,7 +81,7 @@ module.exports = {
     // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
 
     if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       !interaction.member.roles.cache.has(`${process.env.CSGO_MANAGER_ROLE}`)
     ) {
       embed.setDescription("You don't have perms to use this command.");
