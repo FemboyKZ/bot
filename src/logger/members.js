@@ -73,8 +73,8 @@ client.on("ready", async () => {
           Name: newMember.user.username,
           Nickname: newMember.nickname,
           Displayname: newMember.displayName,
-          Avatar: newMember.user.displayAvatarURL({ size: 512 }),
-          Banner: newMember.user.bannerURL({ size: 512 }),
+          Avatar: newMember.user.displayAvatarURL({ size: 128 }),
+          Banner: newMember.user.bannerURL({ size: 128 }),
           Roles: newMember.roles.cache.map((role) => role.id),
           Joined: newMember.joinedAt,
           Created: newMember.user.createdAt,
@@ -203,18 +203,18 @@ client.on("ready", async () => {
             name: `Profile Picture`,
             value: `[Old Pfp](<${
               oldMember.avatarURL({
-                size: 512,
+                size: 128,
               })
                 ? logData.Avatar
-                : oldMember.avatarURL({ size: 512 })
-            }>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`,
+                : oldMember.avatarURL({ size: 128 })
+            }>)  →  [New Pfp](<${newMember.avatarURL({ size: 128 })}>)`,
             inline: false,
           });
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
-              Avatar: newMember.avatarURL({ size: 512 }),
+              Avatar: newMember.avatarURL({ size: 128 }),
             }
           );
         }
@@ -252,18 +252,18 @@ client.on("ready", async () => {
             name: `Profile Picture`,
             value: `[Old Pfp](<${
               oldMember.user.avatarURL({
-                size: 512,
+                size: 128,
               })
                 ? logData.Avatar
-                : oldMember.user.avatarURL({ size: 512 })
-            }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`,
+                : oldMember.user.avatarURL({ size: 128 })
+            }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 128 })}>)`,
             inline: false,
           });
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
-              Avatar: newMember.user.avatarURL({ size: 512 }),
+              Avatar: newMember.user.avatarURL({ size: 128 }),
             }
           );
         }
@@ -300,12 +300,12 @@ client.on("ready", async () => {
             name: `Banner Image`,
             value: `[Old Banner](<${
               oldMember.user.bannerURL({
-                size: 512,
+                size: 128,
               })
                 ? logData.Banner
-                : oldMember.user.bannerURL({ size: 512 })
+                : oldMember.user.bannerURL({ size: 128 })
             }>)  →  [New Banner](<${newMember.user.bannerURL({
-              size: 512,
+              size: 128,
             })}>)`,
             inline: false,
           });
@@ -313,7 +313,7 @@ client.on("ready", async () => {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
-              Banner: newMember.user.bannerURL({ size: 512 }),
+              Banner: newMember.user.bannerURL({ size: 128 }),
             }
           );
         }
@@ -413,8 +413,8 @@ client.on(Events.GuildMemberAdd, async (member) => {
         Name: member.user.username,
         Nickname: member.nickname || member.user.username,
         Displayname: member.displayName,
-        Avatar: member.user.displayAvatarURL({ size: 512 }),
-        Banner: member.user.bannerURL({ size: 512 }),
+        Avatar: member.user.displayAvatarURL({ size: 128 }),
+        Banner: member.user.bannerURL({ size: 128 }),
         Roles: member.roles.cache.map((role) => role.id) || [],
         Joined: member.joinedAt || date,
         Created: member.user.createdAt,
