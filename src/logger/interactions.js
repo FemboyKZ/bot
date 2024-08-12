@@ -28,7 +28,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     .addFields([
       {
         name: "User",
-        value: `${interaction.user.username} / <@${interaction.user.id}>`,
+        value: `<@${interaction.user.id}> - ${interaction.user.username}`,
       },
       {
         name: "Command & User Input",
