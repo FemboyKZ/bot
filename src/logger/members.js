@@ -99,7 +99,7 @@ client.on("ready", async () => {
         }
         if (logData && logData.Avatar) {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 })
+            newMember.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
@@ -108,7 +108,7 @@ client.on("ready", async () => {
           }
         } else {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 }) ||
+            newMember.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           if (settingsData.Post === true) {
@@ -135,7 +135,7 @@ client.on("ready", async () => {
         }
         if (logData && logData.Avatar) {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 })
+            newMember.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
@@ -144,7 +144,7 @@ client.on("ready", async () => {
           }
         } else {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 }) ||
+            newMember.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           if (settingsData.Post === true) {
@@ -171,7 +171,7 @@ client.on("ready", async () => {
         }
         if (logData && logData.Avatar) {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 })
+            newMember.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
@@ -180,7 +180,7 @@ client.on("ready", async () => {
           }
         } else {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 }) ||
+            newMember.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           if (settingsData.Post === true) {
@@ -220,7 +220,7 @@ client.on("ready", async () => {
         }
         if (logData && logData.Avatar) {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 })
+            newMember.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
@@ -229,7 +229,7 @@ client.on("ready", async () => {
           }
         } else {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 }) ||
+            newMember.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           if (settingsData.Post === true) {
@@ -269,7 +269,7 @@ client.on("ready", async () => {
         }
         if (logData && logData.Avatar) {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 })
+            newMember.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
@@ -278,7 +278,7 @@ client.on("ready", async () => {
           }
         } else {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 }) ||
+            newMember.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           if (settingsData.Post === true) {
@@ -319,7 +319,7 @@ client.on("ready", async () => {
         }
         if (logData && logData.Avatar) {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 })
+            newMember.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
@@ -328,7 +328,7 @@ client.on("ready", async () => {
           }
         } else {
           embed.setImage(
-            newMember.user.avatarURL({ size: 256 }) ||
+            newMember.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           if (settingsData.Post === true) {
@@ -432,14 +432,14 @@ client.on(Events.GuildMemberAdd, async (member) => {
         );
         if (logData && logData.Avatar) {
           embed.setImage(
-            member.user.avatarURL({ size: 256 })
+            member.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           await channel.send({ embeds: [embed] });
         } else {
           embed.setImage(
-            member.user.avatarURL({ size: 256 }) ||
+            member.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           await channel.send({ embeds: [embed] });
@@ -460,14 +460,14 @@ client.on(Events.GuildMemberAdd, async (member) => {
         );
         if (logData && logData.Avatar) {
           embed.setImage(
-            member.user.avatarURL({ size: 256 })
+            member.user.avatarURL({ size: 128 })
               ? logData?.Avatar
               : "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           await channel.send({ embeds: [embed] });
         } else {
           embed.setImage(
-            member.user.avatarURL({ size: 256 }) ||
+            member.user.avatarURL({ size: 128 }) ||
               "https://files.femboy.kz/web/images/avatars/unknown.png"
           );
           await channel.send({ embeds: [embed] });
@@ -505,12 +505,7 @@ client.on(Events.GuildMemberRemove, async (member) => {
     .setAuthor({ name: `Member Left` })
     .setFooter({ text: `FKZ • ID: ${member.user.id}` })
     .setTitle(`${member.user.username} has left the server`)
-    .setDescription(`<@${member.user.id}> has left the Server`)
-    .setImage(
-      member.user.avatarURL({ size: 256 })
-        ? logData.Avatar
-        : "https://files.femboy.kz/web/images/avatars/unknown.png"
-    );
+    .setDescription(`<@${member.user.id}> has left the Server`);
 
   try {
     if (logData && settingsData.Store === true) {
@@ -520,7 +515,20 @@ client.on(Events.GuildMemberRemove, async (member) => {
       });
     }
     if (settingsData.Post === true) {
-      await channel.send({ embeds: [embed] });
+      if (logData && logData.Avatar) {
+        embed.setImage(
+          member.user.avatarURL({ size: 128 })
+            ? logData.Avatar
+            : "https://files.femboy.kz/web/images/avatars/unknown.png"
+        );
+        await channel.send({ embeds: [embed] });
+      } else {
+        embed.setImage(
+          member.user.avatarURL({ size: 128 }) ||
+            "https://files.femboy.kz/web/images/avatars/unknown.png"
+        );
+        await channel.send({ embeds: [embed] });
+      }
     }
   } catch (error) {
     console.error(`Error in MemberRemove event:`, error);
