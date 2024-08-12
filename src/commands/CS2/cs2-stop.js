@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  EmbedBuilder,
+} = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
@@ -30,6 +34,12 @@ module.exports = {
   async execute(interaction) {
     const { options } = interaction;
     const servers = options.getString("server");
+
+    const embed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setTitle("FKZ CS2 Stop")
+      .setFooter({ text: `FKZ` });
 
     const server = {
       "cs2-fkz-1": {
@@ -75,11 +85,11 @@ module.exports = {
     }[servers];
 
     if (!server) {
-      await interaction.reply({
-        content: "Unknown server.",
+      embed.setDescription(`Unknown server.`);
+      return await interaction.reply({
+        embeds: [embed],
         ephemeral: true,
       });
-      return;
     }
 
     const { name, user, id } = server;
@@ -88,19 +98,20 @@ module.exports = {
     const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
     // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
     if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
       !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
     ) {
-      await interaction.reply({
-        content: "You don't have perms to use this command.",
+      embed.setDescription("You don't have perms to use this command.");
+      return await interaction.reply({
+        embeds: [embed],
         ephemeral: true,
       });
-      return;
     }
 
     try {
+      embed.setDescription(`Stopping: ${name}`);
       await interaction.reply({
-        content: `Stopping: ${name}`,
+        embeds: [embed],
         ephemeral: true,
       });
       if (id !== null) {
@@ -118,13 +129,15 @@ module.exports = {
           //if (stderr) console.log(stderr);
           //if (stdout) console.log(stdout);
           if (stdout.includes(`"on":false`)) {
+            embed.setDescription(`Stopped: ${name}`);
             return await interaction.editReply({
-              content: `Stopped: ${name}`,
+              cembeds: [embed],
               ephemeral: true,
             });
           } else {
+            embed.setDescription(`(Probably) Stopped: ${name}`);
             return await interaction.editReply({
-              content: `(Probably) Stopped: ${name}`,
+              embeds: [embed],
               ephemeral: true,
             });
           }
@@ -139,18 +152,17 @@ module.exports = {
           }
         );
         await wait(3000);
+        embed.setDescription(`Stopped: ${name}`);
         return await interaction.editReply({
-          content: `Stopped: ${name}`,
+          embeds: [embed],
           ephemeral: true,
         });
       }
     } catch (error) {
-      if (interaction) {
-        await interaction.editReply({
-          content: `Error: ${error}`,
-          ephemeral: true,
-        });
-      }
+      await interaction.reply({
+        content: `Error: ${error}`,
+        ephemeral: true,
+      });
     }
   },
 };
