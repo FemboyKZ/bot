@@ -390,11 +390,6 @@ client.on(Events.GuildMemberAdd, async (member) => {
     .setTimestamp()
     .setTitle(`${member.user.username} Has Joined the Server!`)
     .setAuthor({ name: `Member Joined` })
-    .setImage(
-      member.user.avatarURL({ size: 256 })
-        ? logData.Avatar
-        : "https://files.femboy.kz/web/images/avatars/unknown.png"
-    )
     .setFooter({ text: `FKZ • ID: ${member.user.id}` });
 
   try {
