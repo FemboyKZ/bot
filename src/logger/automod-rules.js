@@ -136,7 +136,7 @@ client.on(Events.AutoModerationRuleDelete, async (rule) => {
 
 client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
   const settingsData = await settings.findOne({
-    Guild: rule.guild.id,
+    Guild: newRule.guild.id,
   });
   if (settingsData.Automod === false) return;
   if (settingsData.Store === false && settingsData.Post === false) return;
