@@ -56,6 +56,14 @@ module.exports = {
       },
     }[servers];
 
+    if (!server) {
+      embed.setDescription(`Unknown server.`);
+      return await interaction.reply({
+        embeds: [embed],
+        ephemeral: true,
+      });
+    }
+
     const { name, user, id } = server;
 
     if (
