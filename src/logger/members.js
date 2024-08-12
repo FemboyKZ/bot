@@ -63,12 +63,7 @@ client.on("ready", async () => {
         name: "User",
         value: `<@${newMember.user.id}> - ${newMember.user.username}`,
         inline: false,
-      })
-      .setImage(
-        newMember.user.avatarURL({ size: 256 })
-          ? logData.Avatar
-          : "https://files.femboy.kz/web/images/avatars/unknown.png"
-      );
+      });
 
     try {
       if (!logData && settingsData.Store === true) {
@@ -102,8 +97,23 @@ client.on("ready", async () => {
             }
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+        } else {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
         }
       }
 
@@ -123,8 +133,23 @@ client.on("ready", async () => {
             }
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+        } else {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
         }
       }
 
@@ -144,8 +169,23 @@ client.on("ready", async () => {
             }
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+        } else {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
         }
       }
 
@@ -178,8 +218,23 @@ client.on("ready", async () => {
             }
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+        } else {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
         }
       }
       */
@@ -212,8 +267,23 @@ client.on("ready", async () => {
             }
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+        } else {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
         }
       }
 
@@ -247,8 +317,23 @@ client.on("ready", async () => {
             }
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
+        } else {
+          embed.setImage(
+            newMember.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
         }
       }
 
@@ -350,7 +435,20 @@ client.on(Events.GuildMemberAdd, async (member) => {
             inline: false,
           }
         );
-        await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            member.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          await channel.send({ embeds: [embed] });
+        } else {
+          embed.setImage(
+            member.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          await channel.send({ embeds: [embed] });
+        }
       } else {
         const inviter = await client.users.fetch(invite.inviter.id);
         embed.addFields(
@@ -365,7 +463,20 @@ client.on(Events.GuildMemberAdd, async (member) => {
             inline: false,
           }
         );
-        await channel.send({ embeds: [embed] });
+        if (logData && logData.Avatar) {
+          embed.setImage(
+            member.user.avatarURL({ size: 256 })
+              ? logData?.Avatar
+              : "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          await channel.send({ embeds: [embed] });
+        } else {
+          embed.setImage(
+            member.user.avatarURL({ size: 256 }) ||
+              "https://files.femboy.kz/web/images/avatars/unknown.png"
+          );
+          await channel.send({ embeds: [embed] });
+        }
       }
     }
   } catch (error) {
