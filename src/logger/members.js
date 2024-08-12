@@ -399,7 +399,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 
   try {
     if (inviteData && settingsData.Store === true) {
-      await invites.findOneAndUpdate(
+      await inviteLogs.findOneAndUpdate(
         { Guild: member.guild.id, Invite: invite.code },
         {
           Uses: invite.uses,
