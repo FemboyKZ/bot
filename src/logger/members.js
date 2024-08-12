@@ -553,12 +553,7 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: `FKZ • ID: ${newMember.user.id}` })
-    .setTitle("Member Updated")
-    .setImage(
-      newMember.user.avatarURL({ size: 256 })
-        ? logData.Avatar
-        : "https://files.femboy.kz/web/images/avatars/unknown.png"
-    );
+    .setTitle("Member Updated");
 
   try {
     if (oldMember.roles.cache.size > newMember.roles.cache.size) {
@@ -576,7 +571,20 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
               inline: false,
             }
           );
-          channel.send({ embeds: [embed] });
+          if (logData && logData.Avatar) {
+            embed.setImage(
+              newMember.user.avatarURL({ size: 128 })
+                ? logData.Avatar
+                : "https://files.femboy.kz/web/images/avatars/unknown.png"
+            );
+            channel.send({ embeds: [embed] });
+          } else {
+            embed.setImage(
+              newMember.user.avatarURL({ size: 128 }) ||
+                "https://files.femboy.kz/web/images/avatars/unknown.png"
+            );
+            channel.send({ embeds: [embed] });
+          }
         }
       });
     }
@@ -595,7 +603,20 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
               inline: false,
             }
           );
-          channel.send({ embeds: [embed] });
+          if (logData && logData.Avatar) {
+            embed.setImage(
+              newMember.user.avatarURL({ size: 128 })
+                ? logData.Avatar
+                : "https://files.femboy.kz/web/images/avatars/unknown.png"
+            );
+            channel.send({ embeds: [embed] });
+          } else {
+            embed.setImage(
+              newMember.user.avatarURL({ size: 128 }) ||
+                "https://files.femboy.kz/web/images/avatars/unknown.png"
+            );
+            channel.send({ embeds: [embed] });
+          }
         }
       });
     }
