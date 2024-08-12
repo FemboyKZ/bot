@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  EmbedBuilder,
+} = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
@@ -27,6 +31,12 @@ module.exports = {
   async execute(interaction) {
     const { options } = interaction;
     const servers = options.getString("server");
+
+    const embed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setTitle("FKZ CS:GO Restart")
+      .setFooter({ text: `FKZ` });
 
     const server = {
       "csgo-fkz-1": {
@@ -57,11 +67,11 @@ module.exports = {
     }[servers];
 
     if (!server) {
-      await interaction.reply({
-        content: "Unknown server.",
+      embed.setDescription(`Unknown server.`);
+      return await interaction.reply({
+        embeds: [embed],
         ephemeral: true,
       });
-      return;
     }
 
     const { name, user, id } = server;
@@ -71,19 +81,20 @@ module.exports = {
     // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
 
     if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
-      !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+      !interaction.member.roles.cache.has(`${process.env.CSGO_MANAGER_ROLE}`)
     ) {
-      await interaction.reply({
-        content: "You don't have perms to use this command.",
+      embed.setDescription("You don't have perms to use this command.");
+      return await interaction.reply({
+        embeds: [embed],
         ephemeral: true,
       });
-      return;
     }
 
     try {
+      embed.setDescription(`Restarting: ${name}`);
       await interaction.reply({
-        content: `Restarting: ${name}`,
+        embeds: [embed],
         ephemeral: true,
       });
       if (id !== null) {
@@ -110,13 +121,15 @@ module.exports = {
           //if (stderr) console.log(stderr);
           //if (stdout) console.log(stdout);
           if (stdout.includes(`"on":true`)) {
-            return await interaction.editReply({
-              content: `Restarted: ${name}`,
+            embed.setDescription(`Restarted: ${name}`);
+            await interaction.editReply({
+              embeds: [embed],
               ephemeral: true,
             });
           } else {
+            embed.setDescription(`(Probably) Restarted: ${name}`);
             return await interaction.editReply({
-              content: `(Probably) Restarted: ${name}`,
+              embed: embed,
               ephemeral: true,
             });
           }
@@ -131,13 +144,14 @@ module.exports = {
           }
         );
         await wait(3000);
+        embed.setDescription(`Restarted: ${name}`);
         await interaction.editReply({
-          content: `Restarted: ${name}`,
+          embeds: [embed],
           ephemeral: true,
         });
       }
     } catch (error) {
-      await interaction.editReply({
+      await interaction.reply({
         content: `Error: ${error}`,
         ephemeral: true,
       });
