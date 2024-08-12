@@ -168,6 +168,8 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   if (oldMessage.author === client.user || newMessage.author === client.user)
     return;
 
+  if (oldMessage.content === newMessage.content) return;
+
   const data = await schema.findOne({
     Guild: newMessage.guild.id,
     ID: "audit-logs",
