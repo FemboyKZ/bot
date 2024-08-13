@@ -61,7 +61,7 @@ client.on("ready", async () => {
       .addFields({
         name: "User",
         value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
-        inline: true,
+        inline: false,
       });
 
     if (logData && logData.Avatar) {
@@ -187,10 +187,11 @@ client.on("ready", async () => {
               Avatar: newMember.avatarURL({ size: 128 }),
             }
           );
-          if (settingsData.Post === true) {
-            await channel.send({ embeds: [embed] });
-          }
         }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
+      }
       */
 
       if (oldMember.user.avatar !== newMember.user.avatar) {
@@ -361,6 +362,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
             inline: false,
           }
         );
+        await channel.send({ embeds: [embed] });
       } else {
         const inviter = await client.users.fetch(invite.inviter.id);
         embed.addFields(
@@ -375,8 +377,8 @@ client.on(Events.GuildMemberAdd, async (member) => {
             inline: false,
           }
         );
+        await channel.send({ embeds: [embed] });
       }
-      await channel.send({ embeds: [embed] });
     }
   } catch (error) {
     console.error("Error in MemberAdd event:", error);
@@ -407,12 +409,8 @@ client.on(Events.GuildMemberRemove, async (member) => {
     .setColor("#ff00b3")
     .setTimestamp()
     .setFooter({ text: `FKZ • ID: ${member.user.id}` })
-    .setTitle(`${member.user.username} has left the Server`)
-    .addFields({
-      name: "User",
-      value: `<@${member.user.id}> - \`${member.user.username}\``,
-      inline: true,
-    });
+    .setTitle(`${member.user.username} has left the server`)
+    .setDescription(`<@${member.user.id}> has left the Server`);
 
   if (logData && logData.Avatar) {
     embed.setAuthor({
@@ -489,8 +487,8 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
               inline: false,
             }
           );
+          channel.send({ embeds: [embed] });
         }
-        channel.send({ embeds: [embed] });
       });
     }
     if (oldMember.roles.cache.size < newMember.roles.cache.size) {
@@ -508,8 +506,8 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
               inline: false,
             }
           );
+          channel.send({ embeds: [embed] });
         }
-        channel.send({ embeds: [embed] });
       });
     }
   } catch (err) {
