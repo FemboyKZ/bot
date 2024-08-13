@@ -112,6 +112,9 @@ client.on("ready", async () => {
             }
           );
         }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
       }
 
       if (oldMember.displayName !== newMember.displayName) {
@@ -130,6 +133,9 @@ client.on("ready", async () => {
             }
           );
         }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
       }
 
       if (oldMember.user.username !== newMember.user.username) {
@@ -147,6 +153,9 @@ client.on("ready", async () => {
               Name: newMember.user.username,
             }
           );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
 
@@ -178,6 +187,9 @@ client.on("ready", async () => {
               Avatar: newMember.avatarURL({ size: 128 }),
             }
           );
+          if (settingsData.Post === true) {
+            await channel.send({ embeds: [embed] });
+          }
         }
       */
 
@@ -208,6 +220,9 @@ client.on("ready", async () => {
               Avatar: newMember.user.avatarURL({ size: 128 }),
             }
           );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
 
@@ -241,6 +256,9 @@ client.on("ready", async () => {
             }
           );
         }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
       }
 
       if (oldMember.roles.cache.size !== newMember.roles.cache.size) {
@@ -252,10 +270,6 @@ client.on("ready", async () => {
             }
           );
         }
-      }
-
-      if (settingsData.Post === true && embed.data().fields.length !== 1) {
-        await channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.error("Error in MemberUpdate event:", error);
