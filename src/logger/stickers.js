@@ -1,114 +1,227 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
+const logs = require("../Schemas/logger/stickers.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
-client.on(Events.GuildStickerCreate, async (sticker) => {
-  try {
-    const data = await Audit_Log.findOne({ Guild: sticker.guild.id });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    let image =
-      sticker.imageURL({ size: 64 }) || "https://femboy.kz/images/wide.png";
+// guild is commented cuz it can be null and it will throw an error, so it will only work on fkz rn.
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setImage(image)
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Sticker Added")
-      .addFields(
-        {
-          name: "Name:",
-          value: `${sticker.name}`,
-          inline: false,
-        },
-        {
-          name: "Description:",
-          value: `${sticker.description || "none"}`,
-          inline: false,
-        },
-        {
-          name: "Format:",
-          value: `${sticker.format || "none"}`,
-          inline: false,
-        },
-        {
-          name: "ID:",
-          value: `${sticker.id}`,
-          inline: false,
-        }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
+client.on(Events.GuildStickerCreate, async (sticker) => {
+  const settingsData = await settings.findOne({
+    Guild: sticker.guild.id,
+  });
+  if (settingsData.Stickers === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    //Guild: sticker.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    //Guild: sticker.guild.id,
+    Sticker: sticker.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: `FKZ • ID: ${sticker.id}` })
+    .setTitle("Sticker Created")
+    .addFields(
+      {
+        name: "Name",
+        value: `${sticker.name}`,
+        inline: false,
+      },
+      {
+        name: "Description",
+        value: `${sticker.description ? logData.Description : "none"}`,
+        inline: false,
+      },
+      {
+        name: "Format",
+        value: `${sticker.format}`,
+        inline: false,
+      }
+    );
+  try {
+    if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: sticker.guild.id,
+        Sticker: sticker.id,
+        Name: sticker.name,
+        Description: sticker.description,
+        Created: sticker.createdAt,
+        Available: sticker.available,
+      });
+    }
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error in StickerCreate event:", error);
   }
 });
 
 client.on(Events.GuildStickerDelete, async (sticker) => {
-  try {
-    const data = await Audit_Log.findOne({ Guild: sticker.guild.id });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    let image =
-      sticker.url({ size: 128 }) || "https://femboy.kz/images/wide.png";
+  const settingsData = await settings.findOne({
+    Guild: sticker.guild.id,
+  });
+  if (settingsData.Stickers === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setImage(image)
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Sticker Deleted")
-      .addFields(
-        { name: "Name:", value: `${sticker.name}`, inline: false },
-        { name: "ID:", value: `${sticker.id}`, inline: false }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
+  const data = await schema.findOne({
+    //Guild: sticker.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    //Guild: sticker.guild.id,
+    Sticker: sticker.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: `FKZ • ID: ${sticker.id}` })
+    .setTitle("Sticker Deleted")
+    .addFields(
+      { name: "Name", value: `${sticker.name}`, inline: false },
+      {
+        name: "Created",
+        value: `${sticker.createdAt}`,
+        inline: false,
+      }
+    );
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.deleteMany({
+        Guild: sticker.guild.id,
+        Sticker: sticker.id,
+      });
+    }
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error in StickerDelete event:", error);
   }
 });
 
 client.on(Events.GuildStickerUpdate, async (oldSticker, newSticker) => {
+  const settingsData = await settings.findOne({
+    Guild: newSticker.guild.id,
+  });
+  if (settingsData.Stickers === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    //Guild: newSticker.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    //Guild: newSticker.guild.id,
+    Sticker: newSticker.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: `FKZ • ID: ${newSticker.id}` })
+    .setTitle("Sticker Edited");
+
   try {
-    const data = await Audit_Log.findOne({ Guild: newSticker.guild.id });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    const changes = [];
+    if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: newSticker.guild.id,
+        Sticker: newSticker.id,
+        Name: newSticker.name,
+        Description: newSticker.description,
+        Created: newSticker.createdAt,
+        Available: newSticker.available,
+      });
+    }
 
     if (oldSticker.name !== newSticker.name) {
-      changes.push(`Name: \`${oldSticker.name}\` → \`${newSticker.name}\``);
+      embed.addFields({
+        name: "Name",
+        value: `\`${oldSticker.name}\` → \`${newSticker.name}\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          {
+            Guild: newSticker.guild.id,
+            Sticker: newSticker.id,
+          },
+          {
+            Name: newSticker.name,
+          }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
+
     if (oldSticker.description !== newSticker.description) {
-      changes.push(
-        `Description: \`${oldSticker.description || "None"}\` → \`${
-          newSticker.description || "None"
-        }\``
-      );
+      embed.addFields({
+        name: "Description",
+        value: `\`${
+          oldSticker.description ? logData.Description : "none"
+        }\` → \`${newSticker.description || "none"}\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          {
+            Guild: newSticker.guild.id,
+            Sticker: newSticker.id,
+          },
+          {
+            Description: newSticker.description,
+          }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
     }
 
-    if (changes.length === 0) return;
-    const changesText = changes.join("\n");
-    let image =
-      newSticker.url({ size: 128 }) || "https://femboy.kz/images/wide.png";
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setImage(image)
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Sticker Edited")
-      .addFields(
-        { name: "Changes:", value: `${changesText}`, inline: false },
-        { name: "ID:", value: `${newSticker.id}`, inline: false }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    if (oldSticker.available !== newSticker.available) {
+      embed.addFields({
+        name: "Available",
+        value: `\`${oldSticker.available}\` → \`${newSticker.available}\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          {
+            Guild: newSticker.guild.id,
+            Sticker: newSticker.id,
+          },
+          {
+            Available: newSticker.available,
+          }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error in StickerUpdate event:", error);
   }
 });

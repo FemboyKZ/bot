@@ -1,6 +1,6 @@
 const { model, Schema } = require("mongoose");
 
-let vipStatusSchema = new Schema({
+let vipStatus = new Schema({
   Claimer: String,
   Status: Boolean,
   Type: String,
@@ -9,4 +9,4 @@ let vipStatusSchema = new Schema({
   Date: Date,
 });
 
-module.exports = model("vipStatusSchema", vipStatusSchema);
+module.exports = model("vipStatus", vipStatus);

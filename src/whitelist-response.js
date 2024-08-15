@@ -1,5 +1,5 @@
 const { PermissionFlagsBits, Events } = require("discord.js");
-const whitelistStatus = require("./Schemas/whitelistStatus.js");
+const schema = require("./Schemas/request-status.js");
 const { client } = require("./index.js");
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
@@ -11,8 +11,9 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (!member.permissions.has(PermissionFlagsBits.Administrator)) return;
 
   try {
-    const data = await whitelistStatus.findOne({
-      Request: user.id,
+    const data = await schema.findOne({
+      User: user.id,
+      Type: "Whitelist",
     });
     if (!data) return;
     const guild = reaction.message.guild;
@@ -23,15 +24,15 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
       (role) => role.name === "Wannabe Fem"
     );
     if (reaction.emoji.name === "👍") {
-      await whitelistStatus.findOneAndUpdate(
-        { Request: user.id },
+      await schema.findOneAndUpdate(
+        { User: user.id, Type: "Whitelist" },
         { Status: true }
       );
       if (!role) await member.roles.add(role);
       if (oldRole) await member.roles.remove(oldRole);
     } else if (reaction.emoji.name === "👎") {
-      await whitelistStatus.findOneAndUpdate(
-        { Request: user.id },
+      await schema.findOneAndUpdate(
+        { User: user.id, Type: "Whitelist" },
         { Status: false }
       );
     } else {

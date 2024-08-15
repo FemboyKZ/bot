@@ -5,7 +5,7 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const reportSchema = require("../../Schemas/reports");
+const schema = require("../../Schemas/base-system.js");
 
 var timeout = [];
 
@@ -31,7 +31,10 @@ module.exports = {
     }
 
     try {
-      const data = await reportSchema.findOne({ Guild: interaction.guild.id });
+      const data = await schema.findOne({
+        Guild: interaction.guild.id,
+        ID: "report",
+      });
       if (!data) {
         await interaction.reply({
           content: "The reports/suggestions are currently disabled.",

@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const linkSchema = require("../../Schemas/anti-link");
+const schema = require("../../Schemas/moderation/anti-link.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -78,7 +78,7 @@ module.exports = {
       case "setup":
         const permissions = options.getString("permissions");
 
-        const Data = await linkSchema.findOne({ Guild: interaction.guild.id });
+        const Data = await schema.findOne({ Guild: interaction.guild.id });
 
         if (Data)
           return await interaction.reply({
@@ -87,7 +87,7 @@ module.exports = {
           });
 
         if (!Data) {
-          linkSchema.create({
+          schema.create({
             Guild: interaction.guild.id,
             Perms: permissions,
           });
@@ -104,7 +104,7 @@ module.exports = {
 
     switch (sub) {
       case "disable":
-        await linkSchema.deleteMany();
+        await schema.deleteMany();
 
         const embed2 = new EmbedBuilder()
           .setColor("#ff00b3")
@@ -115,7 +115,7 @@ module.exports = {
 
     switch (sub) {
       case "check":
-        const Data = await linkSchema.findOne({ Guild: interaction.guild.id });
+        const Data = await schema.findOne({ Guild: interaction.guild.id });
         if (!Data)
           return await interaction.reply({
             content: "The anti-link system has not been setup.",
@@ -137,7 +137,7 @@ module.exports = {
 
     switch (sub) {
       case "edit":
-        const Data = await linkSchema.findOne({ Guild: interaction.guild.id });
+        const Data = await schema.findOne({ Guild: interaction.guild.id });
         const permissions = options.getString("permissions");
 
         if (!Data)
@@ -146,9 +146,9 @@ module.exports = {
             ephemeral: true,
           });
         else {
-          await linkSchema.deleteMany();
+          await schema.deleteMany();
 
-          await linkSchema.create({
+          await schema.create({
             Guild: interaction.guild.id,
             Perms: permissions,
           });

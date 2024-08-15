@@ -1,49 +1,44 @@
 const { EmbedBuilder, Events } = require("discord.js");
-require("dotenv").config();
+const schema = require("../Schemas/base-system.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
-// doesn't have an enable/disable command and only runs on fkz server cuz lazy lol
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction) return;
+  const settingsData = await settings.findOne({
+    Guild: interaction.guild.id,
+  });
+  if (settingsData.Interactions === false) return;
+  if (settingsData.Post === false) return;
+
   if (!interaction.isChatInputCommand()) return;
-  else {
-    const channel = await client.channels.cache.get(process.env.LOGS_CHAT_ID);
-    if (!channel) return;
 
-    const server = interaction.guild?.name;
-    const serverID = interaction.guild?.id;
-    const user = interaction.user?.username;
-    const userID = interaction.user?.id;
+  const data = await schema.findOne({
+    Guild: interaction.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
 
-    if (!server || !serverID || !user || !userID) {
-      console.error("Null or undefined value encountered");
-      return;
-    }
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTitle("Chat Command Executed.")
+    .setFooter({ text: `FKZ` })
+    .setTimestamp()
+    .addFields([
+      {
+        name: "User",
+        value: `<@${interaction.user.id}> - ${interaction.user.username}`,
+      },
+      {
+        name: "Command & User Input",
+        value: `\`${interaction}\``,
+      },
+    ]);
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTitle("Chat Command Executed.")
-      .setFooter({ text: `FKZ • ${serverID}` })
-      .setTimestamp()
-      .addFields([
-        {
-          name: "Channel",
-          value: `${iChannel} / <#${iChannelID}>`,
-        },
-        {
-          name: "User",
-          value: `${user} / <@${userID}>`,
-        },
-        {
-          name: "Command & User Input",
-          value: `\`${interaction}\``,
-        },
-      ]);
-
-    try {
-      await channel.send({ embeds: [embed] });
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+  try {
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.error("Error sending message:", error);
   }
 });

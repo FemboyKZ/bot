@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const ticketSchema = require("../../Schemas/tickets");
+const schema = require("../../Schemas/moderation/tickets.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,7 +16,7 @@ module.exports = {
     }
 
     try {
-      await ticketSchema.deleteMany({ Guild: interaction.guild.id });
+      await schema.deleteMany({ Guild: interaction.guild.id });
       await interaction.reply({
         content: `The tickets system has been disabled`,
         ephemeral: true,

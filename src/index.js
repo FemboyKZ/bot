@@ -45,6 +45,10 @@ process.on("unhandledRejection", (reason, promise) => {
   console.log("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
+client.on("error", (error) => {
+  console.error("Error occurred:", error);
+});
+
 require("dotenv").config();
 
 require("./anti-link.js");
@@ -67,7 +71,6 @@ require("./logger/messages.js");
 require("./logger/roles.js");
 require("./logger/stickers.js");
 require("./logger/threads.js");
-require("./logger/users.js");
 
 const functions = fs
   .readdirSync("./src/functions")

@@ -5,7 +5,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const mcWhitelistSchema = require("../../Schemas/mcWhitelist");
+const schema = require("../../Schemas/base-system.js");
+const status = require("../../Schemas/request-status.js");
 
 var timeout = [];
 
@@ -26,8 +27,36 @@ module.exports = {
     }
 
     try {
-      const data = await mcWhitelistSchema.findOne({
+      const statusData = await status.findOne({
+        User: interaction.user.id,
+        Type: "mc-whitelist",
+      });
+
+      if (statusData.Status === false) {
+        return await interaction.reply({
+          content:
+            "Unfortunately your whitelist request has been denied, you will not be whitelisted.",
+          ephemeral: true,
+        });
+      }
+
+      if (statusData.Status === true) {
+        return await interaction.reply({
+          content: "You have already been whitelisted.",
+          ephemeral: true,
+        });
+      }
+
+      if (statusData.Status === null) {
+        return await interaction.reply({
+          content: "You have already requested, please check again later.",
+          ephemeral: true,
+        });
+      }
+
+      const data = await schema.findOne({
         Guild: interaction.guild.id,
+        ID: "mc-whitelist",
       });
       if (!data) {
         return await interaction.reply({

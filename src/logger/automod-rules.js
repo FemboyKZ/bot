@@ -1,162 +1,259 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
+const logs = require("../Schemas/logger/automod.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
-client.on(Events.AutoModerationRuleCreate, async (autoModerationRule) => {
+client.on(Events.AutoModerationRuleCreate, async (rule) => {
+  const settingsData = await settings.findOne({
+    Guild: rule.guild.id,
+  });
+  if (settingsData.Automod === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    Guild: rule.guild?.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    Guild: rule.guild.id,
+    Rule: rule.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle("Automod Rule Created")
+    .setFooter({ text: `FKZ • ID: ${rule.id}` })
+    .addFields(
+      {
+        name: "Creator",
+        value: `<@${rule.creatorId}>`,
+        inline: false,
+      },
+      {
+        name: "Name",
+        value: rule.name ? logData.Name : "None",
+        inline: false,
+      },
+      {
+        name: "Trigger",
+        value: rule.triggerType ? logData.Trigger : "None",
+        inline: false,
+      },
+      {
+        name: "Actions",
+        value: rule.actions[0].type ? logData.Action : "None",
+        inline: false,
+      }
+    );
+
   try {
-    const data = await Audit_Log.findOne({
-      Guild: autoModerationRule.guild?.id,
-    });
-    if (!data) return;
-
-    const logID = data.Channel;
-    if (!logID) return;
-
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-
-    let actions = JSON.stringify(autoModerationRule.actions);
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Automod Rule Created")
-      .addFields(
-        {
-          name: "Creator:",
-          value: `<@${autoModerationRule.creatorId}>`,
-          inline: false,
-        },
-        {
-          name: "Name:",
-          value: autoModerationRule.name || "none",
-          inline: false,
-        },
-        {
-          name: "Actions:",
-          value: actions,
-          inline: false,
-        }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
-  } catch (error) {
-    console.error("Error in AutoModerationRuleCreate event:", error);
-  }
-});
-
-client.on(Events.AutoModerationRuleDelete, async (autoModerationRule) => {
-  try {
-    const data = await Audit_Log.findOne({
-      Guild: autoModerationRule.guild.id,
-    });
-    if (!data) return;
-
-    let logID = data.Channel;
-    if (!logID) return;
-
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-
-    let actions = JSON.stringify(autoModerationRule.actions);
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Automod Rule Deleted")
-      .addFields(
-        {
-          name: "Creator:",
-          value: `<@${autoModerationRule.creatorId}>`,
-          inline: false,
-        },
-        {
-          name: "Name:",
-          value: `${autoModerationRule.name}`,
-          inline: false,
-        },
-        {
-          name: "Actions:",
-          value: `${actions}`,
-          inline: false,
-        }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
-  } catch (error) {
-    console.error("Error in AutoModerationRuleDelete event:", error);
-  }
-});
-
-client.on(
-  Events.AutoModerationRuleUpdate,
-  async (oldAutoModerationRule, newAutoModerationRule) => {
-    try {
-      const data = await Audit_Log.findOne({
-        Guild: newAutoModerationRule.guild.id,
+    if (!logData && settingsData.Store) {
+      await logs.create({
+        Guild: rule.guild.id,
+        Name: rule.name,
+        Rule: rule.id,
+        User: rule.creatorId,
+        Trigger: rule.triggerType,
+        Action: rule.actions[0].type,
+        Enabled: rule.enabled,
       });
-      if (!data) return;
-
-      const logID = data.Channel;
-      if (!logID) return;
-
-      const auditChannel = client.channels.cache.get(logID);
-      if (!auditChannel) return;
-
-      const changes = [];
-
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Automod Rule Updated");
-
-      if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
-        changes.push(
-          `Name: \`${oldAutoModerationRule.name || "None"}\`  →  \`${
-            newAutoModerationRule.name || "None"
-          }\``
-        );
-        const changesText = changes.join("\n");
-        auditEmbed.addFields({
-          name: "Name Updated.",
-          value: changesText,
-        });
-        await auditChannel.send({ embeds: [auditEmbed] });
-      }
-
-      if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
-        let oldActions =
-          JSON.stringify(oldAutoModerationRule.actions) || "none";
-        let newActions =
-          JSON.stringify(newAutoModerationRule.actions) || "none";
-        auditEmbed.addFields(
-          {
-            name: "Old Rules:",
-            value: oldActions,
-            inline: false,
-          },
-          {
-            name: "New Rules:",
-            value: newActions,
-            inline: false,
-          }
-        );
-        await auditChannel.send({ embeds: [auditEmbed] });
-      }
-
-      if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
-        auditEmbed.addFields({
-          name: "Enabled?:",
-          value: `\`${oldAutoModerationRule.enabled || "Unknown"}\`  →  \`${
-            newAutoModerationRule.enabled || "Unknown"
-          }\``,
-          inline: false,
-        });
-        await auditChannel.send({ embeds: [auditEmbed] });
-      }
-    } catch (error) {
-      console.error(error);
     }
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.error("Error in AutoModRuleCreate event:", error);
   }
-);
+});
+
+client.on(Events.AutoModerationRuleDelete, async (rule) => {
+  const settingsData = await settings.findOne({
+    Guild: rule.guild.id,
+  });
+  if (settingsData.Automod === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    Guild: rule.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    Guild: rule.guild.id,
+    Rule: rule.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle("Automod Rule Deleted")
+    .setFooter({ text: `FKZ • ID: ${rule.id}` })
+    .addFields(
+      {
+        name: "Creator",
+        value: `<@${rule.creatorId}>`,
+        inline: false,
+      },
+      {
+        name: "Name",
+        value: rule.name ? logData.Name : "None",
+        inline: false,
+      },
+      {
+        name: "Trigger",
+        value: rule.triggerType ? logData.Trigger : "None",
+        inline: false,
+      },
+      {
+        name: "Actions",
+        value: rule.actions[0].type ? logData.Action : "None",
+        inline: false,
+      }
+    );
+
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.deleteMany({ Guild: rule.guild?.id, Rule: rule.id });
+    }
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.error("Error in AutoModRuleDelete event:", error);
+  }
+});
+
+client.on(Events.AutoModerationRuleUpdate, async (oldRule, newRule) => {
+  const settingsData = await settings.findOne({
+    Guild: newRule.guild.id,
+  });
+  if (settingsData.Automod === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    Guild: newRule.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle("Automod Rule Updated")
+    .setFooter({ text: `FKZ • ID: ${newRule.id}` });
+
+  const logData = await logs.findOne({
+    Guild: newRule.guild.id,
+    Rule: newRule.id,
+  });
+
+  try {
+    if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: newRule.guild.id,
+        Name: newRule.name,
+        Rule: newRule.id,
+        User: newRule.creatorId,
+        Trigger: newRule.triggerType,
+        Action: newRule.actions[0].type,
+        Enabled: newRule.enabled,
+      });
+    }
+
+    if (oldRule.name !== newRule.name) {
+      embed.addFields({
+        name: "Name",
+        value: `\`${oldRule.name ? logData.Name : "None"}\`  →  \`${
+          newRule.name || "None"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Name: newRule.name }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+    }
+
+    if (oldRule.actions !== newRule.actions) {
+      embed.addFields(
+        {
+          name: "Old Rules",
+          value: oldRule.actions[0].type ? logData.Action : "None",
+          inline: false,
+        },
+        {
+          name: "New Rules",
+          value: newRule.actions[0].type || "None",
+          inline: false,
+        }
+      );
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Action: newRule.actions[0].type }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+    }
+
+    if (oldRule.enabled !== newRule.enabled) {
+      embed.addFields({
+        name: "Enabled?",
+        value: `\`${oldRule.enabled ? logData.Enabled : "Unknown"}\`  →  \`${
+          newRule.enabled || "Unknown"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Enabled: newRule.enabled }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+    }
+
+    if (oldRule.triggerType !== newRule.triggerType) {
+      embed.addFields({
+        name: "Trigger",
+        value: `\`${oldRule.triggerType ? logData.Trigger : "None"}\`  →  \`${
+          newRule.triggerType || "None"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newRule.guild?.id, Rule: newRule.id },
+          { Trigger: newRule.triggerType }
+        );
+      }
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+    }
+  } catch (error) {
+    console.error("Error in AutoModRuleUpdate event:", error);
+  }
+});
