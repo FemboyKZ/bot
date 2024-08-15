@@ -1,11 +1,13 @@
 const {
   EmbedBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
   Collection,
   Events,
 } = require("discord.js");
 require("dotenv").config();
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
+const logs = require("../Schemas/logger/members.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 const invites = new Collection();
@@ -17,8 +19,7 @@ client.on("ready", async () => {
   client.guilds.cache.forEach(async (guild) => {
     const clientMember = guild.members.cache.get(client.user.id);
 
-    if (!clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild))
-      return;
+    if (!clientMember.permissions.has(PermissionFlagsBits.ManageGuild)) return;
 
     const firstInvites = await guild.invites.fetch().catch((err) => {
       console.log(err);
@@ -30,279 +31,486 @@ client.on("ready", async () => {
     );
   });
 
+  // guild is commented cuz it can be null and it will throw an error, so it will only work on fkz rn.
+
   client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
-    try {
-      const data = await Audit_Log.findOne({
-        Guild: oldMember.guild.id,
+    const settingsData = await settings.findOne({
+      Guild: newMember.guild.id,
+    });
+    if (settingsData.Members === false) return;
+    if (settingsData.Store === false && settingsData.Post === false) return;
+
+    const data = await schema.findOne({
+      //Guild: oldMember.guild.id,
+      ID: "audit-logs",
+    });
+    if (!data || !data.Channel) return;
+    const channel = client.channels.cache.get(data.Channel);
+    if (!channel) return;
+
+    const logData = await logs.findOne({
+      //Guild: oldMember.guild.id,
+      User: oldMember.user.id,
+    });
+
+    const embed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setFooter({ text: `FKZ • ID: ${newMember.user.id}` })
+      .setTitle("Member Updated")
+      .addFields({
+        name: "User",
+        value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
+        inline: false,
       });
-      if (!data) return;
 
-      const logID = data.Channel;
-      const logsChatID = await client.channels.fetch(process.env.LOGS_CHAT_ID);
+    if (logData && logData.Avatar) {
+      embed.setAuthor({
+        name: `${newMember.user.username} has updated their profile`,
+        iconURL: newMember.user.avatarURL({ size: 256 })
+          ? logData.Avatar
+          : "https://files.femboy.kz/web/images/avatars/unknown.png",
+      });
+    } else {
+      embed.setAuthor({
+        name: `${newMember.user.username} has updated their profile`,
+        iconURL:
+          newMember.user.avatarURL({ size: 256 }) ||
+          "https://files.femboy.kz/web/images/avatars/unknown.png",
+      });
+    }
 
-      let auditChannel = client.channels.cache.get(logID);
-      if (auditChannel === undefined) {
-        let auditChannel = client.channels.cache.get(logsChatID);
-        if (auditChannel === undefined) {
-          return;
+    try {
+      if (!logData && settingsData.Store === true) {
+        await logs.create({
+          Guild: newMember.guild.id,
+          User: newMember.user.id,
+          Name: newMember.user.username,
+          Nickname: newMember.nickname,
+          Displayname: newMember.displayName,
+          Avatar: newMember.user.displayAvatarURL({ size: 128 }),
+          Banner: newMember.user.bannerURL({ size: 128 }),
+          Roles: newMember.roles.cache.map((role) => role.id),
+          Joined: newMember.joinedAt,
+          Created: newMember.user.createdAt,
+        });
+      }
+
+      if (oldMember.nickname !== newMember.nickname) {
+        embed.addFields({
+          name: `Nickname`,
+          value: `\`${oldMember.nickname || "none"}\`  →  \`${
+            newMember.nickname || "none"
+          }\``,
+          inline: false,
+        });
+        if (logData && settingsData.Store === true) {
+          await logs.findOneAndUpdate(
+            { Guild: newMember.guild.id, User: newMember.user.id },
+            {
+              Nickname: newMember.nickname,
+            }
+          );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
         }
       }
 
-      if (oldMember.user.system || newMember.user.system) return;
-      const fullOldMember = await oldMember.fetch(); // fetch seems to return same as newMember. ?
-
-      const auditEmbed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setFooter({ text: "FKZ Log System" })
-        .setTitle("Member Updated")
-        .addFields({
-          name: "User:",
-          value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+      if (oldMember.displayName !== newMember.displayName) {
+        embed.addFields({
+          name: `Displayname`,
+          value: `\`${oldMember.displayName || "none"}\`  →  \`${
+            newMember.displayName || "none"
+          }\``,
           inline: false,
         });
-
-      if (oldMember.nickname !== newMember.nickname) {
-        const auditEmbedNick = new EmbedBuilder()
-          .setColor("#ff00b3")
-          .setTimestamp()
-          .setFooter({ text: "FKZ Log System" })
-          .setTitle("Member Updated")
-          .addFields(
+        if (logData && settingsData.Store === true) {
+          await logs.findOneAndUpdate(
+            { Guild: newMember.guild.id, User: newMember.user.id },
             {
-              name: "User:",
-              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-              inline: false,
-            },
-            {
-              name: `Nickname Updated`,
-              value: `DisplayName: \`${oldMember.nickname || "none"}\`  →  \`${
-                newMember.nickname || "none"
-              }\``,
-              inline: false,
+              Displayname: newMember.displayName,
             }
           );
-        if (oldMember.nickname === null && newMember.nickname === null) return;
-        await auditChannel.send({ embeds: [auditEmbedNick] });
-      }
-
-      if (oldMember.displayName !== newMember.displayName) {
-        const auditEmbedDisplay = new EmbedBuilder()
-          .setColor("#ff00b3")
-          .setTimestamp()
-          .setFooter({ text: "FKZ Log System" })
-          .setTitle("Member Updated")
-          .addFields(
-            {
-              name: "User:",
-              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
-              inline: false,
-            },
-            {
-              name: `Displayname Updated`,
-              value: `DisplayName: \`${
-                oldMember.displayName || "none"
-              }\`  →  \`${newMember.displayName || "none"}\``,
-              inline: false,
-            }
-          );
-        await auditChannel.send({ embeds: [auditEmbedDisplay] });
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
       }
 
       if (oldMember.user.username !== newMember.user.username) {
-        auditEmbed.addFields({
-          name: `Username Updated`,
-          value: `Name: \`${oldMember.user.username || "none"}\`  →  \`${
+        embed.addFields({
+          name: `Username`,
+          value: `\`${oldMember.user.username || "none"}\`  →  \`${
             newMember.user.username || "none"
           }\``,
           inline: false,
         });
-        await auditChannel.send({ embeds: [auditEmbed] });
+        if (logData && settingsData.Store === true) {
+          await logs.findOneAndUpdate(
+            { Guild: newMember.guild.id, User: newMember.user.id },
+            {
+              Name: newMember.user.username,
+            }
+          );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
       }
 
+      /*
       if (oldMember.avatar !== newMember.avatar) {
-        if (oldMember.avatar === null || newMember.avatar === null) return;
-        auditEmbed.setImage(`${newMember.avatarURL({ size: 128 })}`).addFields({
-          name: `Profile picture updated`,
-          value: `[Old Pfp](<${oldMember.avatarURL({
-            size: 512,
-          })}>)  →  [New Pfp](<${newMember.avatarURL({ size: 512 })}>)`,
-          inline: false,
-        });
-        await auditChannel.send({ embeds: [auditEmbed] });
-      }
-
-      if (oldMember.user.avatar !== newMember.user.avatar) {
-        if (oldMember.user.avatar === null || newMember.user.avatar === null)
-          return;
-        auditEmbed
-          .setImage(`${newMember.user.avatarURL({ size: 128 })}`)
+        embed
+          .setImage(
+            `${
+              newMember.avatarURL({ size: 128 })
+                ? logData.Avatar
+                : oldMember.avatarURL({ size: 128 })
+            }`
+          )
           .addFields({
-            name: `Profile picture updated`,
-            value: `[Old Pfp](<${oldMember.user.avatarURL({
-              size: 512,
-            })}>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 512 })}>)`,
+            name: `Profile Picture`,
+            value: `[Old Pfp](<${
+              oldMember.avatarURL({
+                size: 128,
+              })
+                ? logData.Avatar
+                : oldMember.avatarURL({ size: 128 })
+            }>)  →  [New Pfp](<${newMember.avatarURL({ size: 128 })}>)`,
             inline: false,
           });
-        await auditChannel.send({ embeds: [auditEmbed] });
+        if (logData && settingsData.Store === true) {
+          await logs.findOneAndUpdate(
+            { Guild: newMember.guild.id, User: newMember.user.id },
+            {
+              Avatar: newMember.avatarURL({ size: 128 }),
+            }
+          );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
+      }
+      */
+
+      if (oldMember.user.avatar !== newMember.user.avatar) {
+        embed
+          .setImage(
+            `${
+              newMember.user.avatarURL({ size: 128 })
+                ? logData.Avatar
+                : oldMember.user.avatarURL({ size: 128 })
+            }`
+          )
+          .addFields({
+            name: `Profile Picture`,
+            value: `[Old Pfp](<${
+              oldMember.user.avatarURL({
+                size: 128,
+              })
+                ? logData.Avatar
+                : oldMember.user.avatarURL({ size: 128 })
+            }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 128 })}>)`,
+            inline: false,
+          });
+        if (logData && settingsData.Store === true) {
+          await logs.findOneAndUpdate(
+            { Guild: newMember.guild.id, User: newMember.user.id },
+            {
+              Avatar: newMember.user.avatarURL({ size: 128 }),
+            }
+          );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
       }
 
       if (oldMember.user.banner !== newMember.user.banner) {
-        if (oldMember.user.banner === null || newMember.user.banner === null)
-          return;
-        auditEmbed
-          .setImage(`${newMember.user.bannerURL({ size: 128 })}`)
+        embed
+          .setImage(
+            `${
+              newMember.user.bannerURL({ size: 128 })
+                ? logData.Banner
+                : oldMember.user.bannerURL({ size: 128 })
+            }`
+          )
           .addFields({
-            name: `Banner updated`,
-            value: `[Old Banner](<${oldMember.user.bannerURL({
-              size: 512,
-            })}>)  →  [New Banner](<${newMember.user.bannerURL({
-              size: 512,
+            name: `Banner Image`,
+            value: `[Old Banner](<${
+              oldMember.user.bannerURL({
+                size: 128,
+              })
+                ? logData.Banner
+                : oldMember.user.bannerURL({ size: 128 })
+            }>)  →  [New Banner](<${newMember.user.bannerURL({
+              size: 128,
             })}>)`,
             inline: false,
           });
-        await auditChannel.send({ embeds: [auditEmbed] });
+        if (logData && settingsData.Store === true) {
+          await logs.findOneAndUpdate(
+            { Guild: newMember.guild.id, User: newMember.user.id },
+            {
+              Banner: newMember.user.bannerURL({ size: 128 }),
+            }
+          );
+        }
+        if (settingsData.Post === true) {
+          await channel.send({ embeds: [embed] });
+        }
+      }
+
+      if (oldMember.roles.cache.size !== newMember.roles.cache.size) {
+        if (logData && settingsData.Store === true) {
+          await logs.findOneAndUpdate(
+            { Guild: newMember.guild.id, User: newMember.user.id },
+            {
+              Roles: newMember.roles.cache.map((role) => role.id),
+            }
+          );
+        }
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error in MemberUpdate event:", error);
     }
   });
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
-  try {
-    const data = await Audit_Log.findOne({
-      Guild: member.guild.id,
+  const settingsData = await settings.findOne({
+    Guild: member.guild.id,
+  });
+  if (settingsData.Members === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    Guild: member.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    Guild: member.guild.id,
+    User: member.user.id,
+  });
+
+  const newInvites = await member.guild.invites.fetch();
+  const oldInvites = invites.get(member.guild.id) || new Map();
+
+  const invite = newInvites.find((i) => i.uses > oldInvites.get(i.code));
+
+  const date = new Date();
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setTitle(`${member.user.username} Has Joined the Server!`)
+    .setFooter({ text: `FKZ • ID: ${member.user.id}` })
+    .addFields({
+      name: "User",
+      value: `<@${member.user.id}> - \`${member.user.username}\``,
+      inline: true,
     });
 
-    if (!data) return;
-    const logID = data.Channel;
-    if (!logID) return;
+  if (logData && logData.Avatar) {
+    embed.setAuthor({
+      name: `Member Joined`,
+      iconURL: member.user.avatarURL({ size: 256 })
+        ? logData.Avatar
+        : "https://files.femboy.kz/web/images/avatars/unknown.png",
+    });
+  } else {
+    embed.setAuthor({
+      name: `Member Joined`,
+      iconURL:
+        member.user.avatarURL({ size: 256 }) ||
+        "https://files.femboy.kz/web/images/avatars/unknown.png",
+    });
+  }
 
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-
-    const newInvites = await member.guild.invites.fetch();
-    const oldInvites = invites.get(member.guild.id) || new Map();
-
-    const invite = newInvites.find((i) => i.uses > oldInvites.get(i.code));
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setTitle(`${member.user.username} Has Joined the Server!`)
-      .setAuthor({ name: `Member Joined` })
-      .setImage("https://femboy.kz/images/wide.png")
-      .setFooter({ text: "FKZ Log System" });
-
-    if (!invite) {
-      auditEmbed.setDescription(
-        `<@${member.user.id}> joined the server using an \`unknown invite\`. This could mean they used a vanity invite link if the server has one.`
-      );
-    } else {
-      const inviter = await client.users.fetch(invite.inviter.id);
-      auditEmbed.setDescription(
-        `<@${member.user.id}> Joined the server using the invite: \`${invite.code}\` Which was created by: ${inviter.tag}.\nThe invite has been used \`${invite.uses}\` times since it was created.`
-      );
+  try {
+    if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: member.guild.id,
+        User: member.user.id,
+        Name: member.user.username,
+        Nickname: member.nickname || member.user.username,
+        Displayname: member.displayName,
+        Avatar: member.user.displayAvatarURL({ size: 128 }),
+        Banner: member.user.bannerURL({ size: 128 }) || null,
+        Roles: member.roles.cache.map((role) => role.id) || [],
+        Joined: member.joinedAt || date,
+        Created: member.user.createdAt,
+      });
     }
 
-    await auditChannel.send({ embeds: [auditEmbed] });
+    if (settingsData.Post === true) {
+      if (!invite) {
+        embed.addFields(
+          {
+            name: "Inviter",
+            value: "None",
+            inline: false,
+          },
+          {
+            name: "Invite",
+            value: "Unknown / Vanity",
+            inline: false,
+          }
+        );
+        await channel.send({ embeds: [embed] });
+      } else {
+        const inviter = await client.users.fetch(invite.inviter.id);
+        embed.addFields(
+          {
+            name: "Inviter",
+            value: `${inviter}`,
+            inline: false,
+          },
+          {
+            name: "Invite",
+            value: `<https://discord.gg/${invite.code}>`,
+            inline: false,
+          }
+        );
+        await channel.send({ embeds: [embed] });
+      }
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error in MemberAdd event:", error);
   }
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {
-  try {
-    const data = await Audit_Log.findOne({
-      Guild: member.guild.id,
+  const settingsData = await settings.findOne({
+    Guild: member.guild.id,
+  });
+  if (settingsData.Members === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    Guild: member.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    Guild: member.guild.id,
+    User: member.user.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: `FKZ • ID: ${member.user.id}` })
+    .setTitle(`${member.user.username} has left the server`)
+    .setDescription(`<@${member.user.id}> has left the Server`);
+
+  if (logData && logData.Avatar) {
+    embed.setAuthor({
+      name: `Member Left`,
+      iconURL: member.user.avatarURL({ size: 256 })
+        ? logData.Avatar
+        : "https://files.femboy.kz/web/images/avatars/unknown.png",
     });
+  } else {
+    embed.setAuthor({
+      name: `Member Left`,
+      iconURL:
+        member.user.avatarURL({ size: 256 }) ||
+        "https://files.femboy.kz/web/images/avatars/unknown.png",
+    });
+  }
 
-    if (!data) return;
-    const logID = data.Channel;
-    if (!logID) return;
-
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setAuthor({ name: `Member Left` })
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle(`${member.user.username} has left the server`)
-      .setDescription(`${member} has left the Server`);
-
-    await auditChannel.send({ embeds: [auditEmbed] });
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.deleteMany({
+        Guild: member.guild.id,
+        User: member.user.id,
+      });
+    }
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
-    console.error(`Error in guildMemberRemove event:`, error);
+    console.error(`Error in MemberRemove event:`, error);
   }
 });
 
 client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
-  const data = await Audit_Log.findOne({
-    Guild: oldMember.guild.id,
+  const settingsData = await settings.findOne({
+    Guild: newMember.guild.id,
+  });
+  if (settingsData.Members === false) return;
+  if (settingsData.Post === false) return;
+
+  const data = await schema.findOne({
+    Guild: newMember.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  if (oldMember.partial) await oldMember.fetch();
+
+  const logData = await logs.findOne({
+    Guild: newMember.guild.id,
+    User: newMember.user.id,
   });
 
-  if (!data) return;
-  const logID = data.Channel;
-  if (!logID) return;
-
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
-
-  if (oldMember.user.bot || newMember.user.bot) return;
-  if (oldMember.user.system || newMember.user.system) return;
-  if (oldMember.partial) {
-    await oldMember.fetch().catch(() => {});
-  }
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setFooter({ text: `FKZ • ID: ${newMember.user.id}` })
+    .setTitle("Member Updated");
 
   try {
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Member Updated");
-
     if (oldMember.roles.cache.size > newMember.roles.cache.size) {
       oldMember.roles.cache.forEach((role) => {
         if (!newMember.roles.cache.has(role.id)) {
-          auditEmbed.addFields(
+          embed.addFields(
             {
-              name: "Role Removed: ",
+              name: "Role Removed",
               value: `${role}`,
               inline: false,
             },
             {
-              name: "User:",
-              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              name: "User",
+              value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
               inline: false,
             }
           );
-          auditChannel.send({ embeds: [auditEmbed] });
+          channel.send({ embeds: [embed] });
         }
       });
     }
     if (oldMember.roles.cache.size < newMember.roles.cache.size) {
       newMember.roles.cache.forEach((role) => {
         if (!oldMember.roles.cache.has(role.id)) {
-          auditEmbed.addFields(
+          embed.addFields(
             {
-              name: "Role Added: ",
+              name: "Role Added",
               value: `${role}`,
               inline: false,
             },
             {
-              name: "User:",
-              value: `<@${newMember.user.id}> - ${newMember.user.username}`,
+              name: "User",
+              value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
               inline: false,
             }
           );
-          auditChannel.send({ embeds: [auditEmbed] });
+          channel.send({ embeds: [embed] });
         }
       });
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error in MemberUpdate event:", err);
   }
 });

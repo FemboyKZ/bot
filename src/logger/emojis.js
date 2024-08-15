@@ -1,143 +1,221 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
+const logs = require("../Schemas/logger/emojis.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.GuildEmojiCreate, async (emoji) => {
-  try {
-    const data = await Audit_Log.findOne({
-      Guild: emoji.guild.id,
-    });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    let image = emoji.imageURL({ size: 64 });
+  const settingsData = await settings.findOne({
+    Guild: emoji.guild.id,
+  });
+  if (settingsData.Emojis === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setImage(image || "https://femboy.kz/images/wide.png")
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Emoji Added")
-      .addFields(
+  const data = await schema.findOne({
+    Guild: emoji.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    Guild: emoji.guild.id,
+    Emoji: emoji.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(emoji.imageURL({ size: 128 }) || logData.Image)
+    .setFooter({ text: `FKZ • ID: ${emoji.id}` })
+    .setTitle("Emoji Added")
+    .addFields(
+      {
+        name: "Name",
+        value: emoji.name ? logData.Name : "Unknown",
+        inline: false,
+      },
+      {
+        name: "Author",
+        value: emoji.author ? logData.User : "Unknown",
+        inline: false,
+      },
+      {
+        name: "Animated?",
+        value: emoji.animated ? logData.Animated : "Unknown",
+        inline: false,
+      }
+    );
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.findOneAndUpdate(
+        { Guild: emoji.guild.id, Emoji: emoji.id },
         {
-          name: "Name:",
-          value: emoji.name || "?",
-          inline: false,
-        },
-        {
-          name: "Author:",
-          value: emoji.author ? emoji.author.tag : "unknown",
-          inline: false,
-        },
-        {
-          name: "Animated?:",
-          value: emoji.animated ? "Yes" : "No",
-          inline: false,
-        },
-        {
-          name: "ID:",
-          value: emoji.id,
-          inline: false,
+          Name: emoji.name,
+          User: emoji.author.id,
+          Animated: emoji.animated || null,
+          Image: emoji.imageURL({ size: 128 }),
         }
       );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    } else if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: emoji.guild.id,
+        Emoji: emoji.id,
+        Name: emoji.name,
+        User: emoji.author.id,
+        Created: emoji.createdAt,
+        Animated: emoji.animated,
+        Image: emoji.imageURL({ size: 128 }),
+      });
+    }
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error in EmojiCreate event:", error);
   }
 });
 
 client.on(Events.GuildEmojiDelete, async (emoji) => {
-  try {
-    const data = await Audit_Log.findOne({
-      Guild: emoji.guild.id,
-    });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    let image = emoji.imageURL({ size: 64 });
+  const settingsData = await settings.findOne({
+    Guild: emoji.guild.id,
+  });
+  if (settingsData.Emojis === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setImage(image || "https://femboy.kz/images/wide.png")
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Emoji Deleted")
-      .addFields(
-        {
-          name: "Name:",
-          value: emoji.name || "?",
-          inline: false,
-        },
-        {
-          name: "Author:",
-          value: emoji.author ? emoji.author.tag : "unknown",
-          inline: false,
-        },
-        {
-          name: "Animated?:",
-          value: emoji.animated ? "Yes" : "No",
-          inline: false,
-        },
-        {
-          name: "ID:",
-          value: emoji.id,
-          inline: false,
-        }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
+  const data = await schema.findOne({
+    Guild: emoji.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    Guild: emoji.guild.id,
+    Emoji: emoji.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(emoji.imageURL({ size: 128 }) || logData.Image)
+    .setFooter({ text: `FKZ • ID: ${emoji.id}` })
+    .setTitle("Emoji Deleted")
+    .addFields(
+      {
+        name: "Name",
+        value: emoji.name ? logData.Name : "Unknown",
+        inline: false,
+      },
+      {
+        name: "Author",
+        value: emoji.author ? logData.User : "Unknown",
+        inline: false,
+      },
+      {
+        name: "Animated?",
+        value: emoji.animated ? logData.Animated : "Unknown",
+        inline: false,
+      }
+    );
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.deleteMany({ Guild: emoji.guild.id, Emoji: emoji.id });
+    }
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error in EmojiDelete event:", error);
   }
 });
 
 client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
-  try {
-    const data = await Audit_Log.findOne({
-      Guild: newEmoji.guild.id,
-    });
-    if (!data) return;
-    const logID = data.Channel;
-    const auditChannel = client.channels.cache.get(logID);
-    if (!auditChannel) return;
-    const changes = [];
+  const settingsData = await settings.findOne({
+    Guild: newEmoji.guild.id,
+  });
+  if (settingsData.Emojis === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
 
-    if (oldEmoji.name !== newEmoji.name) {
-      changes.push(
-        `Name: \`${oldEmoji.name || "none"}\` → \`${newEmoji.name || "none"}\``
-      );
+  const data = await schema.findOne({
+    Guild: newEmoji.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
+
+  const logData = await logs.findOne({
+    Guild: oldEmoji.guild.id,
+    Emoji: oldEmoji.id,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor("#ff00b3")
+    .setTimestamp()
+    .setImage(emoji.imageURL({ size: 128 }) || logData.Image)
+    .setFooter({ text: `FKZ • ID: ${newEmoji.id}` })
+    .setTitle("Emoji Edited")
+    .addFields({
+      name: "Author:",
+      value: newEmoji.author ? logData.User : "Unknown",
+      inline: false,
+    });
+
+  try {
+    if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: newEmoji.guild.id,
+        Emoji: newEmoji.id,
+        Name: newEmoji.name ? oldEmoji.name : null,
+        User: newEmoji.author.id ? oldEmoji.author.id : null,
+        Animated: newEmoji.animated ? oldEmoji.animated : null,
+        Created: newEmoji.createdAt,
+        Image: newEmoji.imageURL({ size: 128 }),
+      });
     }
 
-    if (changes.length === 0) return;
-    const changesText = changes.join("\n");
-    let image = newEmoji.imageURL({ size: 64 });
+    if (oldEmoji.name !== newEmoji.name) {
+      embed.addFields({
+        name: "Name:",
+        value: `\`${oldEmoji.name ? logData.Name : "none"}\` →\`${
+          newEmoji.name || "Unknown"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
+          { Name: newEmoji.name }
+        );
+      }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
+    }
 
-    const auditEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setImage(image || "https://femboy.kz/images/wide.png")
-      .setFooter({ text: "FKZ Log System" })
-      .setTitle("Emoji Edited")
-      .addFields(
-        {
-          name: "Changes:",
-          value: changesText,
-          inline: false,
-        },
-        {
-          name: "Author:",
-          value: newEmoji.author ? newEmoji.author.tag : "null",
-          inline: false,
-        },
-        {
-          name: "ID:",
-          value: newEmoji.id,
-          inline: false,
-        }
-      );
-    await auditChannel.send({ embeds: [auditEmbed] });
+    if (oldEmoji.animated !== newEmoji.animated) {
+      embed.addFields({
+        name: "Animated:",
+        value: `\`${oldEmoji.animated ? logData.Animated : "none"}\` →\`${
+          newEmoji.animated || "Unknown"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
+          { Animated: newEmoji.animated }
+        );
+      }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error in EmojiUpdate event:", error);
   }
 });

@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const reactions = require("./Schemas/reactionrole.js");
+const schema = require("./Schemas/reactionrole.js");
 const { client } = require("./index.js");
 
 let lastOnlineTime = Date.now();
@@ -19,7 +19,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   }
 
   try {
-    const data = await reactions.findOne({
+    const data = await schema.findOne({
       Guild: reaction.message.guildId,
       Message: reaction.message.id,
       Emoji: cID,
@@ -66,7 +66,7 @@ client.on(Events.MessageReactionRemove, async (reaction, user) => {
   }
 
   try {
-    const data = await reactions.findOne({
+    const data = await schema.findOne({
       Guild: reaction.message.guildId,
       Message: reaction.message.id,
       Emoji: cID,

@@ -1,9 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const whitelistSchema = require("./Schemas/whitelist.js");
-const whitelistStatusSchema = require("./Schemas/whitelistStatus.js");
-const mcWhitelistSchema = require("./Schemas/mcWhitelist.js");
-const unbanSchema = require("./Schemas/unbans.js");
-const reportSchema = require("./Schemas/reports.js");
+const schema = require("./Schemas/base-system.js");
+const status = require("./Schemas/request-status.js");
 const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -50,8 +47,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    mcWhitelistSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "mc-whitelist" })
       .then(async (data) => {
         if (!data) return;
 
@@ -72,6 +69,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
+    status.create({
+      User: interaction.user.id,
+      Type: "mc-whitelist",
+      Status: null,
+    });
   }
 
   if (interaction.customId === "modalWhitelist") {
@@ -115,8 +117,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    whitelistSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "whitelist" })
       .then(async (data) => {
         if (!data) return;
 
@@ -137,9 +139,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
-
-    whitelistStatusSchema.create({
-      Request: interaction.user.id,
+    status.create({
+      User: interaction.user.id,
+      Type: "whitelist",
       Status: null,
     });
   }
@@ -185,8 +187,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    unbanSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "unban" })
       .then(async (data) => {
         if (!data) return;
 
@@ -207,6 +209,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
+    status.create({
+      User: interaction.user.id,
+      Type: "unban",
+      Status: null,
+    });
   }
 
   if (interaction.customId === "modalReport") {
@@ -250,8 +257,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       })
       .setTimestamp();
 
-    reportSchema
-      .findOne({ Guild: interaction.guild.id })
+    schema
+      .findOne({ Guild: interaction.guild.id, ID: "report" })
       .then(async (data) => {
         if (!data) return;
 
@@ -272,5 +279,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       });
+    status.create({
+      User: interaction.user.id,
+      Type: "report",
+      Status: null,
+    });
   }
 });

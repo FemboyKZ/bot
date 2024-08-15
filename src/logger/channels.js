@@ -1,123 +1,270 @@
-const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const { EmbedBuilder, Events, DMChannel } = require("discord.js");
+const schema = require("../Schemas/base-system.js");
+const logs = require("../Schemas/logger/channels.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
 client.on(Events.ChannelCreate, async (channel) => {
-  const data = await Audit_Log.findOne({ Guild: channel.guild?.id });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
+  const settingsData = await settings.findOne({
+    Guild: channel.guild.id,
+  });
+  if (settingsData.Channels === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  if (channel === DMChannel) return;
+  const data = await schema.findOne({
+    Guild: channel.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const auditChannel = client.channels.cache.get(data.Channel);
   if (!auditChannel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const logData = await logs.findOne({
+    Guild: channel.guild.id,
+    Channel: channel.id,
+  });
+
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
+    .setFooter({ text: `FKZ • ID: ${channel.id}` })
     .setTitle("Channel Created")
     .addFields(
       {
-        name: "Name:",
-        value: `${channel.name || "?"}`,
+        name: "Name",
+        value: `${channel.name}`,
         inline: false,
       },
       {
-        name: "Type:",
+        name: "Type",
         value: `${channel.type}`,
         inline: false,
       },
       {
-        name: "Category:",
-        value: `${channel.parent || "No Category"}`,
+        name: "Topic",
+        value: `${channel.topic ? logData.Topic : "None"}`,
         inline: false,
       },
       {
-        name: "ID:",
-        value: `<#${channel.id}>`,
+        name: "Category",
+        value: `${channel.parentId ? logData.Parent : "Unknown"}`,
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.findOneAndUpdate(
+        { Guild: channel.guild.id, Channel: channel.id },
+        {
+          Name: channel.name,
+          Topic: channel.topic,
+          Parent: channel.parentId,
+          Type: channel.type,
+        }
+      );
+    } else if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: channel.guild.id,
+        Name: channel.name,
+        Type: channel.type,
+        Parent: channel.parentId,
+        Channel: channel.id,
+      });
+    }
+
+    if (settingsData.Post === true) {
+      await auditChannel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.log("Error in ChannelCreate event:", error);
+  }
 });
 
 client.on(Events.ChannelDelete, async (channel) => {
-  const data = await Audit_Log.findOne({ Guild: channel.guild?.id });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
+  const settingsData = await settings.findOne({
+    Guild: channel.guild.id,
+  });
+  if (settingsData.Channels === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  if (channel === DMChannel) return;
+  const data = await schema.findOne({
+    Guild: channel.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const auditChannel = client.channels.cache.get(data.Channel);
   if (!auditChannel) return;
 
-  const auditEmbed = new EmbedBuilder()
+  const logData = await logs.findOne({
+    Guild: channel.guild.id,
+    Channel: channel.id,
+  });
+
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
+    .setFooter({ text: `FKZ • ID: ${channel.id}` })
     .setTitle("Channel Deleted")
     .addFields(
       {
-        name: "Name:",
-        value: `${channel.name || "?"}`,
+        name: "Name",
+        value: `${channel.name ? logData.Name : "Unknown"}`,
         inline: false,
       },
       {
-        name: "Type:",
+        name: "Type",
         value: `${channel.type}`,
         inline: false,
       },
       {
-        name: "Category:",
-        value: `${channel.parent || "No Category"}`,
+        name: "Topic",
+        value: `${channel.topic ? logData.Topic : "No Topic"}`,
         inline: false,
       },
       {
-        name: "ID:",
-        value: `<#${channel.id}>`,
+        name: "Category",
+        value: `${channel.parentId ? logData.Parent : "No Category"}`,
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.deleteMany({ Guild: channel.guild.id, Channel: channel.id });
+    }
+
+    if (settingsData.Post === true) {
+      await auditChannel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.log("Error in ChannelDelete event:", error);
+  }
 });
 
 client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
-  const data = await Audit_Log.findOne({ Guild: oldChannel.guild?.id });
-  if (!data) return;
-  const logID = data.Channel;
-  const auditChannel = client.channels.cache.get(logID);
+  const settingsData = await settings.findOne({
+    Guild: newChannel.guild.id,
+  });
+  if (settingsData.Channels === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
+
+  if (oldChannel === DMChannel || newChannel === DMChannel) return;
+  const data = await schema.findOne({
+    Guild: oldChannel.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const auditChannel = client.channels.cache.get(data.Channel);
   if (!auditChannel) return;
 
-  const changes = [];
+  const logData = await logs.findOne({
+    Guild: oldChannel.guild.id,
+    Channel: oldChannel.id,
+  });
 
-  if (oldChannel.name !== newChannel.name) {
-    changes.push(
-      `Name: \`${oldChannel.name || "none"}\` → \`${
-        newChannel.name || "none"
-      }\``
-    );
-  }
-  if (oldChannel.parent !== newChannel.parent) {
-    changes.push(
-      `Category: \`${oldChannel.parent || "none"}\` → \`${
-        newChannel.parent || "none"
-      }\``
-    );
-  }
-  if (oldChannel.topic !== newChannel.topic) {
-    changes.push(
-      `Topic: \`${oldChannel.topic || "None"}\` → \`${
-        newChannel.topic || "None"
-      }\``
-    );
-  }
-
-  if (changes.length === 0) return;
-  const changesText = changes.join("\n");
-
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
-    .setTitle("Channel Updated")
-    .addFields(
-      { name: "Changes:", value: `${changesText}`, inline: false },
-      { name: "ID:", value: `<#${newChannel.id}>`, inline: false }
-    );
-  await auditChannel.send({ embeds: [auditEmbed] });
+    .setFooter({ text: `FKZ • ID: ${newChannel.id}` });
+
+  try {
+    if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: newChannel.guild.id,
+        Channel: newChannel.id,
+        Name: newChannel.name,
+        Type: newChannel.type,
+        Parent: newChannel.parentId,
+        Topic: newChannel.topic,
+      });
+    }
+
+    if (oldChannel.name !== newChannel.name) {
+      embed.addFields({
+        name: "Name",
+        value: `\`${oldChannel.name ? logData.Name : "none"}\` → \`${
+          newChannel.name || "none"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newChannel.guild.id, Channel: newChannel.id },
+          {
+            Name: newChannel.name,
+          }
+        );
+      }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
+    }
+
+    if (oldChannel.parentId !== newChannel.parentId) {
+      embed.addFields({
+        name: "Category",
+        value: `\`${oldChannel.parentId ? logData.Parent : "none"}\` → \`${
+          newChannel.parentId || "none"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newChannel.guild.id, Channel: newChannel.id },
+          {
+            Parent: newChannel.parentId,
+          }
+        );
+      }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
+    }
+
+    if (oldChannel.topic !== newChannel.topic) {
+      embed.addFields({
+        name: "Topic",
+        value: `\`${oldChannel.topic ? logData.Topic : "none"}\` → \`${
+          newChannel.topic || "none"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newChannel.guild.id, Channel: newChannel.id },
+          {
+            Topic: newChannel.topic || null,
+          }
+        );
+      }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
+    }
+
+    if (oldChannel.type !== newChannel.type) {
+      embed.addFields({
+        name: "Type",
+        value: `\`${oldChannel.type ? logData.Type : "none"}\` → \`${
+          newChannel.type || "none"
+        }\``,
+        inline: false,
+      });
+      if (logData && settingsData.Store === true) {
+        await logs.findOneAndUpdate(
+          { Guild: newChannel.guild.id, Channel: newChannel.id },
+          {
+            Type: newChannel.type || null,
+          }
+        );
+      }
+      if (settingsData.Post === true) {
+        await auditChannel.send({ embeds: [embed] });
+      }
+    }
+  } catch (error) {
+    console.log("Error in ChannelUpdate event:", error);
+  }
 });

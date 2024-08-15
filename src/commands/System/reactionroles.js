@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const reaction = require("../../Schemas/reactionrole");
+const schema = require("../../Schemas/reactionrole.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -72,7 +72,7 @@ module.exports = {
         ephemeral: true,
       });
 
-    const data = await reaction.findOne({
+    const data = await schema.findOne({
       Guild: guild.id,
       Message: message.id,
       Emoji: emoji,
@@ -87,7 +87,7 @@ module.exports = {
           });
         } else {
           const role = options.getRole("role");
-          await reaction.create({
+          await schema.create({
             Guild: guild.id,
             Message: message.id,
             Emoji: emoji,
@@ -112,7 +112,7 @@ module.exports = {
             ephemeral: true,
           });
         } else {
-          await reaction.deleteMany({
+          await schema.deleteMany({
             Guild: guild.id,
             Message: message.id,
             Emoji: emoji,

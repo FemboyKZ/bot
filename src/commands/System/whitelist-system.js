@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const schema = require("../../Schemas/whitelist");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -38,7 +38,7 @@ module.exports = {
     const { guild, options } = interaction;
     const channel = options.getChannel("channel");
     const sub = options.getSubcommand();
-    const data = await schema.findOne({ Guild: guild });
+    const data = await schema.findOne({ Guild: guild.id, ID: "whitelist" });
 
     const embed = new EmbedBuilder()
       .setTitle("Whitelist System Setup")
@@ -53,8 +53,9 @@ module.exports = {
               `All submitted wl requests will be sent in ${channel}`
             );
             await schema.create({
-              Guild: guild,
+              Guild: guild.id,
               Channel: channel.id,
+              ID: "whitelist",
             });
           } else if (data) {
             const existingChannel = client.channels.cache.get(data.Channel);
@@ -80,7 +81,8 @@ module.exports = {
           } else if (data) {
             embed.setDescription(`The whitelist system has been disabled.`);
             await schema.deleteMany({
-              Guild: guild,
+              Guild: guild.id,
+              ID: "whitelist",
             });
           }
 

@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  EmbedBuilder,
+} = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
@@ -30,6 +34,12 @@ module.exports = {
   async execute(interaction) {
     const { options } = interaction;
     const servers = options.getString("server");
+
+    const embed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setTitle("FKZ CS2 Force-Update")
+      .setFooter({ text: `FKZ` });
 
     const server = {
       "cs2-fkz-1": {
@@ -75,14 +85,24 @@ module.exports = {
     }[servers];
 
     if (!server) {
-      await interaction.reply({
-        content: "Unknown server.",
+      embed.setDescription(`Unknown server.`);
+      return await interaction.reply({
+        embeds: [embed],
         ephemeral: true,
       });
-      return;
     }
 
     const { name, user, id } = server;
+
+    if (id !== null) {
+      embed.setDescription(
+        `Cannot force-update: ${name}, use the RESTART command instead.`
+      );
+      return await interaction.reply({
+        embeds: [embed],
+        ephemeral: true,
+      });
+    }
 
     const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
     const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
@@ -91,45 +111,38 @@ module.exports = {
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
     ) {
-      await interaction.reply({
-        content: "You don't have perms to use this command.",
+      embed.setDescription("You don't have perms to use this command.");
+      return await interaction.reply({
+        embeds: [embed],
         ephemeral: true,
       });
-      return;
     }
 
     try {
+      embed.setDescription(`Force-updating: ${name}`);
       await interaction.reply({
-        content: `Force-updating: ${name}`,
+        embeds: [embed],
         ephemeral: true,
       });
-      if (id !== null) {
-        return await interaction.editReply({
-          content: `Cannot force-update: ${name}, use the RESTART command instead.`,
-          ephemeral: true,
-        });
-      } else {
-        exec(
-          `sudo -iu ${user} /home/${user}/cs2server force-update`,
-          async (error, stdout, stderr) => {
-            if (error) console.log(error);
-            //if (stderr) console.log(stderr);
-            //if (stdout) console.log(stdout);
-          }
-        );
-        await wait(30000);
-        return await interaction.editReply({
-          content: `Force-updated: ${name}`,
-          ephemeral: true,
-        });
-      }
+      exec(
+        `sudo -iu ${user} /home/${user}/cs2server force-update`,
+        async (error, stdout, stderr) => {
+          if (error) console.log(error);
+          //if (stderr) console.log(stderr);
+          //if (stdout) console.log(stdout);
+        }
+      );
+      await wait(30000);
+      embed.setDescription(`Force-updated: ${name}`);
+      return await interaction.editReply({
+        embeds: [embed],
+        ephemeral: true,
+      });
     } catch (error) {
-      if (interaction) {
-        await interaction.editReply({
-          content: `Error: ${error}`,
-          ephemeral: true,
-        });
-      }
+      await interaction.reply({
+        content: `Error: ${error}`,
+        ephemeral: true,
+      });
     }
   },
 };

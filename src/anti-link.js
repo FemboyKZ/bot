@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const linkSchema = require("./Schemas/anti-link");
+const schema = require("./Schemas/moderation/anti-link.js");
 const { client } = require("./index.js");
 
 client.on(Events.MessageCreate, async (message) => {
@@ -11,7 +11,7 @@ client.on(Events.MessageCreate, async (message) => {
     message.content.includes("discord.gg/")
   ) {
     try {
-      const Data = await linkSchema.findOne({ Guild: message.guild.id });
+      const Data = await schema.findOne({ Guild: message.guild.id });
 
       if (!Data) return;
 

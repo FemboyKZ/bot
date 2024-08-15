@@ -1,94 +1,126 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const Audit_Log = require("../Schemas/auditlog.js");
+const schema = require("../Schemas/base-system.js");
+const logs = require("../Schemas/logger/bans.js");
+const member = require("../Schemas/logger/members.js");
+const settings = require("../Schemas/logger/settings.js");
 const { client } = require("../index.js");
 
-client.on(Events.GuildBanAdd, async (guild, user) => {
-  const data = await Audit_Log.findOne({
-    Guild: guild.id,
+client.on(Events.GuildBanAdd, async (ban) => {
+  const settingsData = await settings.findOne({
+    Guild: ban.guild.id,
   });
-  if (!data) return;
+  if (settingsData.Bans === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
 
-  const logID = data.Channel;
-  if (!logID) return;
+  const data = await schema.findOne({
+    Guild: ban.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
 
-  const bans = await user.guild.bans.fetch();
-  const banInfo = bans.get(user.id);
-  if (!banInfo) return;
+  const logData = await logs.findOne({
+    Guild: ban.guild.id,
+    User: ban.user.id,
+  });
 
-  const { reason, executor } = banInfo;
-  let reasons = JSON.stringify(reason);
+  const memberData = await member.findOne({
+    Guild: ban.guild.id,
+    User: ban.user.id,
+  });
 
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
+  const date = new Date();
 
-  const fullUser = await user.fetch();
-  let banUser;
-
-  if (user === undefined || user === null) {
-    banUser = fullUser.id;
-  } else {
-    banUser = user.id;
-  }
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
+    .setFooter({ text: `FKZ` })
     .setTitle("Ban Added")
     .addFields(
       {
-        name: "Banned Member:",
-        value: `<@${banUser}>` || "unknown",
+        name: "Banned Member",
+        value: `<@${ban.user.id}>` || "unknown",
         inline: false,
       },
       {
-        name: "Executor:",
-        value: `<@${executor.id}>` || "unknown",
-        inline: false,
-      },
-      {
-        name: "Reason:",
-        value: `${reasons}` || "none",
+        name: "Ban Reason",
+        value: `${ban.reason}` || "none",
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+  try {
+    if (!logData && settingsData.Store === true) {
+      await logs.create({
+        Guild: ban.guild.id,
+        User: ban.user.id,
+        Reason: ban.reason,
+        Created: date,
+      });
+    }
+    if (memberData && settingsData.Store === true) {
+      await member.deleteMany({ Guild: ban.guild.id, User: ban.user.id });
+    }
+
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.error("Error in GuildBanAdd event:", error);
+  }
 });
 
-client.on(Events.GuildBanRemove, async (user) => {
-  const data = await Audit_Log.findOne({
-    Guild: user.guild.id,
+client.on(Events.GuildBanRemove, async (ban) => {
+  const settingsData = await settings.findOne({
+    Guild: ban.guild.id,
   });
-  if (!data) return;
+  if (settingsData.Bans === false) return;
+  if (settingsData.Store === false && settingsData.Post === false) return;
 
-  const logID = data.Channel;
-  if (!logID) return;
+  const data = await schema.findOne({
+    Guild: ban.guild.id,
+    ID: "audit-logs",
+  });
+  if (!data || !data.Channel) return;
+  const channel = client.channels.cache.get(data.Channel);
+  if (!channel) return;
 
-  const bans = await user.guild.bans.fetch();
-  const banInfo = bans.get(user.id);
-  if (!banInfo) return;
+  const logData = await logs.findOne({
+    Guild: ban.guild.id,
+    User: ban.user.id,
+  });
 
-  const { executor } = banInfo;
-
-  const auditChannel = client.channels.cache.get(logID);
-  if (!auditChannel) return;
-
-  const fullUser = await user.fetch();
-  const auditEmbed = new EmbedBuilder()
+  const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()
-    .setFooter({ text: "FKZ Log System" })
+    .setFooter({ text: "FKZ" })
     .setTitle("Ban Removed")
     .addFields(
       {
-        name: "Member:",
-        value: fullUser.user ? fullUser.user.tag : user.tag || "unknown",
+        name: "Banned Member",
+        value: `<@${ban.user.id}>` || "unknown",
         inline: false,
       },
       {
-        name: "Admin:",
-        value: `<@${executor.id}>` || "unknown",
+        name: "Ban Reason",
+        value: `${ban.reason}` || "none",
+        inline: false,
+      },
+      {
+        name: "Ban Created",
+        value: logData.Created || "unknown",
         inline: false,
       }
     );
-  await auditChannel.send({ embeds: [auditEmbed] });
+
+  try {
+    if (logData && settingsData.Store === true) {
+      await logs.deleteMany({ Guild: ban.guild.id, User: ban.user.id });
+    }
+    if (settingsData.Post === true) {
+      await channel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.error("Error in GuildBanRemove event:", error);
+  }
 });

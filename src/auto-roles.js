@@ -1,9 +1,9 @@
 const { Events } = require("discord.js");
-const autorole = require("./Schemas/autorole");
+const schema = require("./Schemas/autorole.js");
 const { client } = require("./index.js");
 
 client.on(Events.GuildMemberAdd, async (member) => {
-  const data = await autorole.findOne({ Guild: member.guild.id });
+  const data = await schema.findOne({ Guild: member.guild.id });
   if (!data || !data.Roles.length) return;
 
   try {

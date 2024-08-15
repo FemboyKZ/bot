@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  EmbedBuilder,
+} = require("discord.js");
 const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
@@ -28,6 +32,12 @@ module.exports = {
     const { options } = interaction;
     const servers = options.getString("server");
 
+    const embed = new EmbedBuilder()
+      .setColor("#ff00b3")
+      .setTimestamp()
+      .setTitle("FKZ ClassicCounter Restart")
+      .setFooter({ text: `FKZ` });
+
     const server = {
       "cscl-fkz-1": {
         name: "CS:CL FKZ 1 - VNL KZ 128t",
@@ -46,21 +56,31 @@ module.exports = {
       },
     }[servers];
 
+    if (!server) {
+      embed.setDescription(`Unknown server.`);
+      return await interaction.reply({
+        embeds: [embed],
+        ephemeral: true,
+      });
+    }
+
     const { name, user, id } = server;
 
     if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       !interaction.member.roles.cache.has(`${process.env.CSCL_MANAGER_ROLE}`)
     ) {
+      embed.setDescription("You don't have perms to use this command.");
       return await interaction.reply({
-        content: "You don't have perms to use this command.",
+        embeds: [embed],
         ephemeral: true,
       });
     }
 
     try {
+      embed.setDescription(`Restarting: ${name}`);
       await interaction.reply({
-        content: `Restarting: ${name}`,
+        embeds: [embed],
         ephemeral: true,
       });
       exec(
@@ -72,17 +92,16 @@ module.exports = {
         }
       );
       await wait(3000);
+      embed.setDescription(`Restarted: ${name}`);
       return await interaction.editReply({
-        content: `Restarted: ${name}`,
+        embeds: [embed],
         ephemeral: true,
       });
     } catch (error) {
-      if (interaction) {
-        await interaction.editReply({
-          content: `Error: ${error}`,
-          ephemeral: true,
-        });
-      }
+      await interaction.reply({
+        content: `Error: ${error}`,
+        ephemeral: true,
+      });
     }
   },
 };
