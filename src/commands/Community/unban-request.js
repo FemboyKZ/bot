@@ -33,7 +33,7 @@ module.exports = {
         Type: "unban",
       });
 
-      if (statusData.Status === false) {
+      if (statusData.Status && statusData.Status === false) {
         return await interaction.reply({
           content:
             "Unfortunately your unban request has been denied, you can request again later.",
@@ -41,14 +41,14 @@ module.exports = {
         });
       }
 
-      if (statusData.Status === true) {
+      if (statusData.Status && statusData.Status === true) {
         return await interaction.reply({
           content: "You have already been unbanned.",
           ephemeral: true,
         });
       }
 
-      if (statusData.Status === null) {
+      if (statusData.Status && statusData.Status === null) {
         return await interaction.reply({
           content: "You have already requested, please check again later.",
           ephemeral: true,
