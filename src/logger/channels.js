@@ -182,13 +182,23 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     }
 
     if (oldChannel.name !== newChannel.name) {
-      embed.addFields({
-        name: "Name",
-        value: `\`${oldChannel.name ? logData.Name : "none"}\` → \`${
-          newChannel.name || "none"
-        }\``,
-        inline: false,
-      });
+      if (logData && logData.Name) {
+        embed.addFields({
+          name: "Name",
+          value: `\`${oldChannel.name ? logData.Name : "none"}\` → \`${
+            newChannel.name || "none"
+          }\``,
+          inline: false,
+        });
+      } else {
+        embed.addFields({
+          name: "Name",
+          value: `\`${oldChannel.name || "none"}\` → \`${
+            newChannel.name || "none"
+          }\``,
+          inline: false,
+        });
+      }
       if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
@@ -203,13 +213,23 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     }
 
     if (oldChannel.parentId !== newChannel.parentId) {
-      embed.addFields({
-        name: "Category",
-        value: `\`${oldChannel.parentId ? logData.Parent : "none"}\` → \`${
-          newChannel.parentId || "none"
-        }\``,
-        inline: false,
-      });
+      if (logData && logData.Parent) {
+        embed.addFields({
+          name: "Category",
+          value: `\`${oldChannel.parentId ? logData.Parent : "none"}\` → \`${
+            newChannel.parentId || "none"
+          }\``,
+          inline: false,
+        });
+      } else {
+        embed.addFields({
+          name: "Category",
+          value: `\`${oldChannel.parentId || "none"}\` → \`${
+            newChannel.parentId || "none"
+          }\``,
+          inline: false,
+        });
+      }
       if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
@@ -224,13 +244,23 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     }
 
     if (oldChannel.topic !== newChannel.topic) {
-      embed.addFields({
-        name: "Topic",
-        value: `\`${oldChannel.topic ? logData.Topic : "none"}\` → \`${
-          newChannel.topic || "none"
-        }\``,
-        inline: false,
-      });
+      if (logData && logData.Topic) {
+        embed.addFields({
+          name: "Topic",
+          value: `\`${oldChannel.topic ? logData.Topic : "none"}\` → \`${
+            newChannel.topic || "none"
+          }\``,
+          inline: false,
+        });
+      } else {
+        embed.addFields({
+          name: "Topic",
+          value: `\`${oldChannel.topic || "none"}\` → \`${
+            newChannel.topic || "none"
+          }\``,
+          inline: false,
+        });
+      }
       if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },
@@ -245,13 +275,23 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
     }
 
     if (oldChannel.type !== newChannel.type) {
-      embed.addFields({
-        name: "Type",
-        value: `\`${oldChannel.type ? logData.Type : "none"}\` → \`${
-          newChannel.type || "none"
-        }\``,
-        inline: false,
-      });
+      if (logData && logData.Type) {
+        embed.addFields({
+          name: "Type",
+          value: `\`${oldChannel.type ? logData.Type : "none"}\` → \`${
+            newChannel.type || "none"
+          }\``,
+          inline: false,
+        });
+      } else {
+        embed.addFields({
+          name: "Type",
+          value: `\`${oldChannel.type || "none"}\` → \`${
+            newChannel.type || "none"
+          }\``,
+          inline: false,
+        });
+      }
       if (logData && settingsData.Store === true) {
         await logs.findOneAndUpdate(
           { Guild: newChannel.guild.id, Channel: newChannel.id },

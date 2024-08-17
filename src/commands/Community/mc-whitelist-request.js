@@ -32,7 +32,7 @@ module.exports = {
         Type: "mc-whitelist",
       });
 
-      if (statusData.Status === false) {
+      if (statusData.Status && statusData.Status === false) {
         return await interaction.reply({
           content:
             "Unfortunately your whitelist request has been denied, you will not be whitelisted.",
@@ -40,14 +40,14 @@ module.exports = {
         });
       }
 
-      if (statusData.Status === true) {
+      if (statusData.Status && statusData.Status === true) {
         return await interaction.reply({
           content: "You have already been whitelisted.",
           ephemeral: true,
         });
       }
 
-      if (statusData.Status === null) {
+      if (statusData.Status && statusData.Status === null) {
         return await interaction.reply({
           content: "You have already requested, please check again later.",
           ephemeral: true,

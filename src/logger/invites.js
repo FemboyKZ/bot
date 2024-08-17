@@ -32,7 +32,7 @@ client.on(Events.InviteCreate, async (invite) => {
     .addFields(
       {
         name: "Creator",
-        value: `<@${invite.inviter.id}>` ? `<@${logData.User}>` : `unknown`,
+        value: `<@${invite.inviter.id}>` ? `<@${logData?.User}>` : `unknown`,
         inline: false,
       },
       {
@@ -50,7 +50,7 @@ client.on(Events.InviteCreate, async (invite) => {
   } else {
     embed.addFields({
       name: "Duration",
-      value: `${invite.maxAge ? logData.Expires : "Unknown"}`,
+      value: `${invite.maxAge ? logData?.Expires : "Unknown"}`,
       inline: false,
     });
   }
@@ -64,7 +64,7 @@ client.on(Events.InviteCreate, async (invite) => {
   } else {
     embed.addFields({
       name: "Max Uses",
-      value: `${invite.maxUses ? logData.MaxUses : "Unknown"}`,
+      value: `${invite.maxUses ? logData?.MaxUses : "Unknown"}`,
       inline: false,
     });
   }
@@ -132,13 +132,13 @@ client.on(Events.InviteDelete, async (invite) => {
     .addFields(
       {
         name: "Author",
-        value: `<@${invite.inviter.id}>` ? `<@${logData.User}>` : `unknown`,
+        value: `<@${invite.inviter.id}>` ? `<@${logData?.User}>` : `unknown`,
         inline: false,
       },
       {
         name: "Uses / Max Uses",
-        value: `${invite.uses ? logData.Uses : "unknown"} / ${
-          invite.maxUses ? logData.MaxUses : "unknown"
+        value: `${invite.uses ? logData?.Uses : "unknown"} / ${
+          invite.maxUses ? logData?.MaxUses : "unknown"
         }`,
         inline: false,
       },
