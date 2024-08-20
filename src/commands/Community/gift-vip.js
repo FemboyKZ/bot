@@ -1,12 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const vip = require("../../Schemas/base-system.js");
 const uses = require("../../Schemas/vip/vip-uses.js");
+const roles = require("../../Schemas/vip/vip-roles.js");
 const status = require("../../Schemas/vip/vip-status.js");
 require("dotenv").config();
-
-const vipRole = process.env.VIP_ROLE;
-const vipPlusRole = process.env.VIP_PLUS_ROLE;
-const contributorRole = process.env.CONTRIBUTOR_ROLE;
 
 var timeout = [];
 
@@ -73,9 +70,11 @@ module.exports = {
     const steamId = options.getString("steamid");
     const code = options.getString("code");
     const target = options.getUser("user");
+
     const perkStatus = await status.findOne({ Claimer: user.id });
     const targetStatus = await status.findOne({ Claimer: target.id });
     const perkSystem = await vip.findOne({ Guild: guild.id, ID: "vip" });
+
     const vipCode = await uses.findOne({ Guild: guild.id, Type: "vip" });
     const vipPlusCode = await uses.findOne({
       Guild: guild.id,
@@ -83,8 +82,19 @@ module.exports = {
     });
     const contributorCode = await uses.findOne({
       Guild: guild.id,
+      Type: "contributor",
+    });
+
+    const vipRole = await roles.findOne({ Guild: guild.id, Type: "vip" });
+    const vipPlusRole = await roles.findOne({
+      Guild: guild.id,
       Type: "vip+",
     });
+    const contributorRole = await roles.findOne({
+      Guild: guild.id,
+      Type: "contributor",
+    });
+
     const member = await guild.members.fetch(target.id);
 
     const embed = new EmbedBuilder()
@@ -197,7 +207,7 @@ module.exports = {
           }
           if (!targetStatus) {
             if (code === vipCode) {
-              let role = await guild.roles.fetch(vipRole);
+              let role = await guild.roles.fetch(vipRole.Role);
               let perkType = "vip";
               await handleCode(
                 interaction,
@@ -211,7 +221,7 @@ module.exports = {
                 role
               );
             } else if (code === vipPlusCode) {
-              let role = await guild.roles.fetch(vipPlusRole);
+              let role = await guild.roles.fetch(vipPlusRole.Role);
               let perkType = "vip+";
               await handleCode(
                 interaction,
@@ -225,7 +235,7 @@ module.exports = {
                 role
               );
             } else if (code === contributorCode) {
-              let role = await guild.roles.fetch(contributorRole);
+              let role = await guild.roles.fetch(contributorRole.Role);
               let perkType = "contributor";
               await handleCode(
                 interaction,
@@ -246,14 +256,14 @@ module.exports = {
             }
           } else if (targetStatus) {
             if (targetStatus.Type === "vip" && targetStatus.Status === true) {
-              let role = await guild.roles.fetch(vipRole);
+              let role = await guild.roles.fetch(vipRole.Role);
               if (code === vipCode || member.roles.cache.has(role)) {
                 return await interaction.reply({
                   content: `${target} already has VIP perms.`,
                   ephemeral: true,
                 });
               } else if (code === vipPlusCode) {
-                let role = await guild.roles.fetch(vipPlusRole);
+                let role = await guild.roles.fetch(vipPlusRole.Role);
                 let perkType = "vip+";
                 if (member.roles.cache.has(role)) {
                   return await interaction.reply({
@@ -274,7 +284,7 @@ module.exports = {
                   );
                 }
               } else if (code === contributorCode) {
-                let role = await guild.roles.fetch(contributorRole);
+                let role = await guild.roles.fetch(contributorRole.Role);
                 let perkType = "contributor";
                 if (member.roles.cache.has(role)) {
                   return await interaction.reply({
@@ -304,8 +314,8 @@ module.exports = {
               perkStatus.Type === "vip+" &&
               perkStatus.Status === true
             ) {
-              let role = await guild.roles.fetch(vipRole);
-              let role2 = await guild.roles.fetch(vipPlusRole);
+              let role = await guild.roles.fetch(vipRole.Role);
+              let role2 = await guild.roles.fetch(vipPlusRole.Role);
               if (
                 code === vipCode ||
                 code === vipPlusCode ||
@@ -348,9 +358,9 @@ module.exports = {
               perkStatus.Type === "contributor" &&
               perkStatus.Status === true
             ) {
-              let role = await guild.roles.fetch(vipRole);
-              let role2 = await guild.roles.fetch(vipPlusRole);
-              let role3 = await guild.roles.fetch(contributorRole);
+              let role = await guild.roles.fetch(vipRole.Role);
+              let role2 = await guild.roles.fetch(vipPlusRole.Role);
+              let role3 = await guild.roles.fetch(contributorRole.Role);
               if (
                 code === vipCode ||
                 code === vipPlusCode ||
@@ -463,7 +473,7 @@ module.exports = {
       );
       await target.roles.add(role);
       if (perkType === "vip+" || perkType === "contributor") {
-        let role2 = await guild.roles.fetch(vipRole);
+        let role2 = await guild.roles.fetch(vipRole.Role);
         await target.roles.add(role2);
       }
       await interaction.reply({ embeds: [embed], ephemeral: true });
