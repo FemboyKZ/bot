@@ -198,10 +198,12 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
   try {
     if (
-      oldMessage.content.length === 0 ||
-      newMessage.content.length === 0 ||
-      oldMessage.content.length > 512 ||
-      newMessage.content.length > 512
+      oldMessage.content !== null &&
+      newMessage.content !== null &&
+      (oldMessage.content.length === 0 ||
+        newMessage.content.length === 0 ||
+        oldMessage.content.length > 512 ||
+        newMessage.content.length > 512)
     ) {
       if (!logData && settingsData.Store === true) {
         await logs.create({
