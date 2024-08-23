@@ -41,7 +41,7 @@ client.on(Events.InviteCreate, async (invite) => {
     if (member) {
       embed.addFields({
         name: "Creator",
-        value: `<@${member}>` || `unknown`,
+        value: `${member}` || `unknown`,
         inline: false,
       });
     } else if (logData && logData.User) {
@@ -61,7 +61,7 @@ client.on(Events.InviteCreate, async (invite) => {
     if (invite.maxAge === 0) {
       embed.addFields({
         name: "Duration",
-        value: "Permanent",
+        value: "Permanent / Unknown",
         inline: false,
       });
     } else {
@@ -75,7 +75,7 @@ client.on(Events.InviteCreate, async (invite) => {
     if (invite.maxUses === 0) {
       embed.addFields({
         name: "Max Uses",
-        value: "Infinite",
+        value: "Infinite / Unknown",
         inline: false,
       });
     } else {
@@ -149,35 +149,76 @@ client.on(Events.InviteDelete, async (invite) => {
     .setTimestamp()
     .setFooter({ text: `FKZ` })
     .setTitle("Invite Deleted")
-    .addFields(
-      {
-        name: "Author",
-        value: `<@${invite.inviter.id}>` ? `<@${logData?.User}>` : `unknown`,
-        inline: false,
-      },
-      {
-        name: "Uses / Max Uses",
-        value: `${invite.uses ? logData?.Uses : "unknown"} / ${
-          invite.maxUses ? logData?.MaxUses : "unknown"
-        }`,
-        inline: false,
-      },
-      {
-        name: "Invite",
-        value: `${invite.url}`,
-        inline: false,
-      }
-    );
+    .addFields({
+      name: "Invite",
+      value: `${invite.url}`,
+      inline: false,
+    });
+
   try {
-    if (logData && settingsData.Store === true) {
-      await logs.deleteMany({
-        Guild: invite.guild.id,
-        Invite: invite.code,
+    //const fullInvite = await invite.guild.invites.fetch();
+    const member = await invite.guild.members.cache.get(invite.inviter.id);
+    if (member) {
+      embed.addFields({
+        name: "Creator",
+        value: `${member}` || `unknown`,
+        inline: false,
+      });
+    } else if (logData && logData.User) {
+      embed.addFields({
+        name: "Creator",
+        value: `<@${logData?.User}>` || `unknown`,
+        inline: false,
+      });
+    } else {
+      embed.addFields({
+        name: "Creator",
+        value: `<@${invite.inviter.id}>` || `unknown`,
+        inline: false,
       });
     }
 
-    if (settingsData.Post === true) {
-      await channel.send({ embeds: [embed] });
+    if (invite.maxAge === 0) {
+      embed.addFields({
+        name: "Duration",
+        value: "Permanent / Unknown",
+        inline: false,
+      });
+    } else {
+      embed.addFields({
+        name: "Duration",
+        value: `${invite.maxAge ? logData?.Expires : "Unknown"}`,
+        inline: false,
+      });
+    }
+
+    if (invite.maxUses === 0) {
+      embed.addFields({
+        name: "Max Uses",
+        value: "Infinite / Unknown",
+        inline: false,
+      });
+    } else {
+      embed.addFields({
+        name: "Max Uses",
+        value: `${invite.maxUses ? logData?.MaxUses : "Unknown"}`,
+        inline: false,
+      });
+    }
+
+    try {
+      if (logData && settingsData.Store === true) {
+        await logs.deleteMany({
+          Guild: invite.guild.id,
+          Invite: invite.code,
+        });
+      }
+
+      if (settingsData.Post === true) {
+        await channel.send({ embeds: [embed] });
+      }
+    } catch (error) {
+      console.error("Error in InviteDelete event:", error);
     }
   } catch (error) {
     console.error("Error in InviteDelete event:", error);
