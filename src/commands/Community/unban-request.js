@@ -20,85 +20,86 @@ module.exports = {
     }
 
     if (timeout.includes(interaction.user.id)) {
-      await interaction.reply({
+      return await interaction.reply({
         content: `You are on a cooldown! Try again in a few seconds.`,
         ephemeral: true,
       });
-      return;
     }
 
+    const statusData = await status.findOne({
+      User: interaction.user.id,
+      Type: "unban",
+    });
+
+    const data = await schema.findOne({
+      Guild: interaction.guild.id,
+      ID: "unban",
+    });
+
+    const modalUnban = new ModalBuilder()
+      .setTitle("Unban Request form")
+      .setCustomId("modalUnban");
+
+    const steamUnban = new TextInputBuilder()
+      .setCustomId("steamUnban")
+      .setRequired(true)
+      .setLabel("What is your SteamID, or Steam Profile URL")
+      .setPlaceholder("STEAM_1:0:XXX, replace X with your ID")
+      .setStyle(TextInputStyle.Short);
+
+    const reasonUnban = new TextInputBuilder()
+      .setCustomId("reasonUnban")
+      .setRequired(true)
+      .setLabel("Why should you get unbanned?")
+      .setPlaceholder(
+        "Why were you banned? Why would we trust that you won't do it again? Etc."
+      )
+      .setStyle(TextInputStyle.Paragraph);
+
+    const serverUnban = new TextInputBuilder()
+      .setCustomId("serverUnban")
+      .setRequired(true)
+      .setLabel("Which server were you banned from?")
+      .setPlaceholder("IP or name of the server")
+      .setStyle(TextInputStyle.Short);
+
+    const firstActionRow = new ActionRowBuilder().addComponents(steamUnban);
+    const secondActionRow = new ActionRowBuilder().addComponents(reasonUnban);
+    const thirdActionRow = new ActionRowBuilder().addComponents(serverUnban);
+
+    modalUnban.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+
     try {
-      const statusData = await status.findOne({
-        User: interaction.user.id,
-        Type: "unban",
-      });
+      if (statusData) {
+        if (statusData.Status === false) {
+          return await interaction.reply({
+            content:
+              "Unfortunately your unban request has been denied, you can request again later.",
+            ephemeral: true,
+          });
+        }
 
-      if (statusData.Status && statusData.Status === false) {
-        return await interaction.reply({
-          content:
-            "Unfortunately your unban request has been denied, you can request again later.",
-          ephemeral: true,
-        });
+        if (statusData.Status === true) {
+          return await interaction.reply({
+            content: "You have already been unbanned.",
+            ephemeral: true,
+          });
+        }
+
+        if (statusData.Status === null) {
+          return await interaction.reply({
+            content: "You have already requested, please check again later.",
+            ephemeral: true,
+          });
+        }
       }
 
-      if (statusData.Status && statusData.Status === true) {
-        return await interaction.reply({
-          content: "You have already been unbanned.",
-          ephemeral: true,
-        });
-      }
-
-      if (statusData.Status && statusData.Status === null) {
-        return await interaction.reply({
-          content: "You have already requested, please check again later.",
-          ephemeral: true,
-        });
-      }
-
-      const data = await schema.findOne({
-        Guild: interaction.guild.id,
-        ID: "unban",
-      });
       if (!data) {
-        await interaction.reply({
+        return await interaction.reply({
           content: "The unban requests are currently disabled.",
           ephemeral: true,
         });
-        return;
       }
-
-      const modalUnban = new ModalBuilder()
-        .setTitle("Unban Request form")
-        .setCustomId("modalUnban");
-
-      const steamUnban = new TextInputBuilder()
-        .setCustomId("steamUnban")
-        .setRequired(true)
-        .setLabel("What is your SteamID, or Steam Profile URL")
-        .setPlaceholder("STEAM_1:0:XXX, replace X with your ID")
-        .setStyle(TextInputStyle.Short);
-
-      const reasonUnban = new TextInputBuilder()
-        .setCustomId("reasonUnban")
-        .setRequired(true)
-        .setLabel("Why should you get unbanned?")
-        .setPlaceholder(
-          "Why were you banned? Why would we trust that you won't do it again? Etc."
-        )
-        .setStyle(TextInputStyle.Paragraph);
-
-      const serverUnban = new TextInputBuilder()
-        .setCustomId("serverUnban")
-        .setRequired(true)
-        .setLabel("Which server were you banned from?")
-        .setPlaceholder("IP or name of the server")
-        .setStyle(TextInputStyle.Short);
-
-      const firstActionRow = new ActionRowBuilder().addComponents(steamUnban);
-      const secondActionRow = new ActionRowBuilder().addComponents(reasonUnban);
-      const thirdActionRow = new ActionRowBuilder().addComponents(serverUnban);
-
-      modalUnban.addComponents(firstActionRow, secondActionRow, thirdActionRow);
 
       await interaction.showModal(modalUnban);
 
