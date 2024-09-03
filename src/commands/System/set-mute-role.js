@@ -33,13 +33,6 @@ module.exports = {
       });
     }
 
-    if (!roleId) {
-      return await interaction.reply({
-        content: `Something went wrong. No role has been set.`,
-        ephemeral: true,
-      });
-    }
-
     try {
       if (!data) {
         if (roleId) {
