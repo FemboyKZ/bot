@@ -30,21 +30,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${server} (${serverId})`
       )
-      .addFields({
-        name: "Name / UUID",
-        value: `${uuid}`,
-        inline: false,
-      })
-      .addFields({
-        name: "Reasoning for whitelist",
-        value: `${reason}`,
-        inline: false,
-      })
-      .addFields({
-        name: "What they want to do on the server",
-        value: `${request}`,
-        inline: false,
-      })
+      .addFields(
+        {
+          name: "Name / UUID",
+          value: `${uuid}`,
+          inline: false,
+        },
+        {
+          name: "Reasoning for whitelist",
+          value: `${reason}`,
+          inline: false,
+        },
+        {
+          name: "What they want to do on the server",
+          value: `${request}`,
+          inline: false,
+        }
+      )
       .setTimestamp();
 
     schema
@@ -100,21 +102,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${guild} (${guildId})`
       )
-      .addFields({
-        name: "SteamID / Profile URL",
-        value: `${steam}`,
-        inline: false,
-      })
-      .addFields({
-        name: "Reasoning for whitelist",
-        value: `${reason}`,
-        inline: false,
-      })
-      .addFields({
-        name: "Requested to Group? Yes/No",
-        value: `${request}`,
-        inline: false,
-      })
+      .addFields(
+        {
+          name: "SteamID / Profile URL",
+          value: `${steam}`,
+          inline: false,
+        },
+        {
+          name: "Reasoning for whitelist",
+          value: `${reason}`,
+          inline: false,
+        },
+        {
+          name: "Requested to Group? Yes/No",
+          value: `${request}`,
+          inline: false,
+        }
+      )
       .setTimestamp();
 
     schema
@@ -170,21 +174,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${guild} (${guildId})`
       )
-      .addFields({
-        name: "SteamID / Profile URL",
-        value: `${steam}`,
-        inline: false,
-      })
-      .addFields({
-        name: "Reasoning for unban",
-        value: `${reason}`,
-        inline: false,
-      })
-      .addFields({
-        name: "Server IP/Name",
-        value: `${server}`,
-        inline: false,
-      })
+      .addFields(
+        {
+          name: "SteamID / Profile URL",
+          value: `${steam}`,
+          inline: false,
+        },
+        {
+          name: "Reasoning for unban",
+          value: `${reason}`,
+          inline: false,
+        },
+        {
+          name: "Server IP/Name",
+          value: `${server}`,
+          inline: false,
+        }
+      )
       .setTimestamp();
 
     schema
@@ -240,21 +246,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .setDescription(
         `Requesting member: ${tag} (${member})\nIn Server: ${guild} (${guildId})`
       )
-      .addFields({
-        name: "Reported issue / Suggestion",
-        value: `${issue}`,
-        inline: false,
-      })
-      .addFields({
-        name: "Issue/Suggestion in detail",
-        value: `${info}`,
-        inline: false,
-      })
-      .addFields({
-        name: "More info, such as links.",
-        value: `${more}`,
-        inline: false,
-      })
+      .addFields(
+        {
+          name: "Reported issue / Suggestion",
+          value: `${issue}`,
+          inline: false,
+        },
+        {
+          name: "Issue/Suggestion in detail",
+          value: `${info}`,
+          inline: false,
+        },
+        {
+          name: "More info, such as links.",
+          value: `${more}`,
+          inline: false,
+        }
+      )
       .setTimestamp();
 
     schema
