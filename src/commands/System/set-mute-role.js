@@ -41,12 +41,6 @@ module.exports = {
     }
 
     try {
-      if (role.id === data.Role) {
-        return await interaction.reply({
-          content: `The role is already set to ${role}.`,
-          ephemeral: true,
-        });
-      }
       if (!data) {
         if (roleId) {
           await schema.create({
@@ -65,6 +59,12 @@ module.exports = {
         }
       }
       if (data) {
+        if (role.id === data.Role) {
+          return await interaction.reply({
+            content: `The role is already set to ${role}.`,
+            ephemeral: true,
+          });
+        }
         if (roleId) {
           await schema.findOneAndUpdate(
             {
