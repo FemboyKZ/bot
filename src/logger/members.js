@@ -460,11 +460,6 @@ client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
   if (oldMember.partial) await oldMember.fetch();
 
-  const logData = await logs.findOne({
-    Guild: newMember.guild.id,
-    User: newMember.user.id,
-  });
-
   const embed = new EmbedBuilder()
     .setColor("#ff00b3")
     .setTimestamp()

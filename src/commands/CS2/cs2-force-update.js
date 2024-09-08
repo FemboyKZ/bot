@@ -23,11 +23,9 @@ module.exports = {
           { name: "CS2 EU - FKZ 1 - Whitelist", value: "cs2-fkz-1" },
           { name: "CS2 EU - FKZ 2 - Public KZ", value: "cs2-fkz-2" },
           { name: "CS2 EU - FKZ 3 - Public MV", value: "cs2-fkz-3" },
-          { name: "CS2 EU - FKZ 4 - Public HNS", value: "cs2-fkz-4" },
-          { name: "CS2 EU - FKZ 5 - Testing", value: "cs2-fkz-5" },
-          { name: "CS2 NA - FKZ 1 - Public KZ", value: "cs2-fkz-6" },
-          { name: "CS2 NA - FKZ 2 - Public MV", value: "cs2-fkz-7" },
-          { name: "CS2 NA - FKZ 3 - Public HNS", value: "cs2-fkz-8" }
+          { name: "CS2 EU - FKZ 4 - Testing", value: "cs2-fkz-4" },
+          { name: "CS2 NA - FKZ 1 - Public KZ", value: "cs2-fkz-5" },
+          { name: "CS2 NA - FKZ 2 - Public MV", value: "cs2-fkz-6" }
         )
     ),
 
@@ -58,29 +56,19 @@ module.exports = {
         id: null,
       },
       "cs2-fkz-4": {
-        name: "CS2 EU - FKZ 4 - Public HNS",
-        user: "cs2-fkz-4",
-        id: null,
-      },
-      "cs2-fkz-5": {
-        name: "CS2 EU - FKZ 5 - Testing",
+        name: "CS2 EU - FKZ 4 - Testing",
         user: "cs2-fkz-5",
         id: null,
       },
-      "cs2-fkz-6": {
+      "cs2-fkz-5": {
         name: "CS2 NA - FKZ 1 - Public KZ",
-        user: "cs2-fkz-6",
+        user: "cs2-fkz-5",
         id: process.env.NA_CS2_KZ_SERVERID,
       },
-      "cs2-fkz-7": {
+      "cs2-fkz-6": {
         name: "CS2 NA - FKZ 1 - Public MV",
-        user: "cs2-fkz-7",
+        user: "cs2-fkz-6",
         id: process.env.NA_CS2_MV_SERVERID,
-      },
-      "cs2-fkz-8": {
-        name: "CS2 NA - FKZ 1 - Public HNS",
-        user: "cs2-fkz-8",
-        id: process.env.NA_CS2_HNS_SERVERID,
       },
     }[servers];
 

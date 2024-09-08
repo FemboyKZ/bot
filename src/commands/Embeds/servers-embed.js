@@ -40,11 +40,9 @@ module.exports = {
     const cs2WLeu = "euwl.femboy.kz";
     const cs2KZeu = "eu1.femboy.kz:27016";
     const cs2MVeu = "eu2.femboy.kz:27017";
-    const cs2HNSeu = "eu3.femboy.kz:27018";
 
     const cs2KZna = "na1.femboy.kz:26578";
     const cs2MVna = "na2.femboy.kz:26212";
-    const cs2HNSna = "na3.femboy.kz:26582";
 
     const embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
@@ -183,21 +181,6 @@ module.exports = {
         {
           name: ":flag_us:  **Movement**",
           value: `[*${cs2MVna}*](<https://cs2.femboy.kz/connect?ip=${cs2MVna}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_eu:  **HNS**",
-          value: `[*${cs2HNSeu}*](<https://cs2.femboy.kz/connect?ip=${cs2HNSeu}>)`,
-          inline: true,
-        },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **HNS**",
-          value: `[*${cs2HNSna}*](<https://cs2.femboy.kz/connect?ip=${cs2HNSna}>)`,
           inline: true,
         },
       ]);
