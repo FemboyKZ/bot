@@ -96,18 +96,23 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "To be able to play on the **[ClassicCounter](https://flashboost.ru)** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter).\n\nPlease do not open any tickets regarding ClassicCounter, or ping their staff on our Discord server, join theirs instead."
+        "To be able to play on the **[ClassicCounter](https://classiccounter.cc/)** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter).\n\nPlease do not open any tickets regarding ClassicCounter, or ping their staff on our Discord server, join theirs instead."
       )
       .addFields([
         {
           name: "**ClassicCounter Website**",
           value:
-            "Check out all their Servers here:\n**<https://flashboost.ru/sourcebans/index.php?p=servers>**",
+            "Check out all their Servers here:\n**<https://classiccounter.cc/servers>**",
+        },
+        {
+          name: "**ClassicCounter Whitelist**",
+          value:
+            "ClassicCounter handles their whitelist via their site, apply or check it out here:\n**<https://classiccounter.cc/whitelist>**",
         },
         {
           name: "**ClassicCounter Bans**",
           value:
-            "ClassicCounter handles their bans and un-bans on their Discord, but they can be viewed here:\n**<https://flashboost.ru/sourcebans/index.php?p=bans>**",
+            "ClassicCounter handles their bans and un-bans on their Discord, but they can be viewed here:\n**<https://classiccounter.cc/bans>**",
         },
       ]);
     const embedSupport = new EmbedBuilder()
