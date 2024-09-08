@@ -26,9 +26,9 @@ module.exports = {
       });
     const channel = interaction.options.getChannel("channel");
 
-    const csgoWLeu = "euwl.femboy.kz:27025";
-    const csgo64eu = "eu64.femboy.kz:27035";
-    const csgoNUeu = "eunu.femboy.kz:27045";
+    const csgoWLeu = "csgo.femboy.kz:27025";
+    const csgo64eu = "csgo.femboy.kz:27035";
+    const csgoNUeu = "csgo.femboy.kz:27045";
 
     const csgoWLna = "nawl.femboy.kz:28455";
     const csgo64na = "na64.femboy.kz:27945";
@@ -37,9 +37,9 @@ module.exports = {
     const cscl128eukzt = "classic.femboy.kz:27079";
     const cscl64eu = "classic.femboy.kz:27089";
 
-    const cs2WLeu = "euwl.femboy.kz";
-    const cs2KZeu = "eu1.femboy.kz:27016";
-    const cs2MVeu = "eu2.femboy.kz:27017";
+    const cs2WLeu = "cs2.femboy.kz";
+    const cs2KZeu = "cs2..femboy.kz:27016";
+    const cs2MVeu = "cs2..femboy.kz:27017";
 
     const cs2KZna = "na1.femboy.kz:26578";
     const cs2MVna = "na2.femboy.kz:26212";
