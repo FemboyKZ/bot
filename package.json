@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "discord.js": "^14.15.3",
+    "discord.js": "^14.16.1",
     "dotenv": "^16.4.5",
-    "mongoose": "^8.6.0",
+    "mongoose": "^8.6.1",
     "undici": "^6.19.8",
     "xml2js": "^0.6.2"
   },
