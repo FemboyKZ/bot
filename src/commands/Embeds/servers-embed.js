@@ -26,23 +26,26 @@ module.exports = {
       });
     const channel = interaction.options.getChannel("channel");
 
-    const csgoWLeu = "csgo.femboy.kz:27025";
-    const csgo64eu = "csgo.femboy.kz:27035";
-    const csgoNUeu = "csgo.femboy.kz:27045";
+    const csgoWLeu = "eu.femboy.kz:27025";
+    const csgo64eu = "eu.femboy.kz:27035";
+    const csgoNUeu = "eu.femboy.kz:27045";
 
-    const csgoWLna = "nawl.femboy.kz:28455";
-    const csgo64na = "na64.femboy.kz:27945";
+    const csgoWLna = "na.femboy.kz:27025";
+    const csgo64na = "na.femboy.kz:27035";
 
-    const cscl128eu = "classic.femboy.kz:27099";
-    const cscl128eukzt = "classic.femboy.kz:27079";
-    const cscl64eu = "classic.femboy.kz:27089";
+    const cscl128eu = "eu.femboy.kz:27099";
+    const cscl128eukzt = "eu.femboy.kz:27079";
+    const cscl64eu = "eu.femboy.kz:27089";
 
-    const cs2WLeu = "cs2.femboy.kz";
-    const cs2KZeu = "cs2..femboy.kz:27016";
-    const cs2MVeu = "cs2..femboy.kz:27017";
+    const cscl128na = "na.femboy.kz:27099";
+    const cscl64na = "na.femboy.kz:27089";
 
-    const cs2KZna = "na1.femboy.kz:26578";
-    const cs2MVna = "na2.femboy.kz:26212";
+    const cs2WLeu = "eu.femboy.kz";
+    const cs2KZeu = "eu.femboy.kz:27016";
+    const cs2MVeu = "eu.femboy.kz:27017";
+
+    const cs2KZna = "na.femboy.kz";
+    const cs2MVna = "na.femboy.kz:27016";
 
     const embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
@@ -165,7 +168,7 @@ module.exports = {
         },
         {
           name: ":flag_us:  **KZ**",
-          value: `[*${cs2KZna}*](<https://cs2.femboy.kz/connect?ip=${cs2KZna}>)`,
+          value: `[*${cs2KZna}*](<https://cs2.femboy.kz/connect?ip=${cs2KZna}:27015>)`,
           inline: true,
         },
         {
