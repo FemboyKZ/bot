@@ -25,9 +25,11 @@ module.exports = {
           { name: "CS2 EU - FKZ 1 - Whitelist", value: "cs2-fkz-1" },
           { name: "CS2 EU - FKZ 2 - Public KZ", value: "cs2-fkz-2" },
           { name: "CS2 EU - FKZ 3 - Public MV", value: "cs2-fkz-3" },
-          { name: "CS2 EU - FKZ 4 - Testing", value: "cs2-fkz-4" },
+          { name: "CS2 EU - FKZ 4 - Testing", value: "cs2-fkz-4" }
+          /*
           { name: "CS2 NA - FKZ 1 - Public KZ", value: "cs2-fkz-5" },
           { name: "CS2 NA - FKZ 2 - Public MV", value: "cs2-fkz-6" }
+          */
         )
     ),
 
