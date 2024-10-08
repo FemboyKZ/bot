@@ -125,13 +125,38 @@ module.exports = {
           inline: true,
         },
         {
+          name: ":flag_us:  **128t VNL KZ**",
+          value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128na}>)`,
+          inline: true,
+        },
+        {
           name: ":flag_eu:  **64t VNL KZ**",
           value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64eu}>)`,
           inline: true,
         },
         {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **64t VNL KZ**",
+          value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64na}>)`,
+          inline: true,
+        },
+        {
           name: ":flag_eu:  **128t KZTimer**",
           value: `[*${cscl128eukzt}*](<https://classic.femboy.kz/connect?ip=${cscl128eukzt}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **128t KZTimer**",
+          value: `[*TBA*]`,
           inline: true,
         },
       ]);
