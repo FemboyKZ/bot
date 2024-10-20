@@ -4,11 +4,14 @@ const {
   EmbedBuilder,
 } = require("discord.js");
 const { exec } = require("child_process");
+const axios = require("axios");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
-const username = process.env.DATHOST_USERNAME;
-const password = process.env.DATHOST_PASSWORD;
+const key = process.env.API_KEY;
+const port = process.env.PORT || 8080;
+const apiUrl = new URL(process.env.API_URL);
+const url = `${apiUrl.origin}:${port}${apiUrl.pathname}`;
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,11 +26,9 @@ module.exports = {
           { name: "CS2 EU - FKZ 1 - Whitelist", value: "cs2-fkz-1" },
           { name: "CS2 EU - FKZ 2 - Public KZ", value: "cs2-fkz-2" },
           { name: "CS2 EU - FKZ 3 - Public MV", value: "cs2-fkz-3" },
-          { name: "CS2 EU - FKZ 4 - Testing", value: "cs2-fkz-4" }
-          /*
+          { name: "CS2 EU - FKZ 4 - Testing", value: "cs2-fkz-4" },
           { name: "CS2 NA - FKZ 1 - Public KZ", value: "cs2-fkz-5" },
           { name: "CS2 NA - FKZ 2 - Public MV", value: "cs2-fkz-6" }
-          */
         )
     ),
 
@@ -65,12 +66,12 @@ module.exports = {
       "cs2-fkz-5": {
         name: "CS2 NA - FKZ 1 - Public KZ",
         user: "cs2-fkz-5",
-        id: process.env.NA_CS2_KZ_SERVERID,
+        id: 1,
       },
       "cs2-fkz-6": {
         name: "CS2 NA - FKZ 1 - Public MV",
         user: "cs2-fkz-6",
-        id: process.env.NA_CS2_MV_SERVERID,
+        id: 2,
       },
     }[servers];
 
@@ -83,10 +84,8 @@ module.exports = {
     }
 
     const { name, user, id } = server;
+    const command = `sudo -iu ${user} /home/${user}/cs2server start`;
 
-    const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
-    const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
-    // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
       !interaction.member.roles.cache.has(process.env.CS2_MANAGER_ROLE)
@@ -104,49 +103,50 @@ module.exports = {
         embeds: [embed],
         ephemeral: true,
       });
-      if (id !== null) {
-        exec(
-          `curl -u "${username}:${password}" --request POST \--url https://dathost.net/api/0.1/game-servers/${id}/start`,
-          async (error, stdout, stderr) => {
-            if (error) console.log(error);
-            //if (stderr) console.log(stderr);
-            //if (stdout) console.log(stdout);
-          }
-        );
-        await wait(3000);
-        exec(statusCommand, async (error, stdout, stderr) => {
+      if (id === null) {
+        exec(command, async (error, stdout, stderr) => {
           if (error) console.log(error);
-          //if (stderr) console.log(stderr);
-          //if (stdout) console.log(stdout);
-          if (stdout.includes(`"on":true`)) {
-            embed.setDescription(`Started: ${name}`);
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          } else {
-            embed.setDescription(`(Probably) Started: ${name}`);
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          }
         });
-      } else {
-        exec(
-          `sudo -iu ${user} /home/${user}/cs2server start`,
-          async (error, stdout, stderr) => {
-            if (error) console.log(error);
-            //if (stderr) console.log(stderr);
-            //if (stdout) console.log(stdout);
-          }
-        );
         await wait(3000);
         embed.setDescription(`Started: ${name}`);
         return await interaction.editReply({
           embeds: [embed],
           ephemeral: true,
         });
+      } else {
+        if (!url || !key) {
+          embed.setDescription("API url and/or key missing.");
+          return await interaction.editReply({
+            embeds: [embed],
+            ephemeral: true,
+          });
+        }
+        const response = await axios.post(
+          url,
+          {
+            command: command,
+          },
+          {
+            headers: {
+              authorization: `Bearer ${key}`,
+            },
+          }
+        );
+        await wait(3000);
+        if (response.data.status === 200) {
+          embed.setDescription(`Started: ${name}`);
+          return await interaction.editReply({
+            embeds: [embed],
+            ephemeral: true,
+          });
+        } else {
+          console.log(response.status, response.data);
+          embed.setDescription(`Something went wrong while starting: ${name}`);
+          return await interaction.editReply({
+            embeds: [embed],
+            ephemeral: true,
+          });
+        }
       }
     } catch (error) {
       await interaction.reply({
