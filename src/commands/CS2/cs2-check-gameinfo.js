@@ -67,12 +67,12 @@ module.exports = {
       },
       "cs2-fkz-5": {
         name: "CS2 NA - FKZ 1 - Public KZ",
-        user: "cs2-fkz-5",
+        user: "cs2-fkz-1",
         id: 1,
       },
       "cs2-fkz-6": {
         name: "CS2 NA - FKZ 1 - Public MV",
-        user: "cs2-fkz-6",
+        user: "cs2-fkz-2",
         id: 2,
       },
     }[servers];
