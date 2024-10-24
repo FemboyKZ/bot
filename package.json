@@ -12,7 +12,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "node src/index.js",
-    "run": "node --no-warnings src/index.js"
+    "start": "node --no-warnings src/index.js"
   },
   "author": "camwhore",
   "license": "GPL-3.0-only",
