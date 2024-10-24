@@ -105,33 +105,37 @@ module.exports = {
         embeds: [embed],
         ephemeral: true,
       });
+
+      const handleOutput = async (output) => {
+        if (output.includes("Line already exists")) {
+          embed.setDescription(
+            `Metamod is already defined in gameinfo for ${name}.`
+          );
+        } else if (output.includes("Line added")) {
+          embed.setDescription(`Defined metamod in gameinfo for ${name}.`);
+        } else {
+          embed.setDescription(
+            `Failed to define metamod in gameinfo for ${name}.`
+          );
+        }
+        await interaction.editReply({
+          embeds: [embed],
+          ephemeral: true,
+        });
+      };
+
       if (id === null) {
         exec(command, async (error, stdout, stderr) => {
-          if (error) console.log(error);
-          await wait(3000);
-          if (stdout.includes("Line already exists")) {
-            embed.setDescription(
-              `Metamod is already defined in gameinfo for ${name}.`
-            );
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          } else if (stdout.includes("Line added")) {
-            embed.setDescription(`Defined metamod in gameinfo for ${name}.`);
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          } else {
-            embed.setDescription(
-              `Failed to define metamod in gameinfo for ${name}.`
-            );
+          if (error) {
+            console.log(error);
+            embed.setDescription(`Error: ${stderr}`);
             return await interaction.editReply({
               embeds: [embed],
               ephemeral: true,
             });
           }
+          await wait(3000);
+          await handleOutput(stdout);
         });
       } else {
         if (!url || !key) {
@@ -154,47 +158,25 @@ module.exports = {
         );
         await wait(3000);
         if (response.status === 200) {
-          if (response.data.hasOwnProperty("Line already exists")) {
-            embed.setDescription(
-              `Metamod is already defined in gameinfo for ${name}.`
-            );
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          } else if (response.data.hasOwnProperty("Line added")) {
-            embed.setDescription(`Defined metamod in gameinfo for ${name}.`);
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          } else {
-            embed.setDescription(
-              `Failed to define metamod in gameinfo for ${name}.`
-            );
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          }
+          await handleOutput(response.data);
         } else {
           console.log(response.status, response.data);
           embed.setDescription(
             `Failed to define metamod in gameinfo for ${name}.`
           );
-          return await interaction.editReply({
+          await interaction.editReply({
             embeds: [embed],
             ephemeral: true,
           });
         }
       }
     } catch (error) {
-      if (interaction) {
-        await interaction.editReply({
-          content: `Error: ${error}`,
-          ephemeral: true,
-        });
-      }
+      console.error(error);
+      embed.setDescription(`Error: ${error.message}`);
+      await interaction.editReply({
+        embeds: [embed],
+        ephemeral: true,
+      });
     }
   },
 };
