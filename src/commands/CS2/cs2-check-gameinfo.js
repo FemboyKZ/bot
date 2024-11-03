@@ -5,7 +5,6 @@ const {
 } = require("discord.js");
 const { exec } = require("child_process");
 const axios = require("axios");
-const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
 const key = process.env.API_KEY;
@@ -47,32 +46,32 @@ module.exports = {
     const server = {
       "cs2-fkz-1": {
         name: "CS2 EU - FKZ 1 - Whitelist",
-        user: "cs2-fkz-1",
+        user: "fkz-1",
         id: null,
       },
       "cs2-fkz-2": {
         name: "CS2 EU - FKZ 2 - Public KZ",
-        user: "cs2-fkz-2",
+        user: "fkz-2",
         id: null,
       },
       "cs2-fkz-3": {
         name: "CS2 EU - FKZ 3 - Public MV",
-        user: "cs2-fkz-3",
+        user: "fkz-3",
         id: null,
       },
       "cs2-fkz-4": {
         name: "CS2 EU - FKZ 4 - Testing",
-        user: "cs2-fkz-5",
+        user: "fkz-5",
         id: null,
       },
       "cs2-fkz-5": {
         name: "CS2 NA - FKZ 1 - Public KZ",
-        user: "cs2-fkz-1",
+        user: "fkz-1",
         id: 1,
       },
       "cs2-fkz-6": {
         name: "CS2 NA - FKZ 1 - Public MV",
-        user: "cs2-fkz-2",
+        user: "fkz-2",
         id: 2,
       },
     }[servers];
@@ -86,7 +85,7 @@ module.exports = {
     }
 
     const { name, user, id } = server;
-    const command = `sudo -iu ${user} /home/${user}/gameinfo.sh`;
+    const command = `sudo -iu cs2-${user} /home/cs2-${user}/gameinfo.sh`;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
@@ -124,52 +123,56 @@ module.exports = {
         });
       };
 
-      if (id === null) {
-        exec(command, async (error, stdout, stderr) => {
-          if (error) {
-            console.log(error);
-            embed.setDescription(`Error: ${stderr}`);
+      const executeCommand = async () => {
+        if (id === null) {
+          exec(command, async (error, stdout, stderr) => {
+            if (error) {
+              console.log(error);
+              embed.setDescription(`Error: ${stderr}`);
+              return await interaction.editReply({
+                embeds: [embed],
+                ephemeral: true,
+              });
+            }
+            await handleOutput(stdout);
+          });
+        } else {
+          if (!url || !key) {
+            embed.setDescription("API url and/or key missing.");
             return await interaction.editReply({
               embeds: [embed],
               ephemeral: true,
             });
           }
-          await wait(3000);
-          await handleOutput(stdout);
-        });
-      } else {
-        if (!url || !key) {
-          embed.setDescription("API url and/or key missing.");
-          return await interaction.editReply({
-            embeds: [embed],
-            ephemeral: true,
-          });
-        }
-        const response = await axios.post(
-          url,
-          {
-            command: command,
-          },
-          {
-            headers: {
-              authorization: `Bearer ${key}`,
+          const response = await axios.post(
+            url,
+            {
+              user: user,
+              game: "cs2",
+              command: "gameinfo.sh",
             },
-          }
-        );
-        await wait(3000);
-        if (response.status === 200) {
-          await handleOutput(response.data);
-        } else {
-          console.log(response.status, response.data);
-          embed.setDescription(
-            `Failed to define metamod in gameinfo for ${name}.`
+            {
+              headers: {
+                authorization: `Bearer ${key}`,
+              },
+            }
           );
-          await interaction.editReply({
-            embeds: [embed],
-            ephemeral: true,
-          });
+          if (response.status === 200) {
+            await handleOutput(response.data);
+          } else {
+            console.log(response.status, response.data);
+            embed.setDescription(
+              `Failed to define metamod in gameinfo for ${name}.`
+            );
+            await interaction.editReply({
+              embeds: [embed],
+              ephemeral: true,
+            });
+          }
         }
-      }
+      };
+
+      await executeCommand();
     } catch (error) {
       console.error(error);
       embed.setDescription(`Error: ${error.message}`);

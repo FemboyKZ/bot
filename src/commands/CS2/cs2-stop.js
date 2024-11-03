@@ -5,7 +5,6 @@ const {
 } = require("discord.js");
 const { exec } = require("child_process");
 const axios = require("axios");
-const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
 const key = process.env.API_KEY;
@@ -45,32 +44,32 @@ module.exports = {
     const server = {
       "cs2-fkz-1": {
         name: "CS2 EU - FKZ 1 - Whitelist",
-        user: "cs2-fkz-1",
+        user: "fkz-1",
         id: null,
       },
       "cs2-fkz-2": {
         name: "CS2 EU - FKZ 2 - Public KZ",
-        user: "cs2-fkz-2",
+        user: "fkz-2",
         id: null,
       },
       "cs2-fkz-3": {
         name: "CS2 EU - FKZ 3 - Public MV",
-        user: "cs2-fkz-3",
+        user: "fkz-3",
         id: null,
       },
       "cs2-fkz-4": {
         name: "CS2 EU - FKZ 4 - Testing",
-        user: "cs2-fkz-5",
+        user: "fkz-5",
         id: null,
       },
       "cs2-fkz-5": {
         name: "CS2 NA - FKZ 1 - Public KZ",
-        user: "cs2-fkz-1",
+        user: "fkz-1",
         id: 1,
       },
       "cs2-fkz-6": {
         name: "CS2 NA - FKZ 1 - Public MV",
-        user: "cs2-fkz-2",
+        user: "fkz-2",
         id: 2,
       },
     }[servers];
@@ -84,7 +83,7 @@ module.exports = {
     }
 
     const { name, user, id } = server;
-    const command = `sudo -iu ${user} /home/${user}/cs2server stop`;
+    const command = `sudo -iu cs2-${user} /home/cs2-${user}/cs2server stop`;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
@@ -107,7 +106,6 @@ module.exports = {
         exec(command, async (error, stdout, stderr) => {
           if (error) console.log(error);
         });
-        await wait(3000);
         embed.setDescription(`Stopped: ${name}`);
         return await interaction.editReply({
           embeds: [embed],
@@ -124,7 +122,9 @@ module.exports = {
         const response = await axios.post(
           url,
           {
-            command: command,
+            user: user,
+            game: "cs2",
+            command: "stop",
           },
           {
             headers: {
@@ -132,7 +132,6 @@ module.exports = {
             },
           }
         );
-        await wait(3000);
         if (response.data.status === 200) {
           embed.setDescription(`Stopped: ${name}`);
           return await interaction.editReply({
