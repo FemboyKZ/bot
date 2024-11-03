@@ -17,7 +17,7 @@ module.exports = {
 
     const data = await schema.findOne({
       Guild: interaction.guild.id,
-      Type: "tickets",
+      ID: "tickets",
     });
 
     try {
@@ -27,7 +27,7 @@ module.exports = {
           ephemeral: true,
         });
       }
-      await schema.deleteMany({ Guild: interaction.guild.id, Type: "tickets" });
+      await schema.deleteMany({ Guild: interaction.guild.id, ID: "tickets" });
       await interaction.reply({
         content: `The tickets system has been disabled.`,
         ephemeral: true,

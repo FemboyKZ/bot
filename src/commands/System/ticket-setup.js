@@ -160,7 +160,7 @@ module.exports = {
     try {
       const data = await schema.findOne({
         Guild: interaction.guild.id,
-        Type: "tickets",
+        ID: "tickets",
       });
       if (data) {
         return await interaction.editReply({
@@ -171,7 +171,7 @@ module.exports = {
         schema.create({
           Guild: interaction.guild.id,
           Channel: category.id,
-          Type: "tickets",
+          ID: "tickets",
         });
         await channel.send({
           embeds: [
