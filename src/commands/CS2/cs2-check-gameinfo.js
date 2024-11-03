@@ -5,12 +5,18 @@ const {
 } = require("discord.js");
 const { exec } = require("child_process");
 const axios = require("axios");
+const https = require("https");
 require("dotenv").config();
 
 const key = process.env.API_KEY;
 const port = process.env.API_PORT || 8080;
 const apiUrl = new URL(process.env.API_URL);
 const url = `${apiUrl.origin}:${port}${apiUrl.pathname}`;
+
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+  secureProtocol: "TLSv1_2_method",
+});
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -155,6 +161,7 @@ module.exports = {
               headers: {
                 authorization: `Bearer ${key}`,
               },
+              httpsAgent,
             }
           );
           if (response.status === 200) {
