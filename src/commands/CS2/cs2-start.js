@@ -14,7 +14,6 @@ const apiUrl = new URL(process.env.API_URL);
 const url = `${apiUrl.origin}:${port}${apiUrl.pathname}`;
 
 const httpsAgent = new https.Agent({
-  rejectUnauthorized: false,
   secureProtocol: "TLSv1_2_method",
 });
 
