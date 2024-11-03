@@ -34,6 +34,8 @@ module.exports = {
         ephemeral: true,
       });
 
+    interaction.deferReply({ ephemeral: true });
+
     const channel = interaction.options.getChannel("channel");
     const category = interaction.options.getChannel("category");
 
@@ -161,7 +163,7 @@ module.exports = {
         ID: "tickets",
       });
       if (data) {
-        return await interaction.reply({
+        return await interaction.editReply({
           content: "Tickets have already been setup",
           ephemeral: true,
         });
@@ -181,14 +183,14 @@ module.exports = {
           ],
           components: [menu],
         });
-        await interaction.reply({
+        await interaction.editReply({
           content: `Your tickets system has been set up in ${channel}.`,
           ephemeral: true,
         });
       }
     } catch (err) {
       console.error("Error executing command:", err);
-      await interaction.reply({
+      await interaction.editReply({
         content: "There was an error while executing this command!",
         ephemeral: true,
       });
