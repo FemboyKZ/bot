@@ -4,11 +4,13 @@ const {
   EmbedBuilder,
 } = require("discord.js");
 const { exec } = require("child_process");
-const wait = require("timers/promises").setTimeout;
+const axios = require("axios");
 require("dotenv").config();
 
-const username = process.env.DATHOST_USERNAME;
-const password = process.env.DATHOST_PASSWORD;
+const key = process.env.API_KEY;
+const port = process.env.PORT || 8080;
+const apiUrl = new URL(process.env.API_URL);
+const url = `${apiUrl.origin}:${port}${apiUrl.pathname}`;
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -22,11 +24,9 @@ module.exports = {
         .addChoices(
           { name: "CS:GO EU - FKZ 1 - Whitelist 128t", value: "csgo-fkz-1" },
           { name: "CS:GO EU - FKZ 2 - Public 64t", value: "csgo-fkz-2" },
-          { name: "CS:GO EU - FKZ 3 - Public Nuke", value: "csgo-fkz-3" }
-          /*
+          { name: "CS:GO EU - FKZ 3 - Public Nuke", value: "csgo-fkz-3" },
           { name: "CS:GO NA - FKZ 1 - Whitelist 128t", value: "csgo-fkz-4" },
           { name: "CS:GO NA - FKZ 2 - Public 64t", value: "csgo-fkz-5" }
-           */
         )
     ),
 
@@ -43,28 +43,28 @@ module.exports = {
     const server = {
       "csgo-fkz-1": {
         name: "CS:GO EU - FKZ 1 - Whitelist 128t",
-        user: "csgo-fkz-1",
+        user: "fkz-1",
         id: null,
       },
       "csgo-fkz-2": {
         name: "CS:GO EU - FKZ 2 - Public 64t",
-        user: "csgo-fkz-2",
+        user: "fkz-2",
         id: null,
       },
       "csgo-fkz-3": {
         name: "CS:GO EU - FKZ 3 - Public Nuke",
-        user: "csgo-fkz-3",
+        user: "fkz-3",
         id: null,
       },
       "csgo-fkz-4": {
         name: "CS:GO NA - FKZ 1 - Whitelist 128t",
-        user: "csgo-fkz-4",
-        id: process.env.NA_CSGO_WL_SERVERID,
+        user: "fkz-1",
+        id: 1,
       },
       "csgo-fkz-5": {
         name: "CS:GO NA - FKZ 2 - Public 64t",
-        user: "csgo-fkz-5",
-        id: process.env.NA_CSGO_64_SERVERID,
+        user: "fkz-2",
+        id: 2,
       },
     }[servers];
 
@@ -77,10 +77,7 @@ module.exports = {
     }
 
     const { name, user, id } = server;
-
-    const statusUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
-    const statusCommand = `curl -u "${username}:${password}" --request GET \--url ${statusUrl} \--header 'accept: application/json'`;
-    // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
+    const command = `sudo -iu csgo-${user} /home/csgo-${user}/csgoserver stop`;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
@@ -99,53 +96,56 @@ module.exports = {
         embeds: [embed],
         ephemeral: true,
       });
-      if (id !== null) {
-        exec(
-          `curl -u "${username}:${password}" --request POST \--url https://dathost.net/api/0.1/game-servers/${id}/stop`,
-          async (error, stdout, stderr) => {
-            if (error) console.log(error);
-            //if (stderr) console.log(stderr);
-            //if (stdout) console.log(stdout);
-          }
-        );
-        await wait(3000);
-        exec(statusCommand, async (error, stdout, stderr) => {
+      if (id === null) {
+        exec(command, async (error, stdout, stderr) => {
           if (error) console.log(error);
-          //if (stderr) console.log(stderr);
-          //if (stdout) console.log(stdout);
-          if (stdout.includes(`"on":false`)) {
-            embed.setDescription(`Stopped: ${name}`);
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          } else {
-            embed.setDescription(`(Probably) Stopped: ${name}`);
-            return await interaction.editReply({
-              embeds: [embed],
-              ephemeral: true,
-            });
-          }
         });
-      } else {
-        exec(
-          `sudo -iu ${user} /home/${user}/csgoserver stop`,
-          async (error, stdout, stderr) => {
-            if (error) console.log(error);
-            //if (stderr) console.log(stderr);
-            //if (stdout) console.log(stdout);
-          }
-        );
-        await wait(3000);
         embed.setDescription(`Stopped: ${name}`);
-        return await interaction.editReply({
+        await interaction.editReply({
           embeds: [embed],
           ephemeral: true,
         });
+      } else {
+        if (!url || !key) {
+          embed.setDescription("API url and/or key missing.");
+          return await interaction.editReply({
+            embeds: [embed],
+            ephemeral: true,
+          });
+        }
+        const response = await axios.post(
+          url,
+          {
+            user: user,
+            game: "csgo",
+            command: "stop",
+          },
+          {
+            headers: {
+              authorization: `Bearer ${key}`,
+            },
+          }
+        );
+        if (response.data.status === 200) {
+          embed.setDescription(`Stopped: ${name}`);
+          return await interaction.editReply({
+            embeds: [embed],
+            ephemeral: true,
+          });
+        } else {
+          console.log(response.status, response.data);
+          embed.setDescription(`Something went wrong while stopping: ${name}`);
+          return await interaction.editReply({
+            embeds: [embed],
+            ephemeral: true,
+          });
+        }
       }
     } catch (error) {
-      await interaction.reply({
-        content: `Error: ${error}`,
+      console.error("Error executing command:", error);
+      embed.setDescription(`Error: ${error.message}`);
+      await interaction.editReply({
+        embeds: [embed],
         ephemeral: true,
       });
     }
