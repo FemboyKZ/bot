@@ -6,7 +6,7 @@ const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
 } = require("discord.js");
-const schema = require("../../Schemas/moderation/tickets.js");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -158,7 +158,10 @@ module.exports = {
     );
 
     try {
-      const data = await schema.findOne({ Guild: interaction.guild.id });
+      const data = await schema.findOne({
+        Guild: interaction.guild.id,
+        Type: "tickets",
+      });
       if (data) {
         return await interaction.editReply({
           content: "Tickets have already been setup",
@@ -168,7 +171,7 @@ module.exports = {
         schema.create({
           Guild: interaction.guild.id,
           Channel: category.id,
-          Ticket: "first",
+          Type: "tickets",
         });
         await channel.send({
           embeds: [

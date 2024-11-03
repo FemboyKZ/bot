@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const schema = require("../../Schemas/moderation/tickets.js");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -15,10 +15,21 @@ module.exports = {
       });
     }
 
+    const data = await schema.findOne({
+      Guild: interaction.guild.id,
+      Type: "tickets",
+    });
+
     try {
-      await schema.deleteMany({ Guild: interaction.guild.id });
+      if (!data) {
+        return await interaction.reply({
+          content: "The tickets system is already disabled.",
+          ephemeral: true,
+        });
+      }
+      await schema.deleteMany({ Guild: interaction.guild.id, Type: "tickets" });
       await interaction.reply({
-        content: `The tickets system has been disabled`,
+        content: `The tickets system has been disabled.`,
         ephemeral: true,
       });
     } catch (err) {
