@@ -8,7 +8,7 @@ const axios = require("axios");
 require("dotenv").config();
 
 const key = process.env.API_KEY;
-const port = process.env.PORT || 8080;
+const port = process.env.API_PORT || 8080;
 const apiUrl = new URL(process.env.API_URL);
 const url = `${apiUrl.origin}:${port}${apiUrl.pathname}`;
 
