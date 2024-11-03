@@ -146,8 +146,10 @@ module.exports = {
         }
       }
     } catch (error) {
-      await interaction.reply({
-        content: `Error: ${error}`,
+      console.error("Error executing command:", error);
+      embed.setDescription(`Error: ${error.message}`);
+      await interaction.editReply({
+        embeds: [embed],
         ephemeral: true,
       });
     }
