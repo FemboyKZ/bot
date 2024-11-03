@@ -5,7 +5,6 @@ const {
 } = require("discord.js");
 const { exec } = require("child_process");
 const axios = require("axios");
-const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
 const key = process.env.API_KEY;
@@ -46,27 +45,27 @@ module.exports = {
     const server = {
       "cscl-fkz-1": {
         name: "CS:CL EU - FKZ 1 - VNL KZ 128t",
-        user: "cscl-fkz-1",
+        user: "fkz-1",
         id: null,
       },
       "cscl-fkz-2": {
         name: "CS:CL EU - FKZ 2 - VNL KZ 64t",
-        user: "cscl-fkz-2",
+        user: "fkz-2",
         id: null,
       },
       "cscl-fkz-3": {
         name: "CS:CL EU - FKZ 3 - KZTimer 128t",
-        user: "cscl-fkz-3",
+        user: "fkz-3",
         id: null,
       },
       "cscl-fkz-4": {
         name: "CS:CL NA - FKZ 1 - VNL KZ 128t",
-        user: "cscl-fkz-1",
+        user: "fkz-1",
         id: 1,
       },
       "cscl-fkz-5": {
         name: "CS:CL NA - FKZ 2 - VNL KZ 64t",
-        user: "cscl-fkz-2",
+        user: "fkz-2",
         id: 2,
       },
     }[servers];
@@ -80,7 +79,7 @@ module.exports = {
     }
 
     const { name, user, id } = server;
-    const command = `sudo -iu ${user} /home/${user}/csgoserver restart`;
+    const command = `sudo -iu cscl-${user} /home/cscl-${user}/csgoserver restart`;
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
@@ -103,7 +102,6 @@ module.exports = {
         exec(command, async (error, stdout, stderr) => {
           if (error) console.log(error);
         });
-        await wait(3000);
         embed.setDescription(`Restarted: ${name}`);
         return await interaction.editReply({
           embeds: [embed],
@@ -120,7 +118,9 @@ module.exports = {
         const response = await axios.post(
           url,
           {
-            command: command,
+            user: user,
+            game: "cscl",
+            command: "restart",
           },
           {
             headers: {
@@ -128,7 +128,6 @@ module.exports = {
             },
           }
         );
-        await wait(3000);
         if (response.data.status === 200) {
           embed.setDescription(`Restarted: ${name}`);
           return await interaction.editReply({
