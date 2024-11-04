@@ -14,6 +14,8 @@ const url = `${apiUrl.origin}:${port}${apiUrl.pathname}`;
 
 const delay = 3000; // 3 seconds, increase if needed, this is set because stdout is not immediately available
 
+// This is kinda useless as it's done automatically by the server already
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("cs2-check-gameinfo")
