@@ -47,6 +47,11 @@ module.exports = {
     const cs2KZna = "na.femboy.kz";
     const cs2MVna = "na.femboy.kz:27016";
 
+    const cs2KZas = "as.femboy.kz:26532";
+    const cs2KZau = "au.femboy.kz:25064";
+    const cs2KZsa = "sa.femboy.kz:25126";
+    const cs2KZza = "za.femboy.kz:26518";
+
     const embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
       .setColor("#ff00b3")
@@ -149,16 +154,6 @@ module.exports = {
           value: `[*${cscl128eukzt}*](<https://classic.femboy.kz/connect?ip=${cscl128eukzt}>)`,
           inline: true,
         },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **128t KZTimer**",
-          value: `[*TBA*]`,
-          inline: true,
-        },
       ]);
 
     const embedCS2 = new EmbedBuilder()
@@ -209,6 +204,36 @@ module.exports = {
         {
           name: ":flag_us:  **Movement**",
           value: `[*${cs2MVna}*](<https://cs2.femboy.kz/connect?ip=${cs2MVna}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_hk:  **KZ**",
+          value: `[*${cs2KZas}*](<https://cs2.femboy.kz/connect?ip=${cs2KZas}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_au:  **KZ**",
+          value: `[*${cs2KZau}*](<https://cs2.femboy.kz/connect?ip=${cs2KZau}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_br:  **KZ**",
+          value: `[*${cs2KZsa}*](<https://cs2.femboy.kz/connect?ip=${cs2KZsa}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_za:  **KZ**",
+          value: `[*${cs2KZza}*](<https://cs2.femboy.kz/connect?ip=${cs2KZza}>)`,
           inline: true,
         },
       ]);
