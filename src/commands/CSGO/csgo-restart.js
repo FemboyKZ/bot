@@ -83,7 +83,7 @@ module.exports = {
     const { name, user, id } = server;
 
     const commandLocal = `sudo -iu csgo-${user} /home/csgo-${user}/csgoserver restart`;
-    const commandApi = `curl -X POST -H 'Accept: application/json' -H 'Authorization: ${key}' -H 'Content-Type: application/json' -d '{"user": "${user}", "game": "csgo", "command": "restart"}' ${url}`;
+    const commandApi = `curl -X POST -H 'Accept: application/json' -H 'authorization: ${key}' -H 'Content-Type: application/json' -d '{"user": "${user}", "game": "csgo", "command": "restart"}' ${url}`;
 
     // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
 

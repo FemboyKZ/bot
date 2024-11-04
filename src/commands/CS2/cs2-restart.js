@@ -135,7 +135,7 @@ module.exports = {
     const dathostCommandStop = `curl -u "${username}:${password}" --request GET \--url ${dathostUrl}/stop \--header 'accept: application/json'`;
 
     const commandLocal = `sudo -iu cs2-${user} /home/cs2-${user}/cs2server restart`;
-    const commandApi = `curl -X POST -H 'Accept: application/json' -H 'Authorization: ${key}' -H 'Content-Type: application/json' -d '{"user": "${user}", "game": "cs2", "command": "restart"}' ${url}`;
+    const commandApi = `curl -X POST -H 'Accept: application/json' -H 'authorization: ${key}' -H 'Content-Type: application/json' -d '{"user": "${user}", "game": "cs2", "command": "restart"}' ${url}`;
 
     // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
 
