@@ -4,8 +4,7 @@ const {
   EmbedBuilder,
 } = require("discord.js");
 const { exec } = require("child_process");
-const axios = require("axios");
-const https = require("https");
+const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
 const key = process.env.API_KEY;
@@ -13,9 +12,9 @@ const port = process.env.API_PORT || 8080;
 const apiUrl = new URL(process.env.API_URL);
 const url = `${apiUrl.origin}:${port}${apiUrl.pathname}`;
 
-const httpsAgent = new https.Agent({
-  secureProtocol: "TLSv1_2_method",
-});
+const delay = 3000; // 3 seconds, increase if needed, this is set because stdout is not immediately available
+
+// TODO: Check if the server is actually online after restarting
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -82,11 +81,15 @@ module.exports = {
     }
 
     const { name, user, id } = server;
-    const command = `sudo -iu csgo-${user} /home/csgo-${user}/csgoserver restart`;
+
+    const commandLocal = `sudo -iu csgo-${user} /home/csgo-${user}/csgoserver restart`;
+    const commandApi = `curl -headers "Accept: application/json, Authorization: Bearer ${key}" --request POST --data '{"user": "${user}", "game": "csgo", "command": "restart"}' ${url}`;
+
+    // I know curl is not the best way to do this, but it works (node-fetch and axios didn't)
 
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) &&
-      !interaction.member.roles.cache.has(`${process.env.CSGO_MANAGER_ROLE}`)
+      !interaction.member.roles.cache.has(process.env.CSGO_MANAGER_ROLE)
     ) {
       embed.setDescription("You don't have perms to use this command.");
       return await interaction.reply({
@@ -102,13 +105,21 @@ module.exports = {
         ephemeral: true,
       });
       if (id === null) {
-        exec(command, async (error, stdout, stderr) => {
-          if (error) console.log(error);
-        });
-        embed.setDescription(`Restarted: ${name}`);
-        await interaction.editReply({
-          embeds: [embed],
-          ephemeral: true,
+        exec(commandLocal, async (error, stdout, stderr) => {
+          if (error) {
+            console.log(error);
+            embed.setDescription(`There was an error restarting ${name}.`);
+            await interaction.editReply({
+              embeds: [embed],
+              ephemeral: true,
+            });
+          } else {
+            embed.setDescription(`Restarted ${name}.`);
+            await interaction.editReply({
+              embeds: [embed],
+              ephemeral: true,
+            });
+          }
         });
       } else {
         if (!url || !key) {
@@ -118,36 +129,23 @@ module.exports = {
             ephemeral: true,
           });
         }
-        const response = await axios.post(
-          url,
-          {
-            user: user,
-            game: "csgo",
-            command: "restart",
-          },
-          {
-            headers: {
-              authorization: `Bearer ${key}`,
-            },
-            httpsAgent,
+        exec(commandApi, async (error, stdout, stderr) => {
+          await wait(delay);
+          if (error) {
+            console.log(error);
+            embed.setDescription(`There was an error restarting ${name}.`);
+            await interaction.editReply({
+              embeds: [embed],
+              ephemeral: true,
+            });
+          } else {
+            embed.setDescription(`Restarted ${name}.`);
+            await interaction.editReply({
+              embeds: [embed],
+              ephemeral: true,
+            });
           }
-        );
-        if (response.data.status === 200) {
-          embed.setDescription(`Restarted: ${name}`);
-          return await interaction.editReply({
-            embeds: [embed],
-            ephemeral: true,
-          });
-        } else {
-          console.log(response.status, response.data);
-          embed.setDescription(
-            `Something went wrong while restarting: ${name}`
-          );
-          return await interaction.editReply({
-            embeds: [embed],
-            ephemeral: true,
-          });
-        }
+        });
       }
     } catch (error) {
       console.error("Error executing command:", error);
