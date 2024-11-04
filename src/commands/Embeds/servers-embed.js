@@ -42,10 +42,12 @@ module.exports = {
 
     const cs2WLeu = "eu.femboy.kz";
     const cs2KZeu = "eu.femboy.kz:27016";
-    const cs2MVeu = "eu.femboy.kz:27017";
+    const cs2KZ2eu = "eu.femboy.kz:27017";
+    const cs2MVeu = "eu.femboy.kz:27018";
 
     const cs2KZna = "na.femboy.kz";
-    const cs2MVna = "na.femboy.kz:27016";
+    const cs2KZ2na = "na.femboy.kz:27016";
+    const cs2MVna = "na.femboy.kz:27017";
 
     const cs2KZas = "as.femboy.kz:26532";
     const cs2KZau = "au.femboy.kz:25064";
@@ -189,6 +191,21 @@ module.exports = {
         {
           name: ":flag_us:  **KZ**",
           value: `[*${cs2KZna}*](<https://cs2.femboy.kz/connect?ip=${cs2KZna}:27015>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **KZ**",
+          value: `[*${cs2KZ2eu}*](<https://cs2.femboy.kz/connect?ip=${cs2KZ2eu}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **KZ**",
+          value: `[*${cs2KZ2na}*](<https://cs2.femboy.kz/connect?ip=${cs2KZ2na}>)`,
           inline: true,
         },
         {
