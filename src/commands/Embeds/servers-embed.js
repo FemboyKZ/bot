@@ -43,7 +43,7 @@ module.exports = {
     const cs2WLeu = "eu.femboy.kz";
     const cs2KZeu = "eu.femboy.kz:27016";
     const cs2KZ2eu = "eu.femboy.kz:27017";
-    const cs2MVeu = "eu.femboy.kz:27018";
+    const cs2MVeu = "eu.femboy.kz:27019";
 
     const cs2KZna = "na.femboy.kz";
     const cs2KZ2na = "na.femboy.kz:27016";
