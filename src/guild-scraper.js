@@ -4,10 +4,10 @@ const channelsData = require("./Schemas/logger/channels.js");
 const emojisData = require("./Schemas/logger/emojis.js");
 const invitesData = require("./Schemas/logger/invites.js");
 const membersData = require("./Schemas/logger/members.js");
-const messagesData = require("./Schemas/logger/messages.js");
+// const messagesData = require("./Schemas/logger/messages.js"); // only logging deleted/edited
 const rolesData = require("./Schemas/logger/roles.js");
 const stickersData = require("./Schemas/logger/stickers.js");
-const threadsData = require("./Schemas/logger/threads.js");
+// const threadsData = require("./Schemas/logger/threads.js"); // pointless
 const settings = require("./Schemas/logger/settings.js");
 
 const { client } = require("./index.js");
