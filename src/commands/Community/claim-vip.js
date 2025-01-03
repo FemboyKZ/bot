@@ -5,7 +5,7 @@ const roles = require("../../Schemas/vip/vip-roles.js");
 const status = require("../../Schemas/vip/vip-status.js");
 require("dotenv").config();
 
-var timeout = [];
+// TODO: MAKE THIS NOT SO SHITTY
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -28,11 +28,8 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
-    if (!interaction || !interaction.user || !interaction.guild) {
-      return;
-    }
-
     const { guild, options, user } = interaction;
+
     const steamId = options.getString("steamid");
     const code = options.getString("code");
 
@@ -40,20 +37,14 @@ module.exports = {
     const perkSystem = await vip.findOne({ Guild: guild.id, ID: "vip" });
 
     const vipCode = await uses.findOne({ Guild: guild.id, Type: "vip" });
-    const vipPlusCode = await uses.findOne({
-      Guild: guild.id,
-      Type: "vip+",
-    });
+    const vipPlusCode = await uses.findOne({ Guild: guild.id, Type: "vip+" });
     const contributorCode = await uses.findOne({
       Guild: guild.id,
       Type: "contributor",
     });
 
     const vipRole = await roles.findOne({ Guild: guild.id, Type: "vip" });
-    const vipPlusRole = await roles.findOne({
-      Guild: guild.id,
-      Type: "vip+",
-    });
+    const vipPlusRole = await roles.findOne({ Guild: guild.id, Type: "vip+" });
     const contributorRole = await roles.findOne({
       Guild: guild.id,
       Type: "contributor",
@@ -70,13 +61,6 @@ module.exports = {
       .setTimestamp();
 
     try {
-      if (timeout.includes(user)) {
-        return await interaction.reply({
-          content: `You are on a cooldown! Try again in a few seconds.`,
-          ephemeral: true,
-        });
-      }
-
       if (!code || !steamId) {
         return await interaction.reply({
           content: "Please enter both a code and a SteamID.",
@@ -109,30 +93,30 @@ module.exports = {
 
       if (!perkStatus) {
         if (
-          code !== vipCode &&
-          code !== vipPlusCode &&
-          code !== contributorCode
+          code !== vipCode.Code &&
+          code !== vipPlusCode.Code &&
+          code !== contributorCode.Code
         ) {
           embed.setDescription(`The code you entered is invalid.`);
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        if (vipCode.Uses > 0 && code === vipCode) {
+        if (vipCode.Uses > 0 && code === vipCode.Code) {
           embed.setDescription(`The code you entered has been used already.`);
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
-        if (vipPlusCode.Uses > 0 && code === vipPlusCode) {
+        if (vipPlusCode.Uses > 0 && code === vipPlusCode.Code) {
           embed.setDescription(`The code you entered has been used already.`);
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
-        if (contributorCode.Uses > 0 && code === contributorCode) {
+        if (contributorCode.Uses > 0 && code === contributorCode.Code) {
           embed.setDescription(`The code you entered has been used already.`);
           return await interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        if (code === vipCode) {
-          let role = await guild.roles.fetch(vipRole.Role);
-          let perkType = "vip";
+        if (code === vipCode.Code) {
+          const role = await guild.roles.fetch(vipRole.Role);
+          const perkType = "vip";
           await handleClaim(
             interaction,
             user,
@@ -143,9 +127,9 @@ module.exports = {
             perkType,
             role
           );
-        } else if (code === vipPlusCode) {
-          let role = await guild.roles.fetch(vipPlusRole.Role);
-          let perkType = "vip+";
+        } else if (code === vipPlusCode.Code) {
+          const role = await guild.roles.fetch(vipPlusRole.Role);
+          const perkType = "vip+";
           await handleClaim(
             interaction,
             user,
@@ -156,9 +140,9 @@ module.exports = {
             perkType,
             role
           );
-        } else if (code === contributorCode) {
-          let role = await guild.roles.fetch(contributorRole.Role);
-          let perkType = "contributor";
+        } else if (code === contributorCode.Code) {
+          const role = await guild.roles.fetch(contributorRole.Role);
+          const perkType = "contributor";
           await handleClaim(
             interaction,
             user,
@@ -177,9 +161,9 @@ module.exports = {
         }
       } else if (perkStatus) {
         if (
-          code !== vipCode &&
-          code !== vipPlusCode &&
-          code !== contributorCode
+          code !== vipCode.Code &&
+          code !== vipPlusCode.Code &&
+          code !== contributorCode.Code
         ) {
           return await interaction.reply({
             content: `You've attempted to claim perks with a code that is invalid.`,
@@ -187,14 +171,14 @@ module.exports = {
           });
         }
         if (perkStatus.Type === "vip" && perkStatus.Status === true) {
-          if (code === vipCode) {
+          if (code === vipCode.Code) {
             await interaction.reply({
               content: `You've already claimed those perks. If you want to gift, use the \`/gift\` command.`,
               ephemeral: true,
             });
-          } else if (code === vipPlusCode) {
-            let role = await guild.roles.fetch(vipPlusRole.Role);
-            let perkType = "vip+";
+          } else if (code === vipPlusCode.Code) {
+            const role = await guild.roles.fetch(vipPlusRole.Role);
+            const perkType = "vip+";
             await handleExistingClaim(
               interaction,
               user,
@@ -205,10 +189,10 @@ module.exports = {
               perkType,
               role
             );
-          } else if (code === contributorCode) {
-            let role = await guild.roles.fetch(contributorRole.Role);
-            let perkType = "contributor";
-            await handleEixistingClaim(
+          } else if (code === contributorCode.Code) {
+            const role = await guild.roles.fetch(contributorRole.Role);
+            const perkType = "contributor";
+            await handleExistingClaim(
               interaction,
               user,
               perkSystem,
@@ -225,15 +209,15 @@ module.exports = {
             });
           }
         } else if (perkStatus.Type === "vip+" && perkStatus.Status === true) {
-          if (code === vipCode || code === vipPlusCode) {
+          if (code === vipCode.Code || code === vipPlusCode.Code) {
             await interaction.reply({
               content: `You've already claimed those perks. If you want to gift, use the \`/gift\` command.`,
               ephemeral: true,
             });
-          } else if (code === contributorCode) {
-            let role = await guild.roles.fetch(contributorRole.Role);
-            let perkType = "contributor";
-            await handleEixistingClaim(
+          } else if (code === contributorCode.Code) {
+            const role = await guild.roles.fetch(contributorRole.Role);
+            const perkType = "contributor";
+            await handleExistingClaim(
               interaction,
               user,
               perkSystem,
@@ -254,9 +238,9 @@ module.exports = {
           perkStatus.Status === true
         ) {
           if (
-            code === vipCode ||
-            code === vipPlusCode ||
-            code === contributorCode
+            code === vipCode.Code ||
+            code === vipPlusCode.Code ||
+            code === contributorCode.Code
           ) {
             await interaction.reply({
               content: `You've already claimed your perks. If you want to gift, use the \`/gift\` command.`,
@@ -281,11 +265,6 @@ module.exports = {
         content: "An error occurred while processing your request.",
         ephemeral: true,
       });
-    } finally {
-      timeout.push(user);
-      setTimeout(() => {
-        timeout.shift();
-      }, 10000);
     }
   },
 
@@ -321,7 +300,7 @@ module.exports = {
       );
       await user.roles.add(role);
       if (perkType === "vip+" || perkType === "contributor") {
-        let role2 = await guild.roles.fetch(vipRole.Role);
+        const role2 = await guild.roles.fetch(vipRole.Role);
         await user.roles.add(role2);
       }
       await interaction.reply({ embeds: [embed], ephemeral: true });

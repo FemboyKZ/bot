@@ -25,107 +25,107 @@ module.exports = {
         .setRequired(false)
     ),
   async execute(interaction) {
+    const guild = interaction.guild;
+    const vipCode = interaction.options.getString("code-vip");
+    const vipPlusCode = interaction.options.getString("code-vip-plus");
+    const contributorCode = interaction.options.getString("code-contributor");
+
+    const data = await schema.findOne({ Guild: guild.id });
+
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
     ) {
       return await interaction.reply({
-        content: "You don't have perms to use this command.",
+        content: "You don't have permissions to use this command.",
         ephemeral: true,
       });
     }
 
-    const { guild } = interaction;
-    const codeVip = interaction.options.getString("code-vip");
-    const codeVipPlus = interaction.options.getString("code-vip-plus");
-    const codeContributor = interaction.options.getString("code-contributor");
-    const data = await schema.findOne({ Guild: guild.id });
-
     try {
       if (!data) {
-        if (codeVip) {
+        if (vipCode) {
           await schema.create({
             Guild: guild.id,
-            Code: codeVip,
+            Code: vipCode,
             Type: "vip",
             Uses: 0,
           });
         }
-        if (codeVipPlus) {
+        if (vipPlusCode) {
           await schema.create({
             Guild: guild.id,
-            Code: codeVipPlus,
+            Code: vipPlusCode,
             Type: "vip+",
             Uses: 0,
           });
         }
-        if (codeContributor) {
+        if (contributorCode) {
           await schema.create({
             Guild: guild.id,
-            Code: codeContributor,
+            Code: contributorCode,
             Type: "contributor",
             Uses: 0,
           });
         } else {
-          await interaction.reply({
-            content: `No code has been set.`,
+          return interaction.reply({
+            content: "No code has been set.",
             ephemeral: true,
           });
         }
-        await interaction.reply({
+        return await interaction.reply({
           content: "Codes have been set.",
           ephemeral: true,
         });
       }
-      if (data) {
-        if (codeVip) {
-          await schema.findOneAndUpdate(
-            {
-              Guild: guild.id,
-              Type: "vip",
-            },
-            {
-              Code: codeVip,
-              Uses: 0,
-            }
-          );
-        }
-        if (codeVipPlus) {
-          await schema.findOneAndUpdate(
-            {
-              Guild: guild.id,
-              Type: "vip+",
-            },
-            {
-              Code: codeVipPlus,
-              Uses: 0,
-            }
-          );
-        }
-        if (codeContributor) {
-          await schema.findOneAndUpdate(
-            {
-              Guild: guild.id,
-              Type: "contributor",
-            },
-            {
-              Code: codeContributor,
-              Uses: 0,
-            }
-          );
-        } else {
-          await interaction.reply({
-            content: `No code has been set.`,
-            ephemeral: true,
-          });
-        }
-        await interaction.reply({
-          content: `Codes have been updated.`,
+
+      if (vipCode) {
+        await schema.findOneAndUpdate(
+          {
+            Guild: guild.id,
+            Type: "vip",
+          },
+          {
+            Code: vipCode,
+            Uses: 0,
+          }
+        );
+      }
+      if (vipPlusCode) {
+        await schema.findOneAndUpdate(
+          {
+            Guild: guild.id,
+            Type: "vip+",
+          },
+          {
+            Code: vipPlusCode,
+            Uses: 0,
+          }
+        );
+      }
+      if (contributorCode) {
+        await schema.findOneAndUpdate(
+          {
+            Guild: guild.id,
+            Type: "contributor",
+          },
+          {
+            Code: contributorCode,
+            Uses: 0,
+          }
+        );
+      } else {
+        return await interaction.reply({
+          content: "No code has been set.",
           ephemeral: true,
         });
       }
-    } catch (err) {
-      console.error("Error executing command:", err);
-      await interaction.reply({
+      return await interaction.reply({
+        content: "Codes have been updated.",
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error("Error executing command:", error);
+      return await interaction.reply({
         content: "There was an error while executing this command!",
         ephemeral: true,
       });
