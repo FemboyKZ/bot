@@ -19,7 +19,7 @@ client.on(Events.MessageDelete, async (message) => {
 
   if (!message.guild) return;
   if (message.webhookId !== null || message.author === client.user) return;
-  if (message.content.length === 0 || message.content === null) return;
+  if (!message.content || message.content.length === 0) return;
 
   const data = await schema.findOne({
     Guild: message.guild.id,
