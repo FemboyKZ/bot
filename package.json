@@ -7,13 +7,13 @@
     "xml2js": "^0.6.2"
   },
   "name": "fkz-bot",
-  "version": "1.6.18",
+  "version": "1.7.35",
   "main": "src/index.js",
   "scripts": {
     "test": "node src/index.js",
-    "run": "node --no-warnings src/index.js"
+    "start": "node --no-warnings src/index.js"
   },
-  "author": "camwhore",
+  "author": "FemboyKZ",
   "license": "GPL-3.0-only",
   "description": "Discord Bot for managing FKZ Discord Server, FKZ Dedicated Server and more."
 }

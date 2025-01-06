@@ -6,7 +6,7 @@ const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
 } = require("discord.js");
-const schema = require("../../Schemas/moderation/tickets.js");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -33,8 +33,6 @@ module.exports = {
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });
-
-    interaction.deferReply();
 
     const channel = interaction.options.getChannel("channel");
     const category = interaction.options.getChannel("category");
@@ -96,18 +94,23 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "To be able to play on the **[ClassicCounter](https://flashboost.ru)** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter).\n\nPlease do not open any tickets regarding ClassicCounter, or ping their staff on our Discord server, join theirs instead."
+        "To be able to play on the **[ClassicCounter](https://classiccounter.cc/)** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter).\n\nPlease do not open any tickets regarding ClassicCounter, or ping their staff on our Discord server, join theirs instead."
       )
       .addFields([
         {
           name: "**ClassicCounter Website**",
           value:
-            "Check out all their Servers here:\n**<https://flashboost.ru/sourcebans/index.php?p=servers>**",
+            "Check out all their Servers here:\n**<https://classiccounter.cc/servers>**",
+        },
+        {
+          name: "**ClassicCounter Whitelist**",
+          value:
+            "ClassicCounter handles their whitelist via their site, apply or check it out here:\n**<https://classiccounter.cc/whitelist>**",
         },
         {
           name: "**ClassicCounter Bans**",
           value:
-            "ClassicCounter handles their bans and un-bans on their Discord, but they can be viewed here:\n**<https://flashboost.ru/sourcebans/index.php?p=bans>**",
+            "ClassicCounter handles their bans and un-bans on their Discord, but they can be viewed here:\n**<https://classiccounter.cc/bans>**",
         },
       ]);
     const embedSupport = new EmbedBuilder()
@@ -153,7 +156,10 @@ module.exports = {
     );
 
     try {
-      const data = await schema.findOne({ Guild: interaction.guild.id });
+      const data = await schema.findOne({
+        Guild: interaction.guild.id,
+        ID: "tickets",
+      });
       if (data) {
         return await interaction.reply({
           content: "Tickets have already been setup",
@@ -163,7 +169,7 @@ module.exports = {
         schema.create({
           Guild: interaction.guild.id,
           Channel: category.id,
-          Ticket: "first",
+          ID: "tickets",
         });
         await channel.send({
           embeds: [

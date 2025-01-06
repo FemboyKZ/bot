@@ -8,7 +8,8 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   if (reaction.message.partial) await reaction.message.fetch();
   if (reaction.partial) await reaction.fetch();
   const member = reaction.message.guild.members.cache.get(user.id);
-  if (!member.permissions.has(PermissionFlagsBits.Administrator)) return;
+  if (!member || !member.permissions.has(PermissionFlagsBits.Administrator))
+    return;
 
   try {
     const data = await schema.findOne({
@@ -16,20 +17,21 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
       Type: "Whitelist",
     });
     if (!data) return;
+
     const guild = reaction.message.guild;
-    const member = guild.members.cache.get(user.id);
-    if (!member || !guild) return;
     const role = guild.roles.cache.find((role) => role.name === "Femmy");
     const oldRole = member.roles.cache.find(
       (role) => role.name === "Wannabe Fem"
     );
+
     if (reaction.emoji.name === "👍") {
       await schema.findOneAndUpdate(
         { User: user.id, Type: "Whitelist" },
         { Status: true }
       );
-      if (!role) await member.roles.add(role);
-      if (oldRole) await member.roles.remove(oldRole);
+      if (member.roles.cache.has(role.id)) await member.roles.add(role);
+      if (member.roles.cache.has(oldRole.id))
+        await member.roles.remove(oldRole);
     } else if (reaction.emoji.name === "👎") {
       await schema.findOneAndUpdate(
         { User: user.id, Type: "Whitelist" },

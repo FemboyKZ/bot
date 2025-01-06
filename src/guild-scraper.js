@@ -4,10 +4,10 @@ const channelsData = require("./Schemas/logger/channels.js");
 const emojisData = require("./Schemas/logger/emojis.js");
 const invitesData = require("./Schemas/logger/invites.js");
 const membersData = require("./Schemas/logger/members.js");
-const messagesData = require("./Schemas/logger/messages.js");
+// const messagesData = require("./Schemas/logger/messages.js"); // only logging deleted/edited
 const rolesData = require("./Schemas/logger/roles.js");
 const stickersData = require("./Schemas/logger/stickers.js");
-const threadsData = require("./Schemas/logger/threads.js");
+// const threadsData = require("./Schemas/logger/threads.js"); // pointless
 const settings = require("./Schemas/logger/settings.js");
 
 const { client } = require("./index.js");
@@ -43,286 +43,226 @@ client.on("ready", async () => {
     });
   }
 
-  if (settingsData && settingsData.Store === false) return;
+  async function updateOrCreate(collection, query, updateData, createData) {
+    try {
+      const data = await collection.findOne(query);
+      if (data) {
+        await collection.findOneAndUpdate(query, updateData);
+      } else {
+        await collection.create(createData);
+      }
+    } catch (err) {
+      console.error(
+        `Error updating or creating document in ${collection.collection.name} collection:`,
+        err
+      );
+    }
+  }
 
-  const automod = await guild.autoModerationRules.fetch();
-  const bans = await guild.bans.fetch();
-  const channels = await guild.channels.fetch();
-  const emojis = await guild.emojis.fetch();
-  const invites = await guild.invites.fetch();
-  const members = await guild.members.fetch();
-  const roles = await guild.roles.fetch();
-  const stickers = await guild.stickers.fetch();
+  if (settingsData && settingsData.Store === false) return;
 
   const date = new Date();
 
-  automod.forEach(async (rule) => {
-    const data = await automodData.findOne({
-      Guild: guild.id,
-      Rule: rule.id,
-    });
+  async function scrapeAutomod(guild, settingsData) {
+    if (settingsData && settingsData.Automod === false) return;
 
-    try {
-      if (settingsData && settingsData.Automod === false) return;
-      if (data) {
-        await automodData.findOneAndUpdate(
-          { Guild: guild.id, Rule: rule.id },
-          {
-            Name: rule.name,
-            Trigger: rule.triggerType,
-            Action: rule.actions[0].type,
-            Enabled: rule.enabled,
-          }
-        );
-      } else {
-        await automodData.create({
-          Guild: guild.id,
+    const automod = await guild.autoModerationRules.fetch();
+    await Promise.all(
+      automod.map(async (rule) => {
+        const query = { Guild: guild.id, Rule: rule.id };
+        const updateData = {
           Name: rule.name,
-          Rule: rule.id,
-          User: rule.creatorId,
           Trigger: rule.triggerType,
           Action: rule.actions[0].type,
           Enabled: rule.enabled,
+        };
+        const createData = {
+          ...updateData,
+          Guild: guild.id,
+          Rule: rule.id,
+          User: rule.creatorId,
           Created: date,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
+        };
+        await updateOrCreate(automodData, query, updateData, createData);
+      })
+    );
+  }
 
-  bans.forEach(async (ban) => {
-    const data = await bansData.findOne({
-      Guild: guild.id,
-      User: ban.user.id,
-    });
-    try {
-      if (settingsData && settingsData.Bans === false) return;
-      if (!data)
-        await bansData.create({
+  async function scrapeBans(guild, settingsData) {
+    if (settingsData && settingsData.Bans === false) return;
+
+    const bans = await guild.bans.fetch();
+    await Promise.all(
+      bans.map(async (ban) => {
+        const query = { Guild: guild.id, User: ban.user.id };
+        const updateData = {
+          Reason: ban.reason || "none",
+        };
+        const createData = {
+          ...updateData,
           Guild: guild.id,
           User: ban.user.id,
           Created: date,
-          Reason: ban.reason || "none",
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  });
+        };
+        await updateOrCreate(bansData, query, updateData, createData);
+      })
+    );
+  }
 
-  emojis.forEach(async (emoji) => {
-    const data = await emojisData.findOne({
-      Guild: guild.id,
-      User: emoji.id,
-    });
+  async function scrapeEmojis(guild, settingsData) {
+    if (settingsData && settingsData.Emojis === false) return;
 
-    try {
-      if (settingsData && settingsData.Emojis === false) return;
-      if (data) {
-        await emojisData.findByIdAndUpdate(
-          {
-            Guild: guild.id,
-            Emoji: emoji.id,
-          },
-          {
-            Name: emoji.name || "none",
-            Animated: emoji.animated || null,
-            Image: emoji.imageURL({ size: 128 }),
-          }
-        );
-      } else {
-        await emojisData.create({
-          Guild: guild.id,
-          Emoji: emoji.id,
+    const emojis = await guild.emojis.fetch();
+    await Promise.all(
+      emojis.map(async (emoji) => {
+        const query = { Guild: guild.id, Emoji: emoji.id };
+        const updateData = {
           Name: emoji.name || "none",
           Animated: emoji.animated || null,
-          Created: emoji.createdAt,
           Image: emoji.imageURL({ size: 128 }),
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
+        };
+        const createData = {
+          ...updateData,
+          Guild: guild.id,
+          Emoji: emoji.id,
+          Created: emoji.createdAt,
+        };
+        await updateOrCreate(emojisData, query, updateData, createData);
+      })
+    );
+  }
 
-  channels.forEach(async (channel) => {
-    const data = await channelsData.findOne({
-      Guild: guild.id,
-      Channel: channel.id,
-    });
+  async function scrapeChannels(guild, settingsData) {
+    if (settingsData && settingsData.Channels === false) return;
 
-    try {
-      if (settingsData && settingsData.Channels === false) return;
-      if (data) {
-        await channelsData.findOneAndUpdate(
-          { Guild: guild.id, Channel: channel.id },
-          {
-            Name: channel.name,
-            Parent: channel.parentId || null,
-            Type: channel.type,
-            Topic: channel.topic || null,
-          }
-        );
-      } else {
-        await channelsData.create({
+    const channels = await guild.channels.fetch();
+    await Promise.all(
+      channels.map(async (channel) => {
+        const query = { Guild: guild.id, Channel: channel.id };
+        const updateData = {
+          Name: channel.name,
+          Parent: channel.parentId || null,
+          Type: channel.type,
+          Topic: channel.topic || null,
+        };
+        const createData = {
+          ...updateData,
           Guild: guild.id,
           Channel: channel.id,
-          Name: channel.name,
-          Parent: channel.parentId,
-          Type: channel.type,
           Created: channel.createdAt,
-          Topic: channel.topic || null,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
+        };
+        await updateOrCreate(channelsData, query, updateData, createData);
+      })
+    );
+  }
 
-  invites.forEach(async (invite) => {
-    const data = await invitesData.findOne({
-      Guild: guild.id,
-      Invite: invite,
-    });
+  async function scrapeInvites(guild, settingsData) {
+    if (settingsData && settingsData.Invites === false) return;
 
-    try {
-      if (settingsData && settingsData.Invites === false) return;
-      if (data) {
-        await channelsData.findOneAndUpdate(
-          { Guild: guild.id, Invite: invite },
-          {
-            Uses: invite.uses,
-          }
-        );
-      } else {
-        if (invite.maxUses === 0) {
-          await channelsData.create({
-            Guild: guild.id,
-            Invite: invite.code,
-            User: invite.inviter.id,
-            Uses: invite.uses || null,
-            maxUses: invite.maxUses,
-            Permanent: true,
-            Created: invite.createdAt || null,
-          });
-        } else {
-          await channelsData.create({
-            Guild: guild.id,
-            Invite: invite.code,
-            User: invite.inviter.id,
-            Uses: invite.uses || null,
-            maxUses: invite.maxUses || null,
-            Permanent: false,
-            Created: invite.createdAt || null,
-          });
-        }
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
-
-  members.forEach(async (member) => {
-    const data = await membersData.findOne({
-      Guild: guild.id,
-      User: member.user.id,
-    });
-
-    try {
-      if (settingsData && settingsData.Members === false) return;
-      if (data) {
-        await membersData.findOneAndUpdate(
-          { Guild: guild.id, User: member.user.id },
-          {
-            Joined: member.joinedAt || null,
-            Name: member.user.username,
-            Nickname: member.nickname || null,
-            Displayname: member.displayName,
-            Avatar: member.user.avatarURL({ size: 512 }) || null,
-            Banner: member.user.bannerURL({ size: 512 }) || null,
-            Roles: member.roles.cache.map((role) => role.id) || [],
-          }
-        );
-      } else {
-        await membersData.create({
+    const invites = await guild.invites.fetch();
+    await Promise.all(
+      invites.map(async (invite) => {
+        const query = { Guild: guild.id, Invite: invite.code };
+        const updateData = {
+          Uses: invite.uses,
+        };
+        const createData = {
+          ...updateData,
           Guild: guild.id,
-          User: member.user.id,
+          Invite: invite.code,
+          User: invite.inviter.id,
+          Uses: invite.uses || null,
+          maxUses: invite.maxUses || null,
+          Permanent: null,
+          Created: invite.createdAt || null,
+        };
+        await updateOrCreate(invitesData, query, updateData, createData);
+      })
+    );
+  }
+
+  async function scrapeMembers(guild, settingsData) {
+    if (settingsData && settingsData.Members === false) return;
+
+    const members = await guild.members.fetch();
+    await Promise.all(
+      members.map(async (member) => {
+        const query = { Guild: guild.id, User: member.user.id };
+        const updateData = {
           Joined: member.joinedAt || null,
-          Created: member.user.createdAt,
           Name: member.user.username,
-          Nickname: member.nickname,
-          Displayname: member.displayName || null,
+          Nickname: member.nickname || null,
+          Displayname: member.displayName,
           Avatar: member.user.avatarURL({ size: 512 }) || null,
           Banner: member.user.bannerURL({ size: 512 }) || null,
           Roles: member.roles.cache.map((role) => role.id) || [],
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
+        };
+        const createData = {
+          ...updateData,
+          Guild: guild.id,
+          User: member.user.id,
+          Created: member.user.createdAt,
+        };
+        await updateOrCreate(membersData, query, updateData, createData);
+      })
+    );
+  }
 
-  roles.forEach(async (role) => {
-    const data = await rolesData.findOne({
-      Guild: guild.id,
-      Role: role.id,
-    });
+  async function scrapeRoles(guild, settingsData) {
+    if (settingsData && settingsData.Roles === false) return;
 
-    try {
-      if (settingsData && settingsData.Roles === false) return;
-      if (data) {
-        await rolesData.findOneAndUpdate(
-          { Guild: guild.id, Role: role.id },
-          {
-            Name: role.name,
-            Color: role.hexColor,
-            Permissions: role.permissions.toArray(),
-          }
-        );
-      } else {
-        await rolesData.create({
+    const roles = await guild.roles.fetch();
+    await Promise.all(
+      roles.map(async (role) => {
+        const query = { Guild: guild.id, Role: role.id };
+        const updateData = {
+          Name: role.name,
+          Color: role.hexColor,
+          Permissions: role.permissions.toArray(),
+        };
+        const createData = {
+          ...updateData,
           Guild: guild.id,
           Role: role.id,
           Name: role.name,
           Permissions: role.permissions.toArray(),
           Color: role.hexColor,
           Created: role.createdAt,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
+        };
+        await updateOrCreate(rolesData, query, updateData, createData);
+      })
+    );
+  }
 
-  stickers.forEach(async (sticker) => {
-    const data = await stickersData.findOne({
-      Guild: guild.id,
-      Sticker: sticker.id,
-    });
+  async function scrapeStickers(guild, settingsData) {
+    if (settingsData && settingsData.Stickers === false) return;
 
-    try {
-      if (settingsData && settingsData.Stickers === false) return;
-      if (data) {
-        await stickersData.findOneAndUpdate(
-          { Guild: guild.id, Sticker: sticker.id },
-          {
-            Name: sticker.name,
-            Description: sticker.description || null,
-            Available: sticker.available || null,
-          }
-        );
-      } else {
-        await stickersData.create({
-          Guild: guild.id,
-          Sticker: sticker.id,
+    const stickers = await guild.stickers.fetch();
+    await Promise.all(
+      stickers.map(async (sticker) => {
+        const query = { Guild: guild.id, Sticker: sticker.id };
+        const updateData = {
           Name: sticker.name,
-          Created: sticker.createdAt,
           Description: sticker.description || null,
           Available: sticker.available || null,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
+        };
+        const createData = {
+          ...updateData,
+          Guild: guild.id,
+          Sticker: sticker.id,
+          Created: sticker.createdAt,
+        };
+        await updateOrCreate(stickersData, query, updateData, createData);
+      })
+    );
+  }
+
+  await scrapeAutomod(guild, settingsData);
+  await scrapeBans(guild, settingsData);
+  await scrapeChannels(guild, settingsData);
+  await scrapeEmojis(guild, settingsData);
+  await scrapeInvites(guild, settingsData);
+  await scrapeMembers(guild, settingsData);
+  await scrapeRoles(guild, settingsData);
+  await scrapeStickers(guild, settingsData);
 });

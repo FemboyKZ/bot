@@ -16,6 +16,7 @@ module.exports = {
       await mongoose.connect(mongodbURL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 30000,
       });
 
       console.log("The MongoDB Database is running.");
