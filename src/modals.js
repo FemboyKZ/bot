@@ -1,4 +1,11 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const {
+  EmbedBuilder,
+  Events,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChannelType,
+} = require("discord.js");
 const schema = require("./Schemas/base-system.js");
 const status = require("./Schemas/request-status.js");
 const { client } = require("./index.js");
@@ -271,7 +278,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 
     if (interaction.customId === "modalTicket") {
-      const data = await system.findOne({
+      const data = await schema.findOne({
         Guild: interaction.guild.id,
         Type: "tickets",
       });
