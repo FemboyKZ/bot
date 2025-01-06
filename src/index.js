@@ -10,13 +10,15 @@ const client = new Client({
   intents: [
     GatewayIntentBits.AutoModerationConfiguration,
     GatewayIntentBits.AutoModerationExecution,
+    GatewayIntentBits.DirectMessagePolls,
     GatewayIntentBits.DirectMessageReactions,
     GatewayIntentBits.DirectMessageTyping,
     GatewayIntentBits.DirectMessages,
-    GatewayIntentBits.GuildEmojisAndStickers,
+    GatewayIntentBits.GuildExpressions,
     GatewayIntentBits.GuildIntegrations,
     GatewayIntentBits.GuildInvites,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessagePolls,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.GuildMessageTyping,
     GatewayIntentBits.GuildMessages,
@@ -100,8 +102,10 @@ client.on("disconnect", () => {
 });
 
 require("./anti-link.js");
+require("./anti-spam.js");
 require("./auto-roles.js");
 require("./bot-guilds.js");
+require("./buttons.js");
 require("./guild-scraper.js");
 require("./modals.js");
 require("./reaction-roles.js");

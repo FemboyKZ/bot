@@ -1,21 +1,16 @@
 const {
-  EmbedBuilder,
-  PermissionsBitField,
   Events,
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
-  ChannelType,
 } = require("discord.js");
-const system = require("./Schemas/base-system.js");
 const { client } = require("./index.js");
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (interaction.isButton()) return;
-  if (interaction.isChatInputCommand()) return;
+  if (!interaction.isStringSelectMenu() || !interaction.isModalSubmit()) {
+    return;
+  }
 
   const modalTicket = new ModalBuilder()
     .setTitle("Provide us with more information")
@@ -50,31 +45,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   modalTicket.addComponents(firstActionRow, secondActionRow, thirdActionRow);
 
-  if (interaction.isStringSelectMenu()) {
-    if (!interaction.isModalSubmit()) {
-      interaction.showModal(modalTicket);
-    }
-  }
-});
-
-client.on(Events.InteractionCreate, async (interaction) => {
-  if (interaction.isButton()) {
-    if (
-      !interaction.member.permissions.has(
-        PermissionsBitField.Flags.Administrator
-      )
-    ) {
-      return await interaction.reply({
-        content: `You don't have perms to use this command.`,
-        ephemeral: true,
-      });
-    }
-    if (interaction.customId === "ticket-close") {
-      await interaction.reply({
-        content: `Ticket closed.`,
-        ephemeral: true,
-      });
-      await interaction.message.delete();
-    }
+  try {
+    await interaction.showModal(modalTicket);
+  } catch (error) {
+    console.error(error);
   }
 });
