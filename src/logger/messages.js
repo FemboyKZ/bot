@@ -154,15 +154,17 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
   const settingsData = await settings.findOne({
     Guild: newMessage.guild.id,
   });
-  if (settingsData.Messages === false) return;
-  if (settingsData.Store === false && settingsData.Post === false) return;
+  if (
+    (settingsData.Messages && settingsData.Messages === false) ||
+    (settingsData.Store && settingsData.Store === false) ||
+    (settingsData.Post && settingsData.Post === false)
+  )
+    return;
 
-  try {
-    if (newMessage.partial === true) await newMessage.fetch();
-    if (oldMessage.partial === true) await oldMessage.fetch();
-  } catch (error) {
-    console.log(error);
-  }
+  if (newMessage.partial && newMessage.partial === true)
+    await newMessage.fetch();
+  if (oldMessage.partial && oldMessage.partial === true)
+    await oldMessage.fetch();
 
   if (!newMessage.guild) return;
   if (oldMessage.webhookId !== null || newMessage.webhookId !== null) return;
