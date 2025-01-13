@@ -4,28 +4,22 @@ const { client } = require("./index.js");
 
 client.on(Events.MessageCreate, async (message) => {
   if (
-    message.content.startsWith("http") ||
-    message.content.startsWith("discord.gg") ||
-    message.content.includes("https://") ||
-    message.content.includes("http://") ||
-    message.content.includes("discord.gg/")
+    message.content.includes("http") ||
+    message.content.includes("https") ||
+    message.content.includes("gg/")
   ) {
     try {
-      const Data = await schema.findOne({ Guild: message.guild.id });
+      const data = await schema.findOne({ Guild: message.guild.id });
+      if (!data) return;
 
-      if (!Data) return;
-
-      const memberPerms = Data.Perms;
-      const user = message.author;
-      const member = message.guild.members.cache.get(user.id);
-
-      if (member && member.permissions.has(memberPerms)) {
+      const member = message.guild.members.cache.get(message.author.id);
+      if (member && member.permissions.has(data.Perms)) {
         return;
       } else if (member) {
-        const sentMessage = await message.channel.send(
+        const msg = await message.channel.send(
           `${message.author}, you can't send links here!`
         );
-        setTimeout(() => sentMessage.delete(), 3000);
+        setTimeout(() => msg.delete(), 3000);
         await message.delete();
       }
     } catch (error) {
