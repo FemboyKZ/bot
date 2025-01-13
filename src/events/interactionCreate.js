@@ -540,8 +540,8 @@ module.exports = {
       Guild: interaction.guild.id,
     });
 
-    if (settingsData.Interactions === false) return;
-    if (settingsData.Post === false) return;
+    if (settingsData && settingsData.Interactions === false) return;
+    if (settingsData && settingsData.Post === false) return;
 
     const data = await schema.findOne({
       Guild: interaction.guild.id,
