@@ -1,3 +1,4 @@
+const { Events } = require("discord.js");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const mongodbURL = process.env.MONGODB_URL;
@@ -5,7 +6,7 @@ const mongodbURL = process.env.MONGODB_URL;
 mongoose.set("strictQuery", false);
 
 module.exports = {
-  name: "ready",
+  name: Events.ClientReady,
   once: true,
   async execute(client) {
     console.log("Ready!");
