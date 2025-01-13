@@ -105,18 +105,14 @@ require("./anti-link.js");
 require("./anti-spam.js");
 require("./auto-roles.js");
 require("./bot-guilds.js");
-require("./buttons.js");
 require("./guild-scraper.js");
-require("./modals.js");
 require("./reaction-roles.js");
-require("./tickets.js");
 require("./whitelist-response.js");
 
 require("./logger/automod-rules.js");
 require("./logger/bans.js");
 require("./logger/channels.js");
 require("./logger/emojis.js");
-require("./logger/interactions.js");
 require("./logger/invites.js");
 require("./logger/members.js");
 require("./logger/messages.js");
