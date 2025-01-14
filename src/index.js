@@ -101,10 +101,7 @@ client.on("disconnect", () => {
     );
 });
 
-require("./anti-link.js");
-require("./anti-spam.js");
 require("./auto-roles.js");
-require("./bot-guilds.js");
 require("./guild-scraper.js");
 require("./reaction-roles.js");
 require("./whitelist-response.js");
