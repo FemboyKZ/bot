@@ -540,33 +540,63 @@ module.exports = {
       Guild: interaction.guild.id,
     });
 
-    if (settingsData && settingsData.Interactions === false) return;
-    if (settingsData && settingsData.Post === false) return;
+    if (
+      settingsData &&
+      (settingsData.Interactions === false || settingsData.Post === false)
+    ) {
+      return;
+    }
 
-    const data = await schema.findOne({
+    const logData = await schema.findOne({
       Guild: interaction.guild.id,
       ID: "audit-logs",
     });
 
-    if (!data || !data.Channel) return;
-    const channel = client.channels.cache.get(data.Channel);
+    if (!logData || !logData.Channel) return;
+    const channel = client.channels.cache.get(logData.Channel);
     if (!channel) return;
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
-      .setTitle("Chat Command Executed.")
+      .setTitle("Interaction Execution Logged.")
       .setFooter({ text: `FKZ` })
       .setTimestamp()
       .addFields([
         {
           name: "User",
           value: `<@${interaction.user.id}> - ${interaction.user.username}`,
+          inline: false,
         },
         {
-          name: "Command & User Input",
-          value: `\`${interaction}\``,
+          name: "Interaction Type",
+          value: `${interaction.type}`,
+          inline: false,
         },
       ]);
+
+    if (interaction.customId) {
+      embed.addFields({
+        name: "Custom ID",
+        value: `\`${interaction.customId}\``,
+        inline: false,
+      });
+    }
+
+    if (interaction.commandName) {
+      embed.addFields({
+        name: "Command Name",
+        value: `\`${interaction.commandName}\``,
+        inline: false,
+      });
+    }
+
+    if (interaction.options && interaction.options.data.length > 0) {
+      embed.addFields({
+        name: "Options/Arguments",
+        value: `${interaction.options.data.map((x) => x.value).join(", ")}`,
+        inline: false,
+      });
+    }
 
     try {
       await channel.send({ embeds: [embed] });
