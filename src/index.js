@@ -79,7 +79,6 @@ client.on("disconnect", () => {
     .catch((error) => console.error("Failed to log in:", error));
 });
 
-require("./auto-roles.js");
 require("./guild-scraper.js");
 
 require("./logger/automod-rules.js");
