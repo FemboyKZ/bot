@@ -547,13 +547,13 @@ module.exports = {
       return;
     }
 
-    const logData = await schema.findOne({
+    const auditlogData = await schema.findOne({
       Guild: interaction.guild.id,
       ID: "audit-logs",
     });
 
-    if (!logData || !logData.Channel) return;
-    const channel = client.channels.cache.get(logData.Channel);
+    if (!auditlogData || !auditlogData.Channel) return;
+    const channel = client.channels.cache.get(auditlogData.Channel);
     if (!channel) return;
 
     const embed = new EmbedBuilder()

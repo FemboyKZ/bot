@@ -54,12 +54,12 @@ module.exports = {
     if (settingsData.Members === false) return;
     if (settingsData.Store === false && settingsData.Post === false) return;
 
-    const data = await schema.findOne({
+    const auditlogData = await schema.findOne({
       Guild: member.guild.id,
       ID: "audit-logs",
     });
-    if (!data || !data.Channel) return;
-    const channel = client.channels.cache.get(data.Channel);
+    if (!auditlogData || !auditlogData.Channel) return;
+    const channel = client.channels.cache.get(auditlogData.Channel);
     if (!channel) return;
 
     const logData = await logs.findOne({

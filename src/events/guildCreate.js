@@ -4,14 +4,14 @@ const schema = require("../Schemas/base-system.js");
 module.exports = {
   name: Events.GuildCreate,
   async execute(guild, client) {
-    const data = await schema.findOne({
+    const auditlogData = await schema.findOne({
       Guild: guild.id,
       ID: "audit-logs",
     });
 
-    if (data) {
-      const channel = await client.channels.cache.get(data.Channel);
-      if (!data.Channel || !channel) return;
+    if (auditlogData) {
+      const channel = await client.channels.cache.get(auditlogData.Channel);
+      if (!auditlogData.Channel || !channel) return;
       const owner = await client.users.cache.get(guild.ownerId);
 
       const embed = new EmbedBuilder()
