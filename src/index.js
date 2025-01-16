@@ -43,34 +43,19 @@ const client = new Client({
 exports.client = client;
 client.commands = new Collection();
 
-function logError(error) {
-  const filepath = path.join(__dirname, "error.log");
-  const timestamp = new Date().toISOString();
-  const message = `[${timestamp}]: ${error.stack || error}\n`;
-
-  fs.appendFile(filepath, message, (err) => {
-    if (err) {
-      console.error("Failed to write to log file:", err);
-    }
-  });
-}
-
 const process = require("node:process");
 process.on("unhandledRejection", (reason, promise) => {
   console.log("Unhandled Rejection at:", promise, "reason:", reason);
-  logError("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
 client.on("error", (error) => {
   console.error("Error occurred:", error);
-  logError("Error occurred:", error);
 });
 
 require("dotenv").config();
 
 client.on("disconnect", () => {
   console.log("Disconnected from Discord API");
-  logError("Disconnected from Discord API");
   const retry = (fn, retries = 3, timeout = 1000) => {
     return new Promise((resolve, reject) => {
       fn()
@@ -89,16 +74,9 @@ client.on("disconnect", () => {
     });
   };
   console.log("Attempting to reconnect...");
-  logError("Attempting to reconnect...");
   retry(() => client.login(process.env.TOKEN))
-    .then(
-      () => console.log("Logged in successfully"),
-      logError("Logged in successfully")
-    )
-    .catch(
-      (error) => console.error("Failed to log in:", error),
-      logError("Failed to log in:", error)
-    );
+    .then(() => console.log("Logged in successfully"))
+    .catch((error) => console.error("Failed to log in:", error));
 });
 
 require("./auto-roles.js");

@@ -8,11 +8,14 @@ client.on(Events.MessageDelete, async (message) => {
   const settingsData = await settings.findOne({
     Guild: message.guild.id,
   });
-  if (settingsData.Messages === false) return;
-  if (settingsData.Store === false && settingsData.Post === false) return;
+  if (
+    settingsData.Messages === false ||
+    (settingsData.Store === false && settingsData.Post === false)
+  )
+    return;
 
   try {
-    if (message.partial === true) await message.fetch();
+    if (message.partial && message.partial === true) await message.fetch();
   } catch (error) {
     console.log(error);
   }
