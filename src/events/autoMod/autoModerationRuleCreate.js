@@ -1,12 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../Schemas/base-system.js");
-const logs = require("../Schemas/logger/automod.js");
-const settings = require("../Schemas/logger/settings.js");
+const schema = require("../../Schemas/base-system.js");
+const logs = require("../../Schemas/logger/automod.js");
+const settings = require("../../Schemas/logger/settings.js");
 
 // TODO: make this not shit
 
 module.exports = {
-  name: Events.AutoModerationRuleDelete,
+  name: Events.AutoModerationRuleCreate,
   async execute(rule, client) {
     const settingsData = await settings.findOne({
       Guild: rule.guild.id,
@@ -15,7 +15,7 @@ module.exports = {
     if (settingsData.Store === false && settingsData.Post === false) return;
 
     const auditlogData = await schema.findOne({
-      Guild: rule.guild.id,
+      Guild: rule.guild?.id,
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
@@ -30,7 +30,7 @@ module.exports = {
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setTitle("Automod Rule Deleted")
+      .setTitle("Automod Rule Created")
       .setFooter({ text: `FKZ • ID: ${rule.id}` })
       .addFields(
         {
@@ -56,15 +56,23 @@ module.exports = {
       );
 
     try {
-      if (logData && settingsData.Store === true) {
-        await logs.deleteMany({ Guild: rule.guild?.id, Rule: rule.id });
+      if (!logData && settingsData.Store) {
+        await logs.create({
+          Guild: rule.guild.id,
+          Name: rule.name,
+          Rule: rule.id,
+          User: rule.creatorId,
+          Trigger: rule.triggerType,
+          Action: rule.actions[0].type,
+          Enabled: rule.enabled,
+        });
       }
 
       if (settingsData.Post === true) {
         await channel.send({ embeds: [embed] });
       }
     } catch (error) {
-      console.error("Error in AutoModRuleDelete event:", error);
+      console.error("Error in AutoModRuleCreate event:", error);
     }
   },
 };

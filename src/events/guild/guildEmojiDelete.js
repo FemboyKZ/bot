@@ -1,19 +1,19 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../Schemas/base-system.js");
-const logs = require("../Schemas/logger/bans.js");
-const settings = require("../Schemas/logger/settings.js");
+const schema = require("../../Schemas/base-system.js");
+const logs = require("../../Schemas/logger/emojis.js");
+const settings = require("../../Schemas/logger/settings.js");
 
 module.exports = {
-  name: Events.GuildBanRemove,
-  async execute(ban, client) {
+  name: Events.GuildEmojiDelete,
+  async execute(emoji, client) {
     const settingsData = await settings.findOne({
-      Guild: ban.guild.id,
+      Guild: emoji.guild.id,
     });
-    if (settingsData.Bans === false) return;
+    if (settingsData.Emojis === false) return;
     if (settingsData.Store === false && settingsData.Post === false) return;
 
     const auditlogData = await schema.findOne({
-      Guild: ban.guild.id,
+      Guild: emoji.guild.id,
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
@@ -21,42 +21,42 @@ module.exports = {
     if (!channel) return;
 
     const logData = await logs.findOne({
-      Guild: ban.guild.id,
-      User: ban.user.id,
+      Guild: emoji.guild.id,
+      Emoji: emoji.id,
     });
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setFooter({ text: "FKZ" })
-      .setTitle("Ban Removed")
+      .setImage(emoji.imageURL({ size: 128 }) || logData.Image)
+      .setFooter({ text: `FKZ • ID: ${emoji.id}` })
+      .setTitle("Emoji Deleted")
       .addFields(
         {
-          name: "Banned Member",
-          value: `<@${ban.user.id}>` || "unknown",
+          name: "Name",
+          value: emoji.name ? logData.Name : "Unknown",
           inline: false,
         },
         {
-          name: "Ban Reason",
-          value: `${ban.reason}` || "none",
+          name: "Author",
+          value: emoji.author ? logData.User : "Unknown",
           inline: false,
         },
         {
-          name: "Ban Created",
-          value: logData.Created || "unknown",
+          name: "Animated?",
+          value: emoji.animated ? logData.Animated : "Unknown",
           inline: false,
         }
       );
-
     try {
       if (logData && settingsData.Store === true) {
-        await logs.deleteMany({ Guild: ban.guild.id, User: ban.user.id });
+        await logs.deleteMany({ Guild: emoji.guild.id, Emoji: emoji.id });
       }
       if (settingsData.Post === true) {
         await channel.send({ embeds: [embed] });
       }
     } catch (error) {
-      console.error("Error in GuildBanRemove event:", error);
+      console.error("Error in EmojiDelete event:", error);
     }
   },
 };

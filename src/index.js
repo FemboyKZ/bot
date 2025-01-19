@@ -81,20 +81,18 @@ client.on("disconnect", () => {
 
 //require("./guild-scraper.js");
 
-require("./logger/emojis.js");
-require("./logger/invites.js");
-require("./logger/members.js");
-require("./logger/messages.js");
-require("./logger/roles.js");
-require("./logger/stickers.js");
-require("./logger/threads.js");
-
 const functions = fs
   .readdirSync("./src/functions")
   .filter((file) => file.endsWith(".js"));
 const eventFiles = fs
-  .readdirSync("./src/events")
-  .filter((file) => file.endsWith(".js"));
+  .readdirSync("./src/events", { withFileTypes: true })
+  .filter((dirent) => dirent.isDirectory())
+  .flatMap((directory) =>
+    fs
+      .readdirSync(`./src/events/${directory.name}`)
+      .filter((file) => file.endsWith(".js"))
+      .map((file) => `${directory.name}/${file}`)
+  );
 const commandFolders = fs.readdirSync("./src/commands");
 
 (async () => {

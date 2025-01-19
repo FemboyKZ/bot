@@ -1,8 +1,8 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../Schemas/base-system.js");
+const schema = require("../../Schemas/base-system.js");
 
 module.exports = {
-  name: Events.GuildCreate,
+  name: Events.GuildDelete,
   async execute(guild, client) {
     const auditlogData = await schema.findOne({
       Guild: guild.id,
@@ -15,8 +15,8 @@ module.exports = {
       const owner = await client.users.cache.get(guild.ownerId);
 
       const embed = new EmbedBuilder()
-        .setColor("Green")
-        .setTitle("FKZ Bot has joined a new server.")
+        .setColor("Red")
+        .setTitle("FKZ Bot has left a server.")
         .addFields([
           {
             name: "Server",
@@ -36,12 +36,11 @@ module.exports = {
           },
         ])
         .setTimestamp()
-        .setFooter({ text: `Guild Joined - ${guild.id}` });
-
+        .setFooter({ text: `Guild Left - ${guild.id}` });
       try {
         await channel.send({ embeds: [embed] });
       } catch (error) {
-        console.error("Error in GuildCreate event:", error);
+        console.error("Error in GuildDelete event:", error);
       }
     }
   },

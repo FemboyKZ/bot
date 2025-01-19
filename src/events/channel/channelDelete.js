@@ -1,10 +1,10 @@
 const { EmbedBuilder, Events, DMChannel } = require("discord.js");
-const schema = require("../Schemas/base-system.js");
-const logs = require("../Schemas/logger/channels.js");
-const settings = require("../Schemas/logger/settings.js");
+const schema = require("../../Schemas/base-system.js");
+const logs = require("../../Schemas/logger/channels.js");
+const settings = require("../../Schemas/logger/settings.js");
 
 module.exports = {
-  name: Events.ChannelCreate,
+  name: Events.ChannelDelete,
   async execute(channel, client) {
     const settingsData = await settings.findOne({
       Guild: channel.guild.id,
@@ -30,11 +30,11 @@ module.exports = {
       .setColor("#ff00b3")
       .setTimestamp()
       .setFooter({ text: `FKZ • ID: ${channel.id}` })
-      .setTitle("Channel Created")
+      .setTitle("Channel Deleted")
       .addFields(
         {
           name: "Name",
-          value: `${channel.name}`,
+          value: `${channel.name ? logData.Name : "Unknown"}`,
           inline: false,
         },
         {
@@ -44,41 +44,26 @@ module.exports = {
         },
         {
           name: "Topic",
-          value: `${channel.topic ? logData.Topic : "None"}`,
+          value: `${channel.topic ? logData.Topic : "No Topic"}`,
           inline: false,
         },
         {
           name: "Category",
-          value: `${channel.parentId ? logData.Parent : "Unknown"}`,
+          value: `${channel.parentId ? logData.Parent : "No Category"}`,
           inline: false,
         }
       );
+
     try {
       if (logData && settingsData.Store === true) {
-        await logs.findOneAndUpdate(
-          { Guild: channel.guild.id, Channel: channel.id },
-          {
-            Name: channel.name,
-            Topic: channel.topic,
-            Parent: channel.parentId,
-            Type: channel.type,
-          }
-        );
-      } else if (!logData && settingsData.Store === true) {
-        await logs.create({
-          Guild: channel.guild.id,
-          Name: channel.name,
-          Type: channel.type,
-          Parent: channel.parentId,
-          Channel: channel.id,
-        });
+        await logs.deleteMany({ Guild: channel.guild.id, Channel: channel.id });
       }
 
       if (settingsData.Post === true) {
         await auditChannel.send({ embeds: [embed] });
       }
     } catch (error) {
-      console.log("Error in ChannelCreate event:", error);
+      console.log("Error in ChannelDelete event:", error);
     }
   },
 };

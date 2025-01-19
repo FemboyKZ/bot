@@ -1,11 +1,11 @@
 const { EmbedBuilder, Events } = require("discord.js");
 require("dotenv").config();
-const autoroles = require("../Schemas/autorole.js");
-const mutes = require("../Schemas/moderation/mute.js");
-const muteRoles = require("../Schemas/moderation/mute-role.js");
-const schema = require("../Schemas/base-system.js");
-const logs = require("../Schemas/logger/members.js");
-const settings = require("../Schemas/logger/settings.js");
+const autoroles = require("../../Schemas/autorole.js");
+const mutes = require("../../Schemas/moderation/mute.js");
+const muteRoles = require("../../Schemas/moderation/mute-role.js");
+const schema = require("../../Schemas/base-system.js");
+const logs = require("../../Schemas/logger/members.js");
+const settings = require("../../Schemas/logger/settings.js");
 
 module.exports = {
   name: Events.GuildMemberAdd,
