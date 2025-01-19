@@ -81,7 +81,6 @@ client.on("disconnect", () => {
 
 //require("./guild-scraper.js");
 
-require("./logger/automod-rules.js");
 require("./logger/channels.js");
 require("./logger/emojis.js");
 require("./logger/invites.js");
