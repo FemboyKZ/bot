@@ -58,7 +58,7 @@ module.exports = {
     */
 
     if (interaction.isCommand()) {
-      const command = client.commands.get(interaction.commandName);
+      const command = await client.commands.get(interaction.commandName);
       if (!command) {
         return;
       }
@@ -142,7 +142,9 @@ module.exports = {
           ID: "mc-whitelist",
         });
         if (!data || !data.Channel) return;
-        const channel = interaction.guild.channels.cache.get(data.Channel);
+        const channel = await interaction.guild.channels.cache.get(
+          data.Channel
+        );
         if (!channel) return;
 
         try {
@@ -209,7 +211,9 @@ module.exports = {
           ID: "whitelist",
         });
         if (!data || !data.Channel) return;
-        const channel = interaction.guild.channels.cache.get(data.Channel);
+        const channel = await interaction.guild.channels.cache.get(
+          data.Channel
+        );
         if (!channel) return;
 
         try {
@@ -275,7 +279,9 @@ module.exports = {
           ID: "unban",
         });
         if (!data || !data.Channel) return;
-        const channel = interaction.guild.channels.cache.get(data.Channel);
+        const channel = await interaction.guild.channels.cache.get(
+          data.Channel
+        );
         if (!channel) return;
 
         try {
@@ -341,7 +347,9 @@ module.exports = {
           ID: "report",
         });
         if (!data || !data.Channel) return;
-        const channel = interaction.guild.channels.cache.get(data.Channel);
+        const channel = await interaction.guild.channels.cache.get(
+          data.Channel
+        );
         if (!channel) return;
 
         try {
@@ -553,7 +561,7 @@ module.exports = {
     });
 
     if (!auditlogData || !auditlogData.Channel) return;
-    const channel = client.channels.cache.get(auditlogData.Channel);
+    const channel = await client.channels.cache.get(auditlogData.Channel);
     if (!channel) return;
 
     const embed = new EmbedBuilder()
@@ -593,7 +601,9 @@ module.exports = {
     if (interaction.options && interaction.options.data.length > 0) {
       embed.addFields({
         name: "Options/Arguments",
-        value: `${interaction.options.data.map((x) => x.value).join(", ")}`,
+        value: `${await interaction.options.data
+          .map((x) => x.value)
+          .join(", ")}`,
         inline: false,
       });
     }

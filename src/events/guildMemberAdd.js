@@ -19,7 +19,7 @@ module.exports = {
       if (!autoroleData.Roles.length) return;
       try {
         for (const roleId of autoroleData.Roles) {
-          const role = member.guild.roles.cache.get(roleId);
+          const role = await member.guild.roles.cache.get(roleId);
           if (role) {
             await member.roles.add(role);
           }
@@ -39,7 +39,7 @@ module.exports = {
     if (muteData) {
       if (!muteRole) return;
       try {
-        const role = member.guild.roles.cache.get(muteRole.Role);
+        const role = await member.guild.roles.cache.get(muteRole.Role);
         if (role) {
           await member.roles.add(role);
         }
@@ -59,7 +59,7 @@ module.exports = {
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
-    const channel = client.channels.cache.get(auditlogData.Channel);
+    const channel = await client.channels.cache.get(auditlogData.Channel);
     if (!channel) return;
 
     const logData = await logs.findOne({
@@ -68,9 +68,11 @@ module.exports = {
     });
 
     const newInvites = await member.guild.invites.fetch();
-    const oldInvites = client.invites.get(member.guild.id) || new Map();
+    const oldInvites = (await client.invites.get(member.guild.id)) || new Map();
 
-    const invite = newInvites.find((i) => i.uses > oldInvites.get(i.code));
+    const invite = await newInvites.find(
+      (i) => i.uses > oldInvites.get(i.code)
+    );
 
     const date = new Date();
 

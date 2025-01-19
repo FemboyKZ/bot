@@ -17,7 +17,7 @@ module.exports = {
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
-    const channel = client.channels.cache.get(auditlogData.Channel);
+    const channel = await client.channels.cache.get(auditlogData.Channel);
     if (!channel) return;
 
     const logData = await logs.findOne({

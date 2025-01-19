@@ -28,7 +28,7 @@ module.exports = {
     }
 
     client.guilds.cache.forEach(async (guild) => {
-      const clientMember = guild.members.cache.get(client.user.id);
+      const clientMember = await guild.members.cache.get(client.user.id);
       if (!clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild))
         return;
 

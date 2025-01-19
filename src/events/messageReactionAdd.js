@@ -46,12 +46,14 @@ module.exports = {
     });
     if (requestData) {
       const guild = reaction.message.guild;
-      const newRole = guild.roles.cache.find((role) => role.name === "Femmy");
-      const oldRole = member.roles.cache.find(
+      const newRole = await guild.roles.cache.find(
+        (role) => role.name === "Femmy"
+      );
+      const oldRole = await member.roles.cache.find(
         (role) => role.name === "Wannabe Fem"
       );
 
-      const member = reaction.message.guild.members.cache.get(user.id);
+      const member = await reaction.message.guild.members.cache.get(user.id);
       if (
         !member ||
         !member.permissions.has(PermissionFlagsBits.Administrator)
@@ -63,8 +65,9 @@ module.exports = {
           { User: user.id, Type: "Whitelist" },
           { Status: true }
         );
-        if (member.roles.cache.has(newRole.id)) await member.roles.add(newRole);
-        if (member.roles.cache.has(oldRole.id))
+        if (await member.roles.cache.has(newRole.id))
+          await member.roles.add(newRole);
+        if (await member.roles.cache.has(oldRole.id))
           await member.roles.remove(oldRole);
       } else if (reaction.emoji.name === "👎") {
         await schema.findOneAndUpdate(
