@@ -85,14 +85,8 @@ const functions = fs
   .readdirSync("./src/functions")
   .filter((file) => file.endsWith(".js"));
 const eventFiles = fs
-  .readdirSync("./src/events", { withFileTypes: true })
-  .filter((dirent) => dirent.isDirectory())
-  .flatMap((directory) =>
-    fs
-      .readdirSync(`./src/events/${directory.name}`)
-      .filter((file) => file.endsWith(".js"))
-      .map((file) => `${directory.name}/${file}`)
-  );
+  .readdirSync("./src/events")
+  .filter((file) => file.endsWith(".js"));
 const commandFolders = fs.readdirSync("./src/commands");
 
 (async () => {
