@@ -79,10 +79,9 @@ client.on("disconnect", () => {
     .catch((error) => console.error("Failed to log in:", error));
 });
 
-require("./guild-scraper.js");
+//require("./guild-scraper.js");
 
 require("./logger/automod-rules.js");
-require("./logger/bans.js");
 require("./logger/channels.js");
 require("./logger/emojis.js");
 require("./logger/invites.js");
