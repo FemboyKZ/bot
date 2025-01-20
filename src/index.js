@@ -42,6 +42,8 @@ const client = new Client({
 });
 exports.client = client;
 client.commands = new Collection();
+client.cooldowns = new Collection();
+client.invites = new Collection();
 
 const process = require("node:process");
 process.on("unhandledRejection", (reason, promise) => {
@@ -81,19 +83,20 @@ client.on("disconnect", () => {
 
 //require("./guild-scraper.js");
 
+const functionsPath = path.join(__dirname, "functions");
+const eventsPath = path.join(__dirname, "events");
+const commandsPath = path.join(__dirname, "commands");
+
 const functions = fs
-  .readdirSync("./src/functions")
+  .readdirSync(functionsPath)
   .filter((file) => file.endsWith(".js"));
-const eventFiles = fs
-  .readdirSync("./src/events")
-  .filter((file) => file.endsWith(".js"));
-const commandFolders = fs.readdirSync("./src/commands");
+const commandFolders = fs.readdirSync(commandsPath);
 
 (async () => {
   for (file of functions) {
-    require(`./functions/${file}`)(client);
+    require(`${functionsPath}/${file}`)(client);
   }
-  client.handleEvents(eventFiles, "./src/events");
-  client.handleCommands(commandFolders, "./src/commands");
+  client.handleEvents(eventsPath);
+  client.handleCommands(commandFolders, commandsPath);
   client.login(process.env.TOKEN);
 })();
