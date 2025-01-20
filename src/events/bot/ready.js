@@ -1,6 +1,6 @@
 const { Events, PermissionsBitField, Collection } = require("discord.js");
 const mongoose = require("mongoose");
-require("dotenv").config({ path: "/home/discord-fkz-1/bot/.env" });
+require("dotenv").config();
 const mongodbURI = process.env.MONGODB_URI;
 
 mongoose.set("strictQuery", false);
