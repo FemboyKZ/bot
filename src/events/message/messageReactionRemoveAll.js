@@ -5,6 +5,5 @@ module.exports = {
   async execute(reaction, user, client) {
     // Kinda pointless
     // TODO: Implement this event handler
-    return;
   },
 };

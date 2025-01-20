@@ -7,6 +7,5 @@ module.exports = {
   name: Events.ChannelPinsUpdate,
   async execute(channel, client) {
     // TODO: implement logger
-    return;
   },
 };

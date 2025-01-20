@@ -5,6 +5,5 @@ module.exports = {
   async execute(reaction, user, client) {
     // How does this differ from the MessageReactionRemove event?
     // TODO: Implement this event handler
-    return;
   },
 };
