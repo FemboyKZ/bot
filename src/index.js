@@ -6,6 +6,7 @@ const {
 } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
+
 const client = new Client({
   intents: [
     GatewayIntentBits.AutoModerationConfiguration,
@@ -41,6 +42,7 @@ const client = new Client({
   ],
 });
 exports.client = client;
+
 client.commands = new Collection();
 client.cooldowns = new Collection();
 client.invites = new Collection();
@@ -50,36 +52,7 @@ process.on("unhandledRejection", (reason, promise) => {
   console.log("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
-client.on("error", (error) => {
-  console.error("Error occurred:", error);
-});
-
 require("dotenv").config();
-
-client.on("disconnect", () => {
-  console.log("Disconnected from Discord API");
-  const retry = (fn, retries = 3, timeout = 1000) => {
-    return new Promise((resolve, reject) => {
-      fn()
-        .then(resolve)
-        .catch((error) => {
-          if (retries > 0) {
-            setTimeout(() => {
-              retry(fn, retries - 1, timeout)
-                .then(resolve)
-                .catch(reject);
-            }, timeout);
-          } else {
-            reject(error);
-          }
-        });
-    });
-  };
-  console.log("Attempting to reconnect...");
-  retry(() => client.login(process.env.TOKEN))
-    .then(() => console.log("Logged in successfully"))
-    .catch((error) => console.error("Failed to log in:", error));
-});
 
 //require("./guild-scraper.js");
 
