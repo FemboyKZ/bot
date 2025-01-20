@@ -4,7 +4,7 @@ require("dotenv").config({ path: "/home/discord-fkz-1/bot/.env" });
 const mongodbURI = process.env.MONGODB_URI;
 
 mongoose.set("strictQuery", false);
-mongoose.set("debug", true);
+mongoose.set("debug", false);
 
 module.exports = {
   name: Events.ClientReady,
