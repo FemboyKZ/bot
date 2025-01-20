@@ -41,15 +41,3 @@ module.exports = {
     }
   },
 };
-
-/*
-module.exports = {
-  name: Events.MessageReactionRemoveAll,
-  async execute(reaction, user, client) {},
-};
-
-module.exports = {
-  name: Events.MessageReactionRemoveEmoji,
-  async execute(reaction, user, client) {},
-};
-*/
