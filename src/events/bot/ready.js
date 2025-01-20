@@ -21,7 +21,6 @@ module.exports = {
           useNewUrlParser: true,
           useUnifiedTopology: true,
           serverSelectionTimeoutMS: 3000,
-          bufferCommands: false,
         });
       } else {
         return console.log(
