@@ -5,8 +5,6 @@ const settings = require("../../Schemas/logger/settings.js");
 
 // TODO: update comapring to (db data !== newChannel data)
 
-// TODO: handle pins update
-
 module.exports = {
   name: Events.ChannelUpdate,
   async execute(oldChannel, newChannel, client) {
@@ -175,10 +173,3 @@ module.exports = {
     }
   },
 };
-
-/*
-module.exports = {
-  name: Events.ChannelPinsUpdate,
-  async execute(channel, client) {},
-};
-*/
