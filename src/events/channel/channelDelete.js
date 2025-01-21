@@ -1,7 +1,7 @@
 const { EmbedBuilder, Events, DMChannel } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const logs = require("../../Schemas/logger/channels.js");
-const settings = require("../../Schemas/logger/settings.js");
+const schema = require("../../schemas/base-system.js");
+const logs = require("../../schemas/events/channels.js");
+const settings = require("../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.ChannelDelete,

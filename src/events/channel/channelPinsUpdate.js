@@ -1,7 +1,4 @@
-const { EmbedBuilder, Events, DMChannel } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const logs = require("../../Schemas/logger/channels.js");
-const settings = require("../../Schemas/logger/settings.js");
+const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.ChannelPinsUpdate,

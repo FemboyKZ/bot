@@ -1,7 +1,7 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const logs = require("../../Schemas/logger/roles.js");
-const settings = require("../../Schemas/logger/settings.js");
+const schema = require("../../schemas/base-system.js");
+const logs = require("../../schemas/events/roles.js");
+const settings = require("../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildRoleUpdate,
