@@ -5,7 +5,7 @@ const settings = require("../../Schemas/logger/settings.js");
 
 module.exports = {
   name: Events.ThreadCreate,
-  async execute(thread, client) {
+  async execute(thread, newlyCreated, client) {
     const settingsData = await settings.findOne({
       Guild: thread.guild.id,
     });
