@@ -4,7 +4,7 @@ const reactions = require("../../Schemas/reactionrole.js");
 
 module.exports = {
   name: Events.MessageReactionRemove,
-  async execute(reaction, user, client) {
+  async execute(reaction, user, details, client) {
     if (!reaction || !user || !client) {
       return;
     }

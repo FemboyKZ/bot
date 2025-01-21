@@ -4,7 +4,7 @@ const requests = require("../../Schemas/request-status.js");
 
 module.exports = {
   name: Events.MessageReactionAdd,
-  async execute(reaction, user, client) {
+  async execute(reaction, user, details, client) {
     if (!reaction || !user || !client) {
       return;
     }
