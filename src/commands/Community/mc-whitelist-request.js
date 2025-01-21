@@ -5,8 +5,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const status = require("../../Schemas/request-status.js");
+const schema = require("../../schemas/base-system.js");
+const status = require("../../schemas/request-status.js");
 
 var timeout = [];
 

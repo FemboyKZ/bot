@@ -1,14 +1,14 @@
-const automodData = require("./Schemas/logger/automod.js");
-const bansData = require("./Schemas/logger/bans.js");
-const channelsData = require("./Schemas/logger/channels.js");
-const emojisData = require("./Schemas/logger/emojis.js");
-const invitesData = require("./Schemas/logger/invites.js");
-const membersData = require("./Schemas/logger/members.js");
-// const messagesData = require("./Schemas/logger/messages.js"); // only logging deleted/edited
-const rolesData = require("./Schemas/logger/roles.js");
-const stickersData = require("./Schemas/logger/stickers.js");
-// const threadsData = require("./Schemas/logger/threads.js"); // pointless
-const settings = require("./Schemas/logger/settings.js");
+const automodData = require("./schemas/events/automod.js");
+const bansData = require("./schemas/events/bans.js");
+const channelsData = require("./schemas/events/channels.js");
+const emojisData = require("./schemas/events/emojis.js");
+const invitesData = require("./schemas/events/invites.js");
+const membersData = require("./schemas/events/members.js");
+// const messagesData = require("./schemas/events/messages.js"); // only logging deleted/edited
+const rolesData = require("./schemas/events/roles.js");
+const stickersData = require("./schemas/events/stickers.js");
+// const threadsData = require("./schemas/events/threads.js"); // pointless
+const settings = require("./schemas/events/settings.js");
 
 const { client } = require("./index.js");
 require("dotenv").config();

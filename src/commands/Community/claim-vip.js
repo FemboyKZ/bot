@@ -1,8 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const vip = require("../../Schemas/base-system.js");
-const uses = require("../../Schemas/vip/vip-uses.js");
-const roles = require("../../Schemas/vip/vip-roles.js");
-const status = require("../../Schemas/vip/vip-status.js");
+const vip = require("../../schemas/base-system.js");
+const uses = require("../../schemas/vip/vip-uses.js");
+const roles = require("../../schemas/vip/vip-roles.js");
+const status = require("../../schemas/vip/vip-status.js");
 require("dotenv").config();
 
 // TODO: MAKE THIS NOT SO SHITTY
