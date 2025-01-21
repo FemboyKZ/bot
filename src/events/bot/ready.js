@@ -33,6 +33,10 @@ module.exports = {
           );
 
           /*
+          if (!sessionId) {
+            console.warn("Setup your session ID in .env");
+            //client.gracefulShutdown();
+          }
           try {
             console.log("Loading session data...");
             const session = await client.loadSessionData(sessionId);
@@ -59,11 +63,6 @@ module.exports = {
       }
     } catch (error) {
       console.error("Error connecting to MongoDB:", error);
-    }
-
-    if (!sessionId) {
-      console.warn("Setup your session ID in .env");
-      client.gracefulShutdown();
     }
 
     await client.guilds.cache.forEach(async (guild) => {
