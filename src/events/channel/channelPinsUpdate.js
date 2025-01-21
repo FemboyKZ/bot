@@ -5,7 +5,7 @@ const settings = require("../../Schemas/logger/settings.js");
 
 module.exports = {
   name: Events.ChannelPinsUpdate,
-  async execute(channel, client) {
+  async execute(channel, date, client) {
     // TODO: implement logger
   },
 };

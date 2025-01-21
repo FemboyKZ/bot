@@ -7,15 +7,15 @@ const settings = require("../../Schemas/logger/settings.js");
 
 module.exports = {
   name: Events.AutoModerationRuleUpdate,
-  async execute(oldRule, newRule, client) {
+  async execute(oldAutoModerationRule, newAutoModerationRule, client) {
     const settingsData = await settings.findOne({
-      Guild: newRule.guild.id,
+      Guild: newAutoModerationRule.guild.id,
     });
     if (settingsData.Automod === false) return;
     if (settingsData.Store === false && settingsData.Post === false) return;
 
     const auditlogData = await schema.findOne({
-      Guild: newRule.guild.id,
+      Guild: newAutoModerationRule.guild.id,
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
@@ -26,38 +26,41 @@ module.exports = {
       .setColor("#ff00b3")
       .setTimestamp()
       .setTitle("Automod Rule Updated")
-      .setFooter({ text: `FKZ • ID: ${newRule.id}` });
+      .setFooter({ text: `FKZ • ID: ${newAutoModerationRule.id}` });
 
     const logData = await logs.findOne({
-      Guild: newRule.guild.id,
-      Rule: newRule.id,
+      Guild: newAutoModerationRule.guild.id,
+      Rule: newAutoModerationRule.id,
     });
 
     try {
       if (!logData && settingsData.Store === true) {
         await logs.create({
-          Guild: newRule.guild.id,
-          Name: newRule.name,
-          Rule: newRule.id,
-          User: newRule.creatorId,
-          Trigger: newRule.triggerType,
-          Action: newRule.actions[0].type,
-          Enabled: newRule.enabled,
+          Guild: newAutoModerationRule.guild.id,
+          Name: newAutoModerationRule.name,
+          Rule: newAutoModerationRule.id,
+          User: newAutoModerationRule.creatorId,
+          Trigger: newAutoModerationRule.triggerType,
+          Action: newAutoModerationRule.actions[0].type,
+          Enabled: newAutoModerationRule.enabled,
         });
       }
 
-      if (oldRule.name !== newRule.name) {
+      if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
         embed.addFields({
           name: "Name",
-          value: `\`${oldRule.name ? logData.Name : "None"}\`  →  \`${
-            newRule.name || "None"
-          }\``,
+          value: `\`${
+            oldAutoModerationRule.name ? logData.Name : "None"
+          }\`  →  \`${newAutoModerationRule.name || "None"}\``,
           inline: false,
         });
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
-            { Guild: newRule.guild?.id, Rule: newRule.id },
-            { Name: newRule.name }
+            {
+              Guild: newAutoModerationRule.guild?.id,
+              Rule: newAutoModerationRule.id,
+            },
+            { Name: newAutoModerationRule.name }
           );
         }
         if (settingsData.Post === true) {
@@ -65,23 +68,28 @@ module.exports = {
         }
       }
 
-      if (oldRule.actions !== newRule.actions) {
+      if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
         embed.addFields(
           {
             name: "Old Rules",
-            value: oldRule.actions[0].type ? logData.Action : "None",
+            value: oldAutoModerationRule.actions[0].type
+              ? logData.Action
+              : "None",
             inline: false,
           },
           {
             name: "New Rules",
-            value: newRule.actions[0].type || "None",
+            value: newAutoModerationRule.actions[0].type || "None",
             inline: false,
           }
         );
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
-            { Guild: newRule.guild?.id, Rule: newRule.id },
-            { Action: newRule.actions[0].type }
+            {
+              Guild: newAutoModerationRule.guild?.id,
+              Rule: newAutoModerationRule.id,
+            },
+            { Action: newAutoModerationRule.actions[0].type }
           );
         }
         if (settingsData.Post === true) {
@@ -89,18 +97,21 @@ module.exports = {
         }
       }
 
-      if (oldRule.enabled !== newRule.enabled) {
+      if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
         embed.addFields({
           name: "Enabled?",
-          value: `\`${oldRule.enabled ? logData.Enabled : "Unknown"}\`  →  \`${
-            newRule.enabled || "Unknown"
-          }\``,
+          value: `\`${
+            oldAutoModerationRule.enabled ? logData.Enabled : "Unknown"
+          }\`  →  \`${newAutoModerationRule.enabled || "Unknown"}\``,
           inline: false,
         });
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
-            { Guild: newRule.guild?.id, Rule: newRule.id },
-            { Enabled: newRule.enabled }
+            {
+              Guild: newAutoModerationRule.guild?.id,
+              Rule: newAutoModerationRule.id,
+            },
+            { Enabled: newAutoModerationRule.enabled }
           );
         }
         if (settingsData.Post === true) {
@@ -108,18 +119,23 @@ module.exports = {
         }
       }
 
-      if (oldRule.triggerType !== newRule.triggerType) {
+      if (
+        oldAutoModerationRule.triggerType !== newAutoModerationRule.triggerType
+      ) {
         embed.addFields({
           name: "Trigger",
-          value: `\`${oldRule.triggerType ? logData.Trigger : "None"}\`  →  \`${
-            newRule.triggerType || "None"
-          }\``,
+          value: `\`${
+            oldAutoModerationRule.triggerType ? logData.Trigger : "None"
+          }\`  →  \`${newAutoModerationRule.triggerType || "None"}\``,
           inline: false,
         });
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
-            { Guild: newRule.guild?.id, Rule: newRule.id },
-            { Trigger: newRule.triggerType }
+            {
+              Guild: newAutoModerationRule.guild?.id,
+              Rule: newAutoModerationRule.id,
+            },
+            { Trigger: newAutoModerationRule.triggerType }
           );
         }
         if (settingsData.Post === true) {
