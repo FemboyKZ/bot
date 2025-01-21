@@ -1,6 +1,8 @@
+const { Events } = require("discord.js");
+
 module.exports = {
-  name: "warn",
-  async execute(warning, client) {
-    console.warn("Warning occurred:", warning);
+  name: Events.Warn,
+  async execute(message, client) {
+    console.warn("Warning occurred:", message);
   },
 };
