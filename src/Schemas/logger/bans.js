@@ -1,10 +1,10 @@
 const { model, Schema } = require("mongoose");
 
 let bans = new Schema({
-  Guild: String,
-  User: String,
-  Created: Date,
-  Reason: String,
+  Guild: { type: String, required: true },
+  User: { type: String, unique: true, required: true }, // ID or username
+  Created: { type: Date, default: Date.now },
+  Reason: { type: String, default: null },
 });
 
 module.exports = model("bans", bans);

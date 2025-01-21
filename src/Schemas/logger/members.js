@@ -1,16 +1,16 @@
 const { model, Schema } = require("mongoose");
 
 let members = new Schema({
-  Guild: String,
-  User: String, // users = members
-  Name: String,
-  Nickname: String,
-  Displayname: String,
-  Avatar: String,
-  Banner: String,
-  Roles: [String],
-  Joined: Date,
-  Created: Date,
+  Guild: { type: String, required: true },
+  User: { type: String, unique: true, required: true }, // users = members
+  Name: { type: String, default: null },
+  Nickname: { type: String, default: null },
+  Displayname: { type: String, default: null },
+  Avatar: { type: String, default: null }, // URL
+  Banner: { type: String, default: null }, // URL
+  Roles: { type: [String], default: [] },
+  Joined: { type: Date, default: Date.now },
+  Created: { type: Date, default: null },
 });
 
 module.exports = model("members", members);

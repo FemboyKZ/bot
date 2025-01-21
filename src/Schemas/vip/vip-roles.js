@@ -1,9 +1,9 @@
 const { model, Schema } = require("mongoose");
 
 let vipRoles = new Schema({
-  Guild: String,
-  Type: String,
-  Role: String,
+  Guild: { type: String, required: true },
+  Type: { type: String, required: true },
+  Role: { type: String, required: true },
 });
 
 module.exports = model("vipRoles", vipRoles);

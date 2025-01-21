@@ -1,9 +1,9 @@
 const { model, Schema } = require("mongoose");
 
 let numSchema = new Schema({
-  Guild: String,
-  User: String,
-  Number: Number,
+  Guild: { type: String },
+  User: { type: String },
+  Number: { type: Number },
 });
 
 module.exports = model("ghostNum", numSchema);
