@@ -29,7 +29,7 @@ module.exports = {
         );
       }
 
-      console.log("The MongoDB Database is running.");
+      console.log("Connection successful, The MongoDB Database is running.");
     } catch (error) {
       console.error("Error connecting to MongoDB:", error);
     }
