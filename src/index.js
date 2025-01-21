@@ -40,6 +40,7 @@ const client = new Client({
     Partials.ThreadMember,
     Partials.User,
   ],
+  presence: { status: "online" },
 });
 exports.client = client;
 
