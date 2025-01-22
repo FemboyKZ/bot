@@ -112,10 +112,6 @@ if (!process.env.TOKEN) {
   client.gracefulShutdown().catch(console.error);
 }
 
-client.rest.on("rateLimited", (info) => {
-  console.warn(`Rate limit hit: ${JSON.stringify(info)}`);
-});
-
 //require("./guild-scraper.js");
 
 const functionsPath = path.join(__dirname, "functions");
