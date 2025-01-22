@@ -116,27 +116,19 @@ client.rest.on("rateLimited", (info) => {
 
 //require("./guild-scraper.js");
 
+const functionsPath = path.join(__dirname, "functions");
+const functions = fs
+  .readdirSync(functionsPath)
+  .filter((file) => file.endsWith(".js"));
+
+const eventsPath = path.join(__dirname, "events");
+
 const processEventsPath = path.join(__dirname, "processEvents");
 const processEventFiles = fs
   .readdirSync(processEventsPath)
   .filter((file) => file.endsWith(".js"));
 
-processEventFiles.forEach((file) => {
-  const event = require(`${processEventsPath}/${file}`);
-  if (event.execute) {
-    process.on(event.name, (...args) => event.execute(client, ...args));
-  } else {
-    console.warn(`Event file ${file} is missing an execute function.`);
-  }
-});
-
-const functionsPath = path.join(__dirname, "functions");
-const eventsPath = path.join(__dirname, "events");
 const commandsPath = path.join(__dirname, "commands");
-
-const functions = fs
-  .readdirSync(functionsPath)
-  .filter((file) => file.endsWith(".js"));
 const commandFolders = fs.readdirSync(commandsPath);
 
 (async () => {
@@ -144,6 +136,7 @@ const commandFolders = fs.readdirSync(commandsPath);
     require(`${functionsPath}/${file}`)(client);
   }
   client.handleEvents(eventsPath);
+  client.handleProcessEvents(processEventFiles, processEventsPath);
   client.handleCommands(commandFolders, commandsPath);
   client.login(process.env.TOKEN);
 })();
