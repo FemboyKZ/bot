@@ -2,11 +2,11 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = (client) => {
-  client.handleEvents = async (eventsPath) => {
+  client.handleRestEvents = async (restEventsPath) => {
     const loadDir = (dir) => {
-      const files = fs.readdirSync(path.join(eventsPath, dir));
+      const files = fs.readdirSync(path.join(restEventsPath, dir));
       for (const file of files) {
-        const fullPath = path.join(eventsPath, dir, file);
+        const fullPath = path.join(restEventsPath, dir, file);
         const stat = fs.statSync(fullPath);
 
         if (stat.isDirectory()) {
@@ -21,11 +21,11 @@ module.exports = (client) => {
             }
 
             if (event.once) {
-              client.once(event.name, (...args) =>
+              client.rest.once(event.name, (...args) =>
                 event.execute(...args, client)
               );
             } else {
-              client.on(event.name, (...args) =>
+              client.rest.on(event.name, (...args) =>
                 event.execute(...args, client)
               );
             }

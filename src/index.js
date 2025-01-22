@@ -86,6 +86,7 @@ client.saveSessionData = async (sessionId, data) => {
 };
 
 client.gracefulShutdown = async function () {
+  /*
   try {
     await client.saveSessionData(
       client.sessionData.sessionId,
@@ -94,6 +95,7 @@ client.gracefulShutdown = async function () {
   } catch (error) {
     console.error("Error saving session data during shutdown:", error);
   }
+  */
 
   try {
     await mongoose.connection.close();
@@ -122,21 +124,18 @@ const functions = fs
   .filter((file) => file.endsWith(".js"));
 
 const eventsPath = path.join(__dirname, "events");
-
 const processEventsPath = path.join(__dirname, "processEvents");
-const processEventFiles = fs
-  .readdirSync(processEventsPath)
-  .filter((file) => file.endsWith(".js"));
+const restEventsPath = path.join(__dirname, "restEvents");
 
 const commandsPath = path.join(__dirname, "commands");
-const commandFolders = fs.readdirSync(commandsPath);
 
 (async () => {
   for (file of functions) {
     require(`${functionsPath}/${file}`)(client);
   }
   client.handleEvents(eventsPath);
-  client.handleProcessEvents(processEventFiles, processEventsPath);
-  client.handleCommands(commandFolders, commandsPath);
+  client.handleProcessEvents(processEventsPath);
+  client.handleRestEvents(restEventsPath);
+  client.handleCommands(commandsPath);
   client.login(process.env.TOKEN);
 })();

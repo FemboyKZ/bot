@@ -3,6 +3,7 @@ const { Events } = require("discord.js");
 module.exports = {
   name: Events.Raw,
   async execute(packet, client) {
+    /*
     if (packet.t) {
       if (client.ws && typeof client.ws.sequence !== "undefined") {
         client.sessionData.seq = client.ws.sequence;
@@ -14,5 +15,6 @@ module.exports = {
         //console.error("client.ws or client.ws.sequence is undefined");
       }
     }
+    */
   },
 };
