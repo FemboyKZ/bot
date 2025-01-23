@@ -120,8 +120,10 @@ const functions = fs
   .filter((file) => file.endsWith(".js"));
 
 const eventsPath = path.join(__dirname, "events");
-const processEventsPath = path.join(__dirname, "processEvents");
-const restEventsPath = path.join(__dirname, "restEvents");
+const clientEventsPath = path.join(eventsPath, "client");
+const processEventsPath = path.join(eventsPath, "process");
+const restEventsPath = path.join(eventsPath, "rest");
+const mongoEventsPath = path.join(eventsPath, "mongo");
 
 const commandsPath = path.join(__dirname, "commands");
 
@@ -129,9 +131,10 @@ const commandsPath = path.join(__dirname, "commands");
   for (file of functions) {
     require(`${functionsPath}/${file}`)(client);
   }
-  client.handleEvents(eventsPath);
+  client.handleEvents(clientEventsPath);
   client.handleProcessEvents(processEventsPath);
   client.handleRestEvents(restEventsPath);
+  client.handleMongoEvents(mongoEventsPath);
   client.handleCommands(commandsPath);
   client.login(process.env.TOKEN);
 })();

@@ -10,9 +10,9 @@ const {
   TextInputBuilder,
   TextInputStyle,
 } = require("discord.js");
-const schema = require("../../schemas/base-system.js");
-const settings = require("../../schemas/events/settings.js");
-const status = require("../../schemas/request-status.js");
+const schema = require("../../../schemas/base-system.js");
+const settings = require("../../../schemas/events/settings.js");
+const status = require("../../../schemas/request-status.js");
 
 module.exports = {
   name: Events.InteractionCreate,

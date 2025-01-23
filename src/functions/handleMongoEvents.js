@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = (client) => {
-  client.handleRestEvents = async (eventsPath) => {
+  client.handleMongoEvents = async (eventsPath) => {
     const loadDir = (dir) => {
       const files = fs.readdirSync(path.join(eventsPath, dir));
       for (const file of files) {
@@ -16,21 +16,21 @@ module.exports = (client) => {
             const event = require(fullPath);
 
             if (!event.name || !event.execute) {
-              console.error(`Invalid rest event file: ${fullPath}`);
+              console.error(`Invalid mongo event file: ${fullPath}`);
               continue;
             }
 
-            if (event.once) {
-              client.rest.once(event.name, (...args) =>
-                event.execute(...args, client)
+            if (event.execute) {
+              mongoose.connection.on(event.name, (...args) =>
+                event.execute(client, ...args)
               );
             } else {
-              client.rest.on(event.name, (...args) =>
-                event.execute(...args, client)
+              console.warn(
+                `Event file ${file} is missing an execute function.`
               );
             }
           } catch (error) {
-            console.error(`Error loading rest event file ${fullPath}:`, error);
+            console.error(`Error loading mongo event file ${fullPath}:`, error);
           }
         }
       }

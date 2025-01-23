@@ -1,7 +1,7 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../schemas/base-system.js");
-const logs = require("../../schemas/events/invites.js");
-const settings = require("../../schemas/events/settings.js");
+const schema = require("../../../schemas/base-system.js");
+const logs = require("../../../schemas/events/invites.js");
+const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.InviteDelete,

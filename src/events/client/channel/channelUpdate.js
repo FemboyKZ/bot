@@ -1,7 +1,7 @@
 const { EmbedBuilder, Events, DMChannel } = require("discord.js");
-const schema = require("../../schemas/base-system.js");
-const logs = require("../../schemas/events/channels.js");
-const settings = require("../../schemas/events/settings.js");
+const schema = require("../../../schemas/base-system.js");
+const logs = require("../../../schemas/events/channels.js");
+const settings = require("../../../schemas/events/settings.js");
 
 // TODO: update comapring to (db data !== newChannel data)
 

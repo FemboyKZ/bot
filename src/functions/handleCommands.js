@@ -5,7 +5,7 @@ const { Routes } = require("discord-api-types/v9");
 require("dotenv").config();
 
 module.exports = (client) => {
-  client.handleCommands = async (commandFoldersPath) => {
+  client.handleCommands = async (commandsPath) => {
     client.commandArray = [];
     client.commands = new Map();
 
@@ -40,7 +40,7 @@ module.exports = (client) => {
       client.gracefulShutdown().catch(console.error);
     }
 
-    loadCommands(commandFoldersPath);
+    loadCommands(commandsPath);
     const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 
     (async () => {
