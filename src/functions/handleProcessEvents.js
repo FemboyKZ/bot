@@ -16,7 +16,7 @@ module.exports = (client) => {
             const event = require(fullPath);
 
             if (!event.name || !event.execute) {
-              console.error(`Invalid process event file: ${fullPath}`);
+              console.error(`Invalid process event file: ${event.name}`);
               continue;
             }
 
@@ -30,10 +30,7 @@ module.exports = (client) => {
               );
             }
           } catch (error) {
-            console.error(
-              `Error loading process event file ${fullPath}:`,
-              error
-            );
+            console.error(`Error loading process event file:`, error);
           }
         }
       }

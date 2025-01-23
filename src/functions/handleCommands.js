@@ -21,7 +21,7 @@ module.exports = (client) => {
           const command = require(fullPath);
 
           if (!command.data || !command.data.name || !command.data.toJSON) {
-            console.error(`Invalid command file: ${fullPath}`);
+            console.error(`Invalid command file`);
             continue;
           }
 

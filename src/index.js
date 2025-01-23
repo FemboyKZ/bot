@@ -9,9 +9,11 @@ const path = require("path");
 const mongoose = require("mongoose");
 const process = require("node:process");
 
+const consoleHandler = require(path.join(__dirname, "handleConsole.js"));
+
 require("dotenv").config();
 
-const Session = require("./schemas/session.js");
+//const Session = require("./schemas/session.js");
 
 const client = new Client({
   intents: [
@@ -54,6 +56,11 @@ client.commands = new Collection();
 //client.cooldowns = new Collection();
 client.invites = new Collection();
 
+consoleHandler.on("console", (data) => {
+  console.log(data);
+});
+
+/*
 client.loadSessionData = async (sessionId) => {
   try {
     const session = await Session.findOne({ sessionId: sessionId });
@@ -69,7 +76,7 @@ client.loadSessionData = async (sessionId) => {
   }
 };
 
-//client.sessionData = await loadSessionData();
+client.sessionData = await loadSessionData();
 
 client.saveSessionData = async (sessionId, data) => {
   try {
@@ -84,6 +91,7 @@ client.saveSessionData = async (sessionId, data) => {
     console.error("Error saving session data:", error);
   }
 };
+*/
 
 client.gracefulShutdown = async function () {
   /*

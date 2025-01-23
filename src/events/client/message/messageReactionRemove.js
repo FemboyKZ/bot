@@ -1,6 +1,6 @@
 const { Events } = require("discord.js");
-const reactions = require("../../schemas/reactionrole.js");
-//const requests = require("../../schemas/request-status.js");
+const reactions = require("../../../schemas/reactionrole.js");
+//const requests = require("../../../schemas/request-status.js");
 
 module.exports = {
   name: Events.MessageReactionRemove,

@@ -1,8 +1,8 @@
 const { EmbedBuilder, Events } = require("discord.js");
 require("dotenv").config();
-const schema = require("../../schemas/base-system.js");
-const logs = require("../../schemas/events/members.js");
-const settings = require("../../schemas/events/settings.js");
+const schema = require("../../../schemas/base-system.js");
+const logs = require("../../../schemas/events/members.js");
+const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildMemberUpdate,

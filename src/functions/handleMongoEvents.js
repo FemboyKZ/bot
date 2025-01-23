@@ -16,7 +16,7 @@ module.exports = (client) => {
             const event = require(fullPath);
 
             if (!event.name || !event.execute) {
-              console.error(`Invalid mongo event file: ${fullPath}`);
+              console.error(`Invalid mongo event file: ${event.name}`);
               continue;
             }
 
@@ -30,7 +30,7 @@ module.exports = (client) => {
               );
             }
           } catch (error) {
-            console.error(`Error loading mongo event file ${fullPath}:`, error);
+            console.error(`Error loading mongo event file:`, error);
           }
         }
       }
