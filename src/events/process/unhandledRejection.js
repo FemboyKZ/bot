@@ -1,6 +1,22 @@
 module.exports = {
   name: "unhandledRejection",
   async execute(reason, promise, client) {
-    console.warn("Unhandled Rejection at:", promise, "reason:", reason);
+    let reasonDetails;
+    if (reason && reason.message) {
+      reasonDetails = reason.message;
+    } else if (reason && reason.stack) {
+      reasonDetails = reason.stack;
+    } else {
+      try {
+        reasonDetails = JSON.stringify(reason);
+      } catch (error) {
+        reasonDetails = "Unknown reason (failed to stringify)";
+      }
+    }
+
+    console.error(
+      `[UNHANDLED REJECTION] `,
+      `Promise: ${promise}\nReason: ${reasonDetails}`
+    );
   },
 };
