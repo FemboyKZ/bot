@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const mongoose = require("mongoose");
 
 module.exports = (client) => {
   client.handleMongoEvents = async (eventsPath) => {
