@@ -9,8 +9,6 @@ const path = require("path");
 const mongoose = require("mongoose");
 const process = require("node:process");
 
-//const consoleHandler = require(path.join(__dirname, "handleConsole.js"));
-
 require("dotenv").config();
 
 //const Session = require("./schemas/session.js");
@@ -55,6 +53,9 @@ exports.client = client;
 client.commands = new Collection();
 //client.cooldowns = new Collection();
 client.invites = new Collection();
+
+const consoleHandler = require(path.join(__dirname, "handleConsole.js"));
+consoleHandler.on("console", async (eventData) => {});
 
 /*
 client.loadSessionData = async (sessionId) => {
