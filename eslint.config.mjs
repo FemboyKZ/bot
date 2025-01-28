@@ -10,7 +10,7 @@ export default [
   eslintPluginPrettierRecommended,
   {
     rules: {
-      "no-unused-vars": "ignore",
+      "no-unused-vars": "off",
     },
   },
 ];
