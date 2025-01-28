@@ -401,132 +401,139 @@ module.exports = {
       }, 10000);
     }
   },
+};
 
-  async handleGift(
-    interaction,
-    perkSystem,
-    target,
-    user,
-    embed,
-    logEmbed,
-    steamId,
-    role,
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have gifted **VIP** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
-    );
-    logEmbed.setDescription(
-      `**${user}** has gifted **${target}** **VIP**, using their VIP+/Contributor perk.\nSteamID: \`${steamId}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
-    );
-    try {
-      await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await status.create({
-        Claimer: target.id,
-        Status: true,
-        Type: "vip",
-        Gifted: null,
-        Steam: steamId,
-        Date: new Date(),
-      });
-      await status.findOneAndUpdate({ Claimer: user }, { Gifted: true });
-      await target.roles.add(role);
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
-    }
-  },
-
-  async handleCode(
-    interaction,
-    perkSystem,
-    target,
-    user,
-    embed,
-    logEmbed,
-    steamId,
-    perkType,
-    role,
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have gifted **${perkType}** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
-    );
-    logEmbed.setDescription(
-      `**${user}** has gifted **${perkType}** to **${target}**, using a code.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
-    );
+async function handleGift(
+  interaction,
+  perkSystem,
+  target,
+  code,
+  user,
+  embed,
+  logEmbed,
+  steamId,
+  role,
+) {
+  embed.setDescription(
+    `Thank you for supporting us! You have gifted **VIP** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
+  );
+  logEmbed.setDescription(
+    `**${user}** has gifted **${target}** **VIP**, using their VIP+/Contributor perk.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
+  );
+  try {
     await perkSystem.Channel.send({ embeds: [logEmbed] });
-    try {
-      await status.create({
+    await status.create({
+      Claimer: target.id,
+      Status: true,
+      Type: "vip",
+      Gifted: null,
+      Steam: steamId,
+      Date: new Date(),
+    });
+    await status.findOneAndUpdate({ Claimer: user }, { Gifted: true });
+    await target.roles.add(role);
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+  } catch (error) {
+    console.error(error);
+    return await interaction.reply({
+      content: "An error occurred while processing your request.",
+      ephemeral: true,
+    });
+  }
+}
+
+async function handleCode(
+  interaction,
+  perkSystem,
+  target,
+  code,
+  user,
+  embed,
+  logEmbed,
+  steamId,
+  perkType,
+  role,
+) {
+  embed.setDescription(
+    `Thank you for supporting us! You have gifted **${perkType}** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
+  );
+  logEmbed.setDescription(
+    `**${user}** has gifted **${perkType}** to **${target}**, using a code.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
+  );
+  await perkSystem.Channel.send({ embeds: [logEmbed] });
+  try {
+    await status.create({
+      Claimer: target.id,
+      Status: true,
+      Type: perkType,
+      Gifted: null,
+      Steam: steamId,
+      Date: new Date(),
+    });
+    await uses.findOneAndUpdate(
+      { Guild: perkSystem.Guild, Type: perkType },
+      { Uses: 1 },
+    );
+    const vipRole = await roles.findOne({
+      Guild: interaction.guild.id,
+      Type: "vip",
+    });
+    await target.roles.add(role);
+    if (perkType === "vip+" || perkType === "contributor") {
+      let role2 = await interaction.guild.roles.fetch(vipRole.Role);
+      await target.roles.add(role2);
+    }
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+  } catch (error) {
+    console.error(error);
+    return await interaction.reply({
+      content: "An error occurred while processing your request.",
+      ephemeral: true,
+    });
+  }
+}
+
+async function handleCodeExisting(
+  interaction,
+  perkSystem,
+  target,
+  code,
+  user,
+  embed,
+  logEmbed,
+  steamId,
+  perkType,
+  role,
+) {
+  embed.setDescription(
+    `Thank you for supporting us! You have gifted **${perkType}** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
+  );
+  logEmbed.setDescription(
+    `**${user}** has gifted **${perkType}** to **${target}**, using a code.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
+  );
+  try {
+    await perkSystem.Channel.send({ embeds: [logEmbed] });
+    await status.findOneAndUpdate(
+      {
         Claimer: target.id,
+      },
+      {
         Status: true,
         Type: perkType,
-        Gifted: null,
-        Steam: steamId,
         Date: new Date(),
-      });
-      await uses.findOneAndUpdate(
-        { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 },
-      );
-      await target.roles.add(role);
-      if (perkType === "vip+" || perkType === "contributor") {
-        let role2 = await guild.roles.fetch(vipRole.Role);
-        await target.roles.add(role2);
-      }
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
-    }
-  },
-
-  async handleCodeExisting(
-    interaction,
-    perkSystem,
-    target,
-    user,
-    embed,
-    logEmbed,
-    steamId,
-    perkType,
-    role,
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have gifted **${perkType}** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
+      },
     );
-    logEmbed.setDescription(
-      `**${user}** has gifted **${perkType}** to **${target}**, using a code.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
+    await uses.findOneAndUpdate(
+      { Guild: perkSystem.Guild, Type: perkType },
+      { Uses: 1 },
     );
-    try {
-      await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await status.findOneAndUpdate(
-        {
-          Claimer: target.id,
-        },
-        {
-          Status: true,
-          Type: perkType,
-          Date: new Date(),
-        },
-      );
-      await uses.findOneAndUpdate(
-        { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 },
-      );
-      await target.roles.add(role);
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
-    }
-  },
-};
+    await target.roles.add(role);
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+  } catch (error) {
+    console.error(error);
+    return await interaction.reply({
+      content: "An error occurred while processing your request.",
+      ephemeral: true,
+    });
+  }
+}

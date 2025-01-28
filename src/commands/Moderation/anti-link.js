@@ -75,7 +75,7 @@ module.exports = {
     const sub = options.getSubcommand();
 
     switch (sub) {
-      case "setup":
+      case "setup": {
         const permissions = options.getString("permissions");
 
         const Data = await schema.findOne({ Guild: interaction.guild.id });
@@ -100,10 +100,10 @@ module.exports = {
           );
 
         await interaction.reply({ embeds: [embed] });
-    }
+        break;
+      }
 
-    switch (sub) {
-      case "disable":
+      case "disable": {
         await schema.deleteMany();
 
         const embed2 = new EmbedBuilder()
@@ -111,10 +111,10 @@ module.exports = {
           .setDescription(`The anti-link system has been disabled.`);
 
         await interaction.reply({ embeds: [embed2] });
-    }
+        break;
+      }
 
-    switch (sub) {
-      case "check":
+      case "check": {
         const Data = await schema.findOne({ Guild: interaction.guild.id });
         if (!Data)
           return await interaction.reply({
@@ -133,10 +133,10 @@ module.exports = {
             content: `The anti-link system is set up. Members with **${permissions}** can bypass it.`,
             ephemeral: true,
           });
-    }
+        break;
+      }
 
-    switch (sub) {
-      case "edit":
+      case "edit": {
         const Data = await schema.findOne({ Guild: interaction.guild.id });
         const permissions = options.getString("permissions");
 
@@ -161,6 +161,8 @@ module.exports = {
 
           await interaction.reply({ embeds: [embed3] });
         }
+        break;
+      }
     }
   },
 };
