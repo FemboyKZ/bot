@@ -35,7 +35,7 @@ module.exports = {
       .addFields(
         {
           name: "Banned Member",
-          value: `<@${ban.user.id}>` || "unknown",
+          value: `<@${ban.user.id}>`,
           inline: false,
         },
         {

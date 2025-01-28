@@ -130,8 +130,8 @@ module.exports = {
     const { name, user, id } = server;
 
     const dathostUrl = `https://dathost.net/api/0.1/game-servers/${id}`;
-    const dathostStatus = `curl -u "${username}:${password}" --request GET \--url ${dathostUrl} \--header 'accept: application/json'`;
-    const dathostCommand = `curl -u "${username}:${password}" --request GET \--url ${dathostUrl}/stop \--header 'accept: application/json'`;
+    const dathostStatus = `curl -u "${username}:${password}" --request GET -url ${dathostUrl} -header 'accept: application/json'`;
+    const dathostCommand = `curl -u "${username}:${password}" --request GET -url ${dathostUrl}/stop -header 'accept: application/json'`;
 
     const commandLocal = `sudo -iu cs2-${user} /home/cs2-${user}/cs2server stop`;
     const commandApi = `curl -X POST -H 'Accept: application/json' -H 'authorization: ${key}' -H 'Content-Type: application/json' -d '{"user": "${user}", "game": "cs2", "command": "stop"}' ${url}`;

@@ -133,9 +133,11 @@ const mongoEventsPath = path.join(eventsPath, "mongo");
 const commandsPath = path.join(__dirname, "commands");
 
 (async () => {
+  /* eslint-disable no-undef */
   for (file of functions) {
     require(`${functionsPath}/${file}`)(client);
   }
+  /* eslint-enable no-undef */
   client.handleEvents(clientEventsPath);
   client.handleProcessEvents(processEventsPath);
   client.handleRestEvents(restEventsPath);

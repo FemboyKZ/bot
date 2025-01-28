@@ -28,7 +28,7 @@ module.exports = {
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setImage(emoji.imageURL({ size: 128 }) || logData.Image)
+      .setImage(newEmoji.imageURL({ size: 128 }) || logData.Image)
       .setFooter({ text: `FKZ • ID: ${newEmoji.id}` })
       .setTitle("Emoji Edited")
       .addFields({
@@ -65,7 +65,7 @@ module.exports = {
           );
         }
         if (settingsData.Post === true) {
-          await auditChannel.send({ embeds: [embed] });
+          await channel.send({ embeds: [embed] });
         }
       }
 
@@ -84,7 +84,7 @@ module.exports = {
           );
         }
         if (settingsData.Post === true) {
-          await auditChannel.send({ embeds: [embed] });
+          await channel.send({ embeds: [embed] });
         }
       }
     } catch (error) {

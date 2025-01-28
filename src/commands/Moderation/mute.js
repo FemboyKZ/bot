@@ -65,7 +65,7 @@ module.exports = {
       .setFooter({ text: "FKZ" })
       .setTitle("User Muted")
       .setDescription(
-        `**User:** <@${user.id}>\n**Reason:** ${reason}\n**Duration:** ${duration}\n**Executor:** <@${interaction.user.id}>`,
+        `**User:** <@${user.id}>\n**Reason:** ${reason}\n**Executor:** <@${interaction.user.id}>`, // **Duration:** ${duration}\n
       );
 
     const roleId = await roles.findOne({ Guild: interaction.guild.id });
