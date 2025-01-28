@@ -2,14 +2,14 @@ name: Eslint
 
 on:
   push:
-    branches: [misc-dev]
+    branches: ["dev/main","dev/*", "feat/*", "refactor/*", "fix/*", "test/*"]
     paths-ignore:
       - LICENSE
       - README.md
       - .gitignore
       - ".github/*"
   pull_request:
-    branches: [misc-dev]
+    branches: ["dev/main","dev/*", "feat/*", "refactor/*", "fix/*", "test/*"]
     paths-ignore:
       - LICENSE
       - README.md
@@ -36,5 +36,5 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm install
-      - name: Run Prettier
-        run: npx prettier --write .
+      - name: Run Eslint
+        run: npx eslint .
