@@ -29,7 +29,7 @@ module.exports = {
 
         if (result) {
           console.log(
-            "Connection successful, The MongoDB Database is running."
+            "Connection successful, The MongoDB Database is running.",
           );
 
           /*
@@ -58,7 +58,7 @@ module.exports = {
       } else {
         return console.log(
           "Already connected/connecting to MongoDB, stuck disconnecting or uninitialized.\nreadyState: ",
-          mongoose.connection.readyState
+          mongoose.connection.readyState,
         );
       }
     } catch (error) {
@@ -73,7 +73,9 @@ module.exports = {
       const firstInvites = await guild.invites.fetch().catch(console.log);
       client.invites.set(
         guild.id,
-        new Collection(firstInvites.map((invite) => [invite.code, invite.uses]))
+        new Collection(
+          firstInvites.map((invite) => [invite.code, invite.uses]),
+        ),
       );
     });
   },

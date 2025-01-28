@@ -46,7 +46,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Explain what/who you're suggesting/reporting.")
       .setPlaceholder(
-        "What happened? Where? / What makes your suggestion worth adding."
+        "What happened? Where? / What makes your suggestion worth adding.",
       )
       .setStyle(TextInputStyle.Paragraph);
 

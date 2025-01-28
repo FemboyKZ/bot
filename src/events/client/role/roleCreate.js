@@ -35,7 +35,7 @@ module.exports = {
         { name: "Role", value: `<@&${role.id}>`, inline: false },
         { name: "Color", value: `${role.hexColor}`, inline: false },
         { name: "Hoisted?", value: `${role.hoist}`, inline: false },
-        { name: "Mentionable?", value: `${role.mentionable}`, inline: false }
+        { name: "Mentionable?", value: `${role.mentionable}`, inline: false },
       );
     try {
       if (!logData && settingsData.Store === true) {

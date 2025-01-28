@@ -51,7 +51,7 @@ module.exports = {
           name: "Category",
           value: `${channel.parentId ? logData.Parent : "Unknown"}`,
           inline: false,
-        }
+        },
       );
     try {
       if (logData && settingsData.Store === true) {
@@ -62,7 +62,7 @@ module.exports = {
             Topic: channel.topic,
             Parent: channel.parentId,
             Type: channel.type,
-          }
+          },
         );
       } else if (!logData && settingsData.Store === true) {
         await logs.create({

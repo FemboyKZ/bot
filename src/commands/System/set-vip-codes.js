@@ -10,19 +10,19 @@ module.exports = {
       option
         .setName("code-vip")
         .setDescription("Set or update the VIP Code")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("code-vip-plus")
         .setDescription("Set or update the VIP+ Code")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("code-contributor")
         .setDescription("Set or update the Contributor Code")
-        .setRequired(false)
+        .setRequired(false),
     ),
   async execute(interaction) {
     const guild = interaction.guild;
@@ -87,7 +87,7 @@ module.exports = {
           {
             Code: vipCode,
             Uses: 0,
-          }
+          },
         );
       }
       if (vipPlusCode) {
@@ -99,7 +99,7 @@ module.exports = {
           {
             Code: vipPlusCode,
             Uses: 0,
-          }
+          },
         );
       }
       if (contributorCode) {
@@ -111,7 +111,7 @@ module.exports = {
           {
             Code: contributorCode,
             Uses: 0,
-          }
+          },
         );
       } else {
         return await interaction.reply({

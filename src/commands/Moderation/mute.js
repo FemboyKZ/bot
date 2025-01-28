@@ -17,13 +17,13 @@ module.exports = {
       option
         .setName("user")
         .setDescription("The user to mute")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("reason")
         .setDescription("Reason for the mute")
-        .setRequired(false)
+        .setRequired(false),
     ),
   /*.addStringOption((option) =>
       option
@@ -65,7 +65,7 @@ module.exports = {
       .setFooter({ text: "FKZ" })
       .setTitle("User Muted")
       .setDescription(
-        `**User:** <@${user.id}>\n**Reason:** ${reason}\n**Duration:** ${duration}\n**Executor:** <@${interaction.user.id}>`
+        `**User:** <@${user.id}>\n**Reason:** ${reason}\n**Duration:** ${duration}\n**Executor:** <@${interaction.user.id}>`,
       );
 
     const roleId = await roles.findOne({ Guild: interaction.guild.id });

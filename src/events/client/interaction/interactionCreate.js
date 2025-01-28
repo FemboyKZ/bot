@@ -61,7 +61,7 @@ module.exports = {
       if (interaction.customId === "ticket-close") {
         if (
           !interaction.member.permissions.has(
-            PermissionsBitField.Flags.Administrator
+            PermissionsBitField.Flags.Administrator,
           )
         ) {
           return await interaction.reply({
@@ -144,7 +144,7 @@ module.exports = {
           .setTitle("New Whitelist Request")
           .setImage("https://femboy.kz/images/wide.png")
           .setDescription(
-            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`
+            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
           .addFields(
             {
@@ -161,7 +161,7 @@ module.exports = {
               name: "What they want to do on the server",
               value: `${request}`,
               inline: false,
-            }
+            },
           )
           .setTimestamp();
 
@@ -171,7 +171,7 @@ module.exports = {
         });
         if (!data || !data.Channel) return;
         const channel = await interaction.guild.channels.cache.get(
-          data.Channel
+          data.Channel,
         );
         if (!channel) return;
 
@@ -213,7 +213,7 @@ module.exports = {
           .setTitle("New Whitelist Request")
           .setImage("https://femboy.kz/images/wide.png")
           .setDescription(
-            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`
+            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
           .addFields(
             {
@@ -230,7 +230,7 @@ module.exports = {
               name: "Requested to Group? Yes/No",
               value: `${request}`,
               inline: false,
-            }
+            },
           )
           .setTimestamp();
 
@@ -240,7 +240,7 @@ module.exports = {
         });
         if (!data || !data.Channel) return;
         const channel = await interaction.guild.channels.cache.get(
-          data.Channel
+          data.Channel,
         );
         if (!channel) return;
 
@@ -281,7 +281,7 @@ module.exports = {
           .setTitle("New Unban Request")
           .setImage("https://femboy.kz/images/wide.png")
           .setDescription(
-            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`
+            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
           .addFields(
             {
@@ -298,7 +298,7 @@ module.exports = {
               name: "Server IP/Name",
               value: `${server}`,
               inline: false,
-            }
+            },
           )
           .setTimestamp();
 
@@ -308,7 +308,7 @@ module.exports = {
         });
         if (!data || !data.Channel) return;
         const channel = await interaction.guild.channels.cache.get(
-          data.Channel
+          data.Channel,
         );
         if (!channel) return;
 
@@ -349,7 +349,7 @@ module.exports = {
           .setTitle("New Report/Suggestion Request")
           .setImage("https://femboy.kz/images/wide.png")
           .setDescription(
-            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`
+            `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
           .addFields(
             {
@@ -366,7 +366,7 @@ module.exports = {
               name: "More info, such as links.",
               value: `${more}`,
               inline: false,
-            }
+            },
           )
           .setTimestamp();
 
@@ -376,7 +376,7 @@ module.exports = {
         });
         if (!data || !data.Channel) return;
         const channel = await interaction.guild.channels.cache.get(
-          data.Channel
+          data.Channel,
         );
         if (!channel) return;
 
@@ -420,7 +420,7 @@ module.exports = {
         }
 
         const posChannel = await interaction.guild.channels.cache.find(
-          (c) => c.name === `ticket-${interaction.user.id}`
+          (c) => c.name === `ticket-${interaction.user.id}`,
         );
         if (posChannel)
           return await interaction.reply({
@@ -441,7 +441,7 @@ module.exports = {
           .setColor("#ff00b3")
           .setTitle(`${interaction.user.username}'s Ticket`)
           .setDescription(
-            `Thank you for opening a ticket. Please wait while the staff reviews your information. We will respond to you shortly.`
+            `Thank you for opening a ticket. Please wait while the staff reviews your information. We will respond to you shortly.`,
           )
           .addFields([
             {
@@ -473,7 +473,7 @@ module.exports = {
           new ButtonBuilder()
             .setCustomId("ticket-close")
             .setLabel("Close ticket")
-            .setStyle(ButtonStyle.Danger)
+            .setStyle(ButtonStyle.Danger),
         );
 
         let channel = await interaction.guild.channels.create({
@@ -529,7 +529,7 @@ module.exports = {
           .setRequired(true)
           .setLabel("Specify the issue, in detail.")
           .setPlaceholder(
-            "Error messages? What happened? What have you tried already to fix it? Etc."
+            "Error messages? What happened? What have you tried already to fix it? Etc.",
           )
           .setStyle(TextInputStyle.Paragraph);
 
@@ -541,19 +541,19 @@ module.exports = {
           .setStyle(TextInputStyle.Paragraph);
 
         const firstActionRow = new ActionRowBuilder().addComponents(
-          topicTicket
+          topicTicket,
         );
         const secondActionRow = new ActionRowBuilder().addComponents(
-          infoTicket
+          infoTicket,
         );
         const thirdActionRow = new ActionRowBuilder().addComponents(
-          additionalTicket
+          additionalTicket,
         );
 
         modalTicket.addComponents(
           firstActionRow,
           secondActionRow,
-          thirdActionRow
+          thirdActionRow,
         );
 
         try {

@@ -51,7 +51,7 @@ module.exports = {
           name: "Category",
           value: `${channel.parentId ? logData.Parent : "No Category"}`,
           inline: false,
-        }
+        },
       );
 
     try {

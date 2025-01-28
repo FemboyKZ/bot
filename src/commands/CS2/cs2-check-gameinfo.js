@@ -20,7 +20,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("cs2-check-gameinfo")
     .setDescription(
-      "[Admin] Check that metamod is present in the gameinfo file of a FKZ CS2 server"
+      "[Admin] Check that metamod is present in the gameinfo file of a FKZ CS2 server",
     )
     .addStringOption((option) =>
       option
@@ -39,8 +39,8 @@ module.exports = {
           { name: "CS2 AS - FKZ - Public KZ", value: "cs2-fkz-9" },
           { name: "CS2 AU - FKZ - Public KZ", value: "cs2-fkz-10" },
           { name: "CS2 SA - FKZ - Public KZ", value: "cs2-fkz-11" },
-          { name: "CS2 ZA - FKZ - Public KZ", value: "cs2-fkz-12" }
-        )
+          { name: "CS2 ZA - FKZ - Public KZ", value: "cs2-fkz-12" },
+        ),
     ),
 
   async execute(interaction) {

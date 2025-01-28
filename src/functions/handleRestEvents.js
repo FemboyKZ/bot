@@ -22,11 +22,11 @@ module.exports = (client) => {
 
             if (event.once) {
               client.rest.once(event.name, (...args) =>
-                event.execute(...args, client)
+                event.execute(...args, client),
               );
             } else {
               client.rest.on(event.name, (...args) =>
-                event.execute(...args, client)
+                event.execute(...args, client),
               );
             }
           } catch (error) {

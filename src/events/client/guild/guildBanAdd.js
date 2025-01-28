@@ -42,7 +42,7 @@ module.exports = {
           name: "Ban Reason",
           value: `${ban.reason}` || "none",
           inline: false,
-        }
+        },
       );
     try {
       if (!logData && settingsData.Store === true) {

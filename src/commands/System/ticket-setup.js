@@ -17,14 +17,14 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel for the tickets info message")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(true),
     )
     .addChannelOption((option) =>
       option
         .setName("category")
         .setDescription("The category for the tickets to be sent in")
         .addChannelTypes(ChannelType.GuildCategory)
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction) {
@@ -42,7 +42,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "**What is the whitelist and how to get whitelisted?**\nThe whitelist is a list of people that can join *our* private servers."
+        "**What is the whitelist and how to get whitelisted?**\nThe whitelist is a list of people that can join *our* private servers.",
       )
       .addFields([
         {
@@ -61,7 +61,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "If you were banned from one of the servers, you can request for an unban by using the command **/unban-request** in any of this servers channels."
+        "If you were banned from one of the servers, you can request for an unban by using the command **/unban-request** in any of this servers channels.",
       )
       .addFields([
         {
@@ -75,7 +75,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "By choosing to **Donate** to the server you may be able to get VIP perks on the servers and here on Discord"
+        "By choosing to **Donate** to the server you may be able to get VIP perks on the servers and here on Discord",
       )
       .addFields([
         {
@@ -94,7 +94,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "To be able to play on the **[ClassicCounter](https://classiccounter.cc/)** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter).\n\nPlease do not open any tickets regarding ClassicCounter, or ping their staff on our Discord server, join theirs instead."
+        "To be able to play on the **[ClassicCounter](https://classiccounter.cc/)** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter).\n\nPlease do not open any tickets regarding ClassicCounter, or ping their staff on our Discord server, join theirs instead.",
       )
       .addFields([
         {
@@ -151,8 +151,8 @@ module.exports = {
           {
             label: "Other (Redeem Perks)",
             value: "Subject: Other",
-          }
-        )
+          },
+        ),
     );
 
     try {

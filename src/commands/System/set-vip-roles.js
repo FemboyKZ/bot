@@ -10,19 +10,19 @@ module.exports = {
       option
         .setName("role-vip")
         .setDescription("Set or update the VIP Role")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("role-vip-plus")
         .setDescription("Set or update the VIP+ Role")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("role-contributor")
         .setDescription("Set or update the Contributor Role")
-        .setRequired(false)
+        .setRequired(false),
     ),
   async execute(interaction) {
     const guild = interaction.guild;
@@ -73,7 +73,7 @@ module.exports = {
           },
           {
             Role: vipRole,
-          }
+          },
         );
       }
       if (vipPlusRole) {
@@ -84,7 +84,7 @@ module.exports = {
           },
           {
             Role: vipPlusRole,
-          }
+          },
         );
       }
       if (contributorRole) {
@@ -95,7 +95,7 @@ module.exports = {
           },
           {
             Role: contributorRole,
-          }
+          },
         );
       } else {
         return await interaction.reply({

@@ -21,14 +21,14 @@ class ConsoleHandler extends EventEmitter {
       this.handleConsoleEvent("warn", args);
       this.originalConsoleWarn(
         `${await this.getCurrentTimestamp()} |`,
-        ...args
+        ...args,
       );
     };
     console.error = async (...args) => {
       this.handleConsoleEvent("error", args);
       this.originalConsoleError(
         `${await this.getCurrentTimestamp()} |`,
-        ...args
+        ...args,
       );
     };
   }
@@ -62,21 +62,21 @@ class ConsoleHandler extends EventEmitter {
       } catch (error) {
         this.originalConsoleError(
           `Error creating log directory: ${logDir}`,
-          error
+          error,
         );
         return;
       }
     }
 
     const logMessage = `[${await this.getCurrentTimestamp()}] [${eventData.type.toUpperCase()}]: ${eventData.message.join(
-      " "
+      " ",
     )}\n`;
     try {
       fs.appendFileSync(logFilePath, logMessage);
     } catch (error) {
       this.originalConsoleError(
         `Error writing to log file: ${logFilePath}`,
-        error
+        error,
       );
     }
   }

@@ -46,7 +46,7 @@ module.exports = {
           name: "Animated?",
           value: emoji.animated ? logData.Animated : "Unknown",
           inline: false,
-        }
+        },
       );
     try {
       if (logData && settingsData.Store === true) {
@@ -57,7 +57,7 @@ module.exports = {
             User: emoji.author.id,
             Animated: emoji.animated || null,
             Image: emoji.imageURL({ size: 128 }),
-          }
+          },
         );
       } else if (!logData && settingsData.Store === true) {
         await logs.create({

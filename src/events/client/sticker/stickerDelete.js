@@ -36,7 +36,7 @@ module.exports = {
           name: "Created",
           value: `${sticker.createdAt}`,
           inline: false,
-        }
+        },
       );
     try {
       if (logData && settingsData.Store === true) {

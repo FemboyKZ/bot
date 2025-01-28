@@ -60,7 +60,7 @@ module.exports = {
               Guild: newAutoModerationRule.guild?.id,
               Rule: newAutoModerationRule.id,
             },
-            { Name: newAutoModerationRule.name }
+            { Name: newAutoModerationRule.name },
           );
         }
         if (settingsData.Post === true) {
@@ -81,7 +81,7 @@ module.exports = {
             name: "New Rules",
             value: newAutoModerationRule.actions[0].type || "None",
             inline: false,
-          }
+          },
         );
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
@@ -89,7 +89,7 @@ module.exports = {
               Guild: newAutoModerationRule.guild?.id,
               Rule: newAutoModerationRule.id,
             },
-            { Action: newAutoModerationRule.actions[0].type }
+            { Action: newAutoModerationRule.actions[0].type },
           );
         }
         if (settingsData.Post === true) {
@@ -111,7 +111,7 @@ module.exports = {
               Guild: newAutoModerationRule.guild?.id,
               Rule: newAutoModerationRule.id,
             },
-            { Enabled: newAutoModerationRule.enabled }
+            { Enabled: newAutoModerationRule.enabled },
           );
         }
         if (settingsData.Post === true) {
@@ -135,7 +135,7 @@ module.exports = {
               Guild: newAutoModerationRule.guild?.id,
               Rule: newAutoModerationRule.id,
             },
-            { Trigger: newAutoModerationRule.triggerType }
+            { Trigger: newAutoModerationRule.triggerType },
           );
         }
         if (settingsData.Post === true) {

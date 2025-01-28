@@ -96,7 +96,7 @@ module.exports = {
               },
               Edited: newMessage.editedAt,
               Edits: logData.Edits + 1,
-            }
+            },
           );
         }
         embed.addFields({
@@ -146,7 +146,7 @@ module.exports = {
               },
               Edited: newMessage.editedAt,
               Edits: logData.Edits + 1,
-            }
+            },
           );
           embed.addFields({
             name: "Edited Message",

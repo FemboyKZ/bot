@@ -21,8 +21,8 @@ module.exports = {
             .setName("channel")
             .setDescription("The logging channel")
             .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText)
-        )
+            .addChannelTypes(ChannelType.GuildText),
+        ),
     )
     .addSubcommand((command) =>
       command
@@ -32,91 +32,91 @@ module.exports = {
           option
             .setName("store")
             .setDescription("Enable/Disable audit-logs storing in database")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("post")
             .setDescription(
-              "Enable/Disable audit-logs posting in audit-logs channel"
+              "Enable/Disable audit-logs posting in audit-logs channel",
             )
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("automod")
             .setDescription(
-              "Enable/Disable Automod-Rules logging in audit-logs"
+              "Enable/Disable Automod-Rules logging in audit-logs",
             )
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("bans")
             .setDescription("Enable/Disable Bans logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("channels")
             .setDescription("Enable/Disable Channels logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("emojis")
             .setDescription("Enable/Disable Emojis logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("interactions")
             .setDescription("Enable/Disable Interactions logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("invites")
             .setDescription("Enable/Disable Invites logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("members")
             .setDescription("Enable/Disable Members logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("messages")
             .setDescription(
-              "Enable/Disable Deleted/Edited Messages logging in audit-logs"
+              "Enable/Disable Deleted/Edited Messages logging in audit-logs",
             )
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("roles")
             .setDescription("Enable/Disable Roles logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("stickers")
             .setDescription("Enable/Disable Stickers logging in audit-logs")
-            .setRequired(false)
+            .setRequired(false),
         )
         .addBooleanOption((option) =>
           option
             .setName("threads")
             .setDescription("Enable/Disable Threads logging in audit-logs")
-            .setRequired(false)
-        )
+            .setRequired(false),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the audit-logs")
+        .setDescription("[Admin] Disable the audit-logs"),
     ),
   async execute(interaction) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
@@ -163,7 +163,7 @@ module.exports = {
         try {
           if (data && settingsData) {
             embed.setDescription(
-              "You have already have an audit-log system setup here!\nUse /audit-logs config to change the settings."
+              "You have already have an audit-log system setup here!\nUse /audit-logs config to change the settings.",
             );
             return await interaction.reply({
               embeds: [embed],
@@ -171,7 +171,7 @@ module.exports = {
             });
           } else if (data && !settingsData) {
             embed.setDescription(
-              `You have already have an audit-log system setup here!\nAudit-logs Config not found, setting default values.\nUse /audit-logs config to change the settings.`
+              `You have already have an audit-log system setup here!\nAudit-logs Config not found, setting default values.\nUse /audit-logs config to change the settings.`,
             );
             await settings.create({
               Guild: guild.id,
@@ -196,7 +196,7 @@ module.exports = {
           } else if (!data) {
             if (!settingsData) {
               embed.setDescription(
-                `Your Audit Log has been Setup to ${channel}.\nAudit-logs Config not found, setting default values.\nUse /audit-logs config to change the settings.`
+                `Your Audit Log has been Setup to ${channel}.\nAudit-logs Config not found, setting default values.\nUse /audit-logs config to change the settings.`,
               );
               await schema.create({
                 Guild: guild.id,
@@ -225,7 +225,7 @@ module.exports = {
               });
             } else {
               embed.setDescription(
-                `Your Audit Log has been Setup to ${channel}.\nAudit-logs Config found.\nUse /audit-logs config to change the settings.`
+                `Your Audit Log has been Setup to ${channel}.\nAudit-logs Config found.\nUse /audit-logs config to change the settings.`,
               );
               await schema.create({
                 Guild: guild.id,
@@ -250,7 +250,7 @@ module.exports = {
       case "config":
         if (!settingsData) {
           embed.setDescription(
-            "Settings not found! Please use /setup, or restart the bot for default values to be applied."
+            "Settings not found! Please use /setup, or restart the bot for default values to be applied.",
           );
           return await interaction.reply({
             embeds: [embed],
@@ -259,7 +259,7 @@ module.exports = {
         } else {
           if (!data) {
             embed.setDescription(
-              "Audit-logs not Setup! Please use the /setup command first!"
+              "Audit-logs not Setup! Please use the /setup command first!",
             );
             return await interaction.reply({
               embeds: [embed],
@@ -275,7 +275,7 @@ module.exports = {
                 },
                 {
                   Post: postOption,
-                }
+                },
               );
             }
 
@@ -286,7 +286,7 @@ module.exports = {
                 },
                 {
                   Post: postOption,
-                }
+                },
               );
             }
 
@@ -297,7 +297,7 @@ module.exports = {
                 },
                 {
                   Automod: automodOption,
-                }
+                },
               );
             }
 
@@ -308,7 +308,7 @@ module.exports = {
                 },
                 {
                   Bans: bansOption,
-                }
+                },
               );
             }
 
@@ -319,7 +319,7 @@ module.exports = {
                 },
                 {
                   Channels: channelsOption,
-                }
+                },
               );
             }
 
@@ -330,7 +330,7 @@ module.exports = {
                 },
                 {
                   Emojis: emojisOption,
-                }
+                },
               );
             }
 
@@ -341,7 +341,7 @@ module.exports = {
                 },
                 {
                   Interactions: interactionsOption,
-                }
+                },
               );
             }
 
@@ -352,7 +352,7 @@ module.exports = {
                 },
                 {
                   Invites: invitesOption,
-                }
+                },
               );
             }
 
@@ -363,7 +363,7 @@ module.exports = {
                 },
                 {
                   Members: membersOption,
-                }
+                },
               );
             }
 
@@ -374,7 +374,7 @@ module.exports = {
                 },
                 {
                   Messages: messagesOption,
-                }
+                },
               );
             }
 
@@ -385,7 +385,7 @@ module.exports = {
                 },
                 {
                   Roles: rolesOption,
-                }
+                },
               );
             }
 
@@ -396,7 +396,7 @@ module.exports = {
                 },
                 {
                   Stickers: stickersOption,
-                }
+                },
               );
             }
 
@@ -407,7 +407,7 @@ module.exports = {
                 },
                 {
                   Threads: threadsOption,
-                }
+                },
               );
             }
 

@@ -15,7 +15,7 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel where to send the embed")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction) {
@@ -34,7 +34,7 @@ module.exports = {
 
     const embedInfo = new EmbedBuilder()
       .setDescription(
-        "> FemboyKZ has a lot of roles to choose from to customize your experience on the server.\n> **Choose your own by reacting to the messages below**:"
+        "> FemboyKZ has a lot of roles to choose from to customize your experience on the server.\n> **Choose your own by reacting to the messages below**:",
       )
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3");
@@ -44,7 +44,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "> These Roles are for if you want to get pinged for events, news or more. <#858419058172887074>"
+        "> These Roles are for if you want to get pinged for events, news or more. <#858419058172887074>",
       )
       .addFields([
         {
@@ -58,7 +58,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "> Roles for showing off your current region.\n> The amounts on these will help us choose server locations!"
+        "> Roles for showing off your current region.\n> The amounts on these will help us choose server locations!",
       )
       .addFields([
         {
@@ -72,7 +72,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "> Roles for showing off what games you play, and to get pinged for anything related to them."
+        "> Roles for showing off what games you play, and to get pinged for anything related to them.",
       )
       .addFields([
         {
@@ -98,7 +98,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "> Roles for showing off which age group you belong in.\n> **`18+ Role will be required to see the NSFW Channels!`**"
+        "> Roles for showing off which age group you belong in.\n> **`18+ Role will be required to see the NSFW Channels!`**",
       )
       .addFields([
         {

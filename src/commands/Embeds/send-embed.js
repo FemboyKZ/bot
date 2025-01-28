@@ -15,43 +15,43 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel where to send the embed")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("title")
         .setDescription("The title of the embed")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("content")
         .setDescription("The contents of the embed")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("footer")
         .setDescription("The footer of the embed")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("color")
         .setDescription("The color of the embed (e.g. #ff00b3)")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addBooleanOption((option) =>
       option
         .setName("ephemeral")
         .setDescription("Whether the embed should be ephemeral")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addBooleanOption((option) =>
       option
         .setName("timestamp")
         .setDescription("Whether the embed should have a timestamp")
-        .setRequired(false)
+        .setRequired(false),
     ),
 
   async execute(interaction) {

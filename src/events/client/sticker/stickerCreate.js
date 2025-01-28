@@ -45,7 +45,7 @@ module.exports = {
           name: "Format",
           value: `${sticker.format}`,
           inline: false,
-        }
+        },
       );
     try {
       if (!logData && settingsData.Store === true) {

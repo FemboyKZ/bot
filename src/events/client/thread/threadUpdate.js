@@ -59,7 +59,7 @@ module.exports = {
             },
             {
               Name: newThread.name,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -91,7 +91,7 @@ module.exports = {
             },
             {
               Archived: newThread.archived,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -123,7 +123,7 @@ module.exports = {
             },
             {
               Locked: newThread.locked,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -153,7 +153,7 @@ module.exports = {
             },
             {
               Auto: newThread.autoArchiveDuration,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {

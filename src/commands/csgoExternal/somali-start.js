@@ -7,7 +7,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("somali-start")
     .setDescription(
-      "[Pirate] Send a START command to a Somali Pirates CS:GO server"
+      "[Pirate] Send a START command to a Somali Pirates CS:GO server",
     )
     .addStringOption((option) =>
       option
@@ -16,8 +16,8 @@ module.exports = {
         .setRequired(true)
         .addChoices(
           { name: "Somali Pirates 1", value: "csgo-somali-1" },
-          { name: "Somali Pirates 2", value: "csgo-somali-2" }
-        )
+          { name: "Somali Pirates 2", value: "csgo-somali-2" },
+        ),
     ),
 
   async execute(interaction) {
@@ -60,7 +60,7 @@ module.exports = {
           if (error) console.log(error);
           //if (stderr) console.log(stderr);
           //if (stdout) console.log(stdout);
-        }
+        },
       );
       await wait(3000);
       return await interaction.editReply({

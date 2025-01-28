@@ -20,13 +20,13 @@ module.exports = {
             .setName("channel")
             .setDescription("The channel for reports/suggestions")
             .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText)
-        )
+            .addChannelTypes(ChannelType.GuildText),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the report/suggestions system")
+        .setDescription("[Admin] Disable the report/suggestions system"),
     ),
   async execute(interaction, client) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
@@ -51,7 +51,7 @@ module.exports = {
         try {
           if (!data) {
             embed.setDescription(
-              `All submitted reports/suggestions requests will be sent in ${channel}`
+              `All submitted reports/suggestions requests will be sent in ${channel}`,
             );
             await schema.create({
               Guild: guild.id,
@@ -61,7 +61,7 @@ module.exports = {
           } else if (data) {
             const existingChannel = client.channels.cache.get(data.Channel);
             embed.setDescription(
-              `Your reports/suggestions channel has already been set to ${existingChannel}`
+              `Your reports/suggestions channel has already been set to ${existingChannel}`,
             );
           }
 
@@ -79,11 +79,11 @@ module.exports = {
         try {
           if (!data) {
             embed.setDescription(
-              `The reports/suggestions system has already been disabled.`
+              `The reports/suggestions system has already been disabled.`,
             );
           } else if (data) {
             embed.setDescription(
-              `The reports/suggestions system has been disabled.`
+              `The reports/suggestions system has been disabled.`,
             );
             await schema.deleteMany({ Guild: guild.id, ID: "report" });
           }

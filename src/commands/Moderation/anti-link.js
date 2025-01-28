@@ -19,7 +19,7 @@ module.exports = {
             .setName("permissions")
             .setRequired(true)
             .setDescription(
-              "Choose the permissions to bypass the anti-link system"
+              "Choose the permissions to bypass the anti-link system",
             )
             .addChoices(
               { name: "Manage Channel", value: "ManageChannels" },
@@ -27,19 +27,19 @@ module.exports = {
               { name: "Embed Links", value: "EmbedLinks" },
               { name: "Attach File", value: "AttachFiles" },
               { name: "Manage Messages", value: "ManageMessages" },
-              { name: "Administrator", value: "Administrator" }
-            )
-        )
+              { name: "Administrator", value: "Administrator" },
+            ),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the anti-link system")
+        .setDescription("[Admin] Disable the anti-link system"),
     )
     .addSubcommand((command) =>
       command
         .setName("check")
-        .setDescription("[Admin] Checks the status of the anti-link system")
+        .setDescription("[Admin] Checks the status of the anti-link system"),
     )
     .addSubcommand((command) =>
       command
@@ -50,7 +50,7 @@ module.exports = {
             .setName("permissions")
             .setRequired(true)
             .setDescription(
-              "Choose the permissions to bypass the anti-link system"
+              "Choose the permissions to bypass the anti-link system",
             )
             .addChoices(
               { name: "Manage Channel", value: "ManageChannels" },
@@ -58,9 +58,9 @@ module.exports = {
               { name: "Embed Links", value: "EmbedLinks" },
               { name: "Attach File", value: "AttachFiles" },
               { name: "Manage Messages", value: "ManageMessages" },
-              { name: "Administrator", value: "Administrator" }
-            )
-        )
+              { name: "Administrator", value: "Administrator" },
+            ),
+        ),
     ),
 
   async execute(interaction) {
@@ -96,7 +96,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setColor("#ff00b3")
           .setDescription(
-            `The anti-link system has been enabled with the bypass permissions set to ${permissions}.`
+            `The anti-link system has been enabled with the bypass permissions set to ${permissions}.`,
           );
 
         await interaction.reply({ embeds: [embed] });
@@ -156,7 +156,7 @@ module.exports = {
           const embed3 = new EmbedBuilder()
             .setColor("#ff00b3")
             .setDescription(
-              `The anti-link system bypass permissions have been set to ${permissions}.`
+              `The anti-link system bypass permissions have been set to ${permissions}.`,
             );
 
           await interaction.reply({ embeds: [embed3] });

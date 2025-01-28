@@ -55,7 +55,7 @@ module.exports = {
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
-            { Name: newRole.name }
+            { Name: newRole.name },
           );
         }
         if (settingsData.Post === true) {
@@ -72,7 +72,7 @@ module.exports = {
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
-            { Permissions: newPerms }
+            { Permissions: newPerms },
           );
         }
         if (settingsData.Post === true) {
@@ -89,7 +89,7 @@ module.exports = {
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
-            { Mentionable: newRole.mentionable }
+            { Mentionable: newRole.mentionable },
           );
         }
         if (settingsData.Post === true) {
@@ -106,7 +106,7 @@ module.exports = {
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
-            { Hoist: newRole.hoist }
+            { Hoist: newRole.hoist },
           );
         }
         if (settingsData.Post === true) {
@@ -123,7 +123,7 @@ module.exports = {
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
-            { Color: newRole.hexColor }
+            { Color: newRole.hexColor },
           );
         }
         if (settingsData.Post === true) {

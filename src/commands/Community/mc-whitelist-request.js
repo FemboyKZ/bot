@@ -52,7 +52,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Why should you get whitelisted?")
       .setPlaceholder(
-        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc."
+        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc.",
       )
       .setStyle(TextInputStyle.Paragraph);
 

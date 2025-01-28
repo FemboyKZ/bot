@@ -14,7 +14,7 @@ module.exports = {
       option
         .setName("role")
         .setDescription("The Role you want to set for the Autoroles")
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     const roleOptions = ["role"];
@@ -43,14 +43,14 @@ module.exports = {
     await schema.updateOne(
       { Guild: interaction.guild.id },
       { $push: { Roles: { $each: roleIds } } },
-      { upsert: true }
+      { upsert: true },
     );
 
     const roleNames = roles.map((role) => role.name).join(", ");
     const set = new EmbedBuilder()
       .setColor("Green")
       .setDescription(
-        `You have added the roles: ${roleNames}, to the autoroles.`
+        `You have added the roles: ${roleNames}, to the autoroles.`,
       );
 
     await interaction.reply({ embeds: [set], ephemeral: true });

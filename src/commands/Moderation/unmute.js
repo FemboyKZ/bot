@@ -16,7 +16,7 @@ module.exports = {
       option
         .setName("user")
         .setDescription("The user to unmute")
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     if (
@@ -47,7 +47,7 @@ module.exports = {
       .setFooter({ text: "FKZ" })
       .setTitle("User Unmuted")
       .setDescription(
-        `**User:** <@${user.id}>\n**Executor:** <@${interaction.user.id}>`
+        `**User:** <@${user.id}>\n**Executor:** <@${interaction.user.id}>`,
       );
 
     const roleId = await roles.findOne({ Guild: interaction.guild.id });

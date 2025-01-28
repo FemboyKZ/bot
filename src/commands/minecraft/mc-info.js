@@ -15,7 +15,7 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel where to send the embed")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction) {
@@ -32,7 +32,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "> FemboyKZ has its own Minecraft server! Its mainly a survival server to build cool stuff as a community, but we could do other things on it in the future."
+        "> FemboyKZ has its own Minecraft server! Its mainly a survival server to build cool stuff as a community, but we could do other things on it in the future.",
       );
 
     const embedWhitelist = new EmbedBuilder()
@@ -40,7 +40,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "> The Server has a separate whitelist from the CS servers. To connect to the servers you must be whitelisted."
+        "> The Server has a separate whitelist from the CS servers. To connect to the servers you must be whitelisted.",
       )
       .addFields([
         {

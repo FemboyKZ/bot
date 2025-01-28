@@ -35,7 +35,7 @@ module.exports = (client) => {
     const clientId = client.user.id || process.env.CLIENT_ID;
     if (!process.env.TOKEN || !clientId) {
       console.error(
-        "Bot token or client ID is not set in the environment variables."
+        "Bot token or client ID is not set in the environment variables.",
       );
       client.gracefulShutdown().catch(console.error);
     }

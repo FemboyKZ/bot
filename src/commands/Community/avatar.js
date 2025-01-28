@@ -14,7 +14,7 @@ module.exports = {
       option
         .setName("user")
         .setDescription("User whose avatar you want to show")
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction) {

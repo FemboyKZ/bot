@@ -53,7 +53,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Why should you get whitelisted")
       .setPlaceholder(
-        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc."
+        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc.",
       )
       .setStyle(TextInputStyle.Paragraph);
 
@@ -66,16 +66,16 @@ module.exports = {
 
     const firstActionRow = new ActionRowBuilder().addComponents(steamWhitelist);
     const secondActionRow = new ActionRowBuilder().addComponents(
-      reasonWhitelist
+      reasonWhitelist,
     );
     const thirdActionRow = new ActionRowBuilder().addComponents(
-      requestWhitelist
+      requestWhitelist,
     );
 
     modalWhitelist.addComponents(
       firstActionRow,
       secondActionRow,
-      thirdActionRow
+      thirdActionRow,
     );
 
     try {

@@ -73,7 +73,7 @@ module.exports = {
                 name: "User",
                 value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
                 inline: false,
-              }
+              },
             );
             channel.send({ embeds: [roleEmbed] });
           }
@@ -92,7 +92,7 @@ module.exports = {
                 name: "User",
                 value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
                 inline: false,
-              }
+              },
             );
             channel.send({ embeds: [roleEmbed] });
           }
@@ -131,7 +131,7 @@ module.exports = {
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Nickname: newMember.nickname,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -152,7 +152,7 @@ module.exports = {
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Displayname: newMember.displayName,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -173,7 +173,7 @@ module.exports = {
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Name: newMember.user.username,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -223,7 +223,7 @@ module.exports = {
               newMember.user.avatarURL({ size: 128 })
                 ? logData.Avatar
                 : oldMember.user.avatarURL({ size: 128 })
-            }`
+            }`,
           )
           .addFields({
             name: `Profile Picture`,
@@ -241,7 +241,7 @@ module.exports = {
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Avatar: newMember.user.avatarURL({ size: 128 }),
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -256,7 +256,7 @@ module.exports = {
               newMember.user.bannerURL({ size: 128 })
                 ? logData.Banner
                 : oldMember.user.bannerURL({ size: 128 })
-            }`
+            }`,
           )
           .addFields({
             name: `Banner Image`,
@@ -276,7 +276,7 @@ module.exports = {
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Banner: newMember.user.bannerURL({ size: 128 }),
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -290,7 +290,7 @@ module.exports = {
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
               Roles: newMember.roles.cache.map((role) => role.id),
-            }
+            },
           );
         }
       }

@@ -47,10 +47,10 @@ module.exports = {
     if (requestData) {
       const guild = reaction.message.guild;
       const newRole = await guild.roles.cache.find(
-        (role) => role.name === "Femmy"
+        (role) => role.name === "Femmy",
       );
       const oldRole = await member.roles.cache.find(
-        (role) => role.name === "Wannabe Fem"
+        (role) => role.name === "Wannabe Fem",
       );
 
       const member = await reaction.message.guild.members.cache.get(user.id);
@@ -63,7 +63,7 @@ module.exports = {
       if (reaction.emoji.name === "👍") {
         await schema.findOneAndUpdate(
           { User: user.id, Type: "Whitelist" },
-          { Status: true }
+          { Status: true },
         );
         if (await member.roles.cache.has(newRole.id))
           await member.roles.add(newRole);
@@ -72,7 +72,7 @@ module.exports = {
       } else if (reaction.emoji.name === "👎") {
         await schema.findOneAndUpdate(
           { User: user.id, Type: "Whitelist" },
-          { Status: false }
+          { Status: false },
         );
       } else {
         return;

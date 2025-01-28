@@ -18,20 +18,20 @@ module.exports = {
           option
             .setName("message-id")
             .setDescription("The message to react to")
-            .setRequired(true)
+            .setRequired(true),
         )
         .addStringOption((option) =>
           option
             .setName("emoji")
             .setDescription("Select the emoji to react with")
-            .setRequired(true)
+            .setRequired(true),
         )
         .addRoleOption((option) =>
           option
             .setName("role")
             .setDescription("Select the role for this emoji")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     )
     .addSubcommand((command) =>
       command
@@ -41,14 +41,14 @@ module.exports = {
           option
             .setName("message-id")
             .setDescription("The message to remove the react from")
-            .setRequired(true)
+            .setRequired(true),
         )
         .addStringOption((option) =>
           option
             .setName("emoji")
             .setDescription("Select the emoji to unreact with")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     ),
   async execute(interaction) {
     const { options, guild, channel } = interaction;
@@ -97,7 +97,7 @@ module.exports = {
           const embed = new EmbedBuilder()
             .setColor("#ff00b3")
             .setDescription(
-              `A Reaction role has been added to ${message.url} with ${emoji} and the role ${role}`
+              `A Reaction role has been added to ${message.url} with ${emoji} and the role ${role}`,
             );
 
           await message.react(emoji).catch((err) => {});
@@ -121,7 +121,7 @@ module.exports = {
           const embed = new EmbedBuilder()
             .setColor("#ff00b3")
             .setDescription(
-              `A Reaction role has been removed from ${message.url} with ${emoji}`
+              `A Reaction role has been removed from ${message.url} with ${emoji}`,
             );
 
           await interaction.reply({ embeds: [embed], ephemeral: true });

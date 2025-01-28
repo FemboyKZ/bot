@@ -23,11 +23,11 @@ module.exports = (client) => {
 
             if (event.execute) {
               mongoose.connection.on(event.name, (...args) =>
-                event.execute(client, ...args)
+                event.execute(client, ...args),
               );
             } else {
               console.warn(
-                `Event file ${file} is missing an execute function.`
+                `Event file ${file} is missing an execute function.`,
               );
             }
           } catch (error) {

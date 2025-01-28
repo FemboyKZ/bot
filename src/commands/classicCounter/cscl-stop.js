@@ -22,7 +22,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("cscl-stop")
     .setDescription(
-      "[Admin] Send a STOP command to a FKZ ClassicCounter server"
+      "[Admin] Send a STOP command to a FKZ ClassicCounter server",
     )
     .addStringOption((option) =>
       option
@@ -34,8 +34,8 @@ module.exports = {
           { name: "CS:CL EU FKZ 2 - VNL KZ 64t", value: "cscl-fkz-2" },
           { name: "CS:CL EU FKZ 3 - KZTimer 128t", value: "cscl-fkz-3" },
           { name: "CS:CL NA FKZ 1 - VNL KZ 128t", value: "cscl-fkz-4" },
-          { name: "CS:CL NA FKZ 2 - VNL KZ 64t", value: "cscl-fkz-5" }
-        )
+          { name: "CS:CL NA FKZ 2 - VNL KZ 64t", value: "cscl-fkz-5" },
+        ),
     ),
 
   async execute(interaction) {

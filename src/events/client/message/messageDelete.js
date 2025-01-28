@@ -76,7 +76,7 @@ module.exports = {
                 },
               },
               Deleted: date,
-            }
+            },
           );
         }
         embed.addFields({
@@ -121,7 +121,7 @@ module.exports = {
                 },
               },
               Deleted: date,
-            }
+            },
           );
           if (logData.Edits > 0) {
             const count = logData.Edits + 1;

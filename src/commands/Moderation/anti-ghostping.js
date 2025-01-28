@@ -14,12 +14,12 @@ module.exports = {
     .addSubcommand((command) =>
       command
         .setName("setup")
-        .setDescription("[Admin] Set up the anti-ghostping system")
+        .setDescription("[Admin] Set up the anti-ghostping system"),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the anti-ghostping system")
+        .setDescription("[Admin] Disable the anti-ghostping system"),
     )
     .addSubcommand((command) =>
       command
@@ -29,8 +29,8 @@ module.exports = {
           option
             .setName("user")
             .setDescription("The user you want to reset the ghostpings of")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     ),
 
   async execute(interaction) {

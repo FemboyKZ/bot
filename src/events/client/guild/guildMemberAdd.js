@@ -71,7 +71,7 @@ module.exports = {
     const oldInvites = (await client.invites.get(member.guild.id)) || new Map();
 
     const invite = await newInvites.find(
-      (i) => i.uses > oldInvites.get(i.code)
+      (i) => i.uses > oldInvites.get(i.code),
     );
 
     const date = new Date();
@@ -131,7 +131,7 @@ module.exports = {
               name: "Invite",
               value: "Unknown / Vanity",
               inline: false,
-            }
+            },
           );
           await channel.send({ embeds: [embed] });
         } else {
@@ -146,7 +146,7 @@ module.exports = {
               name: "Invite",
               value: `<https://discord.gg/${invite.code}>`,
               inline: false,
-            }
+            },
           );
           await channel.send({ embeds: [embed] });
         }

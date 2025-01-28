@@ -20,13 +20,13 @@ module.exports = {
             .setName("channel")
             .setDescription("The channel for whitelist requests")
             .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText)
-        )
+            .addChannelTypes(ChannelType.GuildText),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the minecraft whitelist system")
+        .setDescription("[Admin] Disable the minecraft whitelist system"),
     ),
   async execute(interaction, client) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
@@ -50,7 +50,7 @@ module.exports = {
         try {
           if (!data) {
             embed.setDescription(
-              `All submitted whitelists requests will be sent in ${channel}`
+              `All submitted whitelists requests will be sent in ${channel}`,
             );
             await schema.create({
               Guild: guild,
@@ -59,7 +59,7 @@ module.exports = {
           } else if (data) {
             const existingChannel = client.channels.cache.get(data.Channel);
             embed.setDescription(
-              `Your wl channel has already been set to ${existingChannel}`
+              `Your wl channel has already been set to ${existingChannel}`,
             );
           }
 

@@ -10,7 +10,7 @@ module.exports = {
       option
         .setName("role")
         .setDescription("Set or update the Mute Role")
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     if (
@@ -65,7 +65,7 @@ module.exports = {
             },
             {
               Role: roleId,
-            }
+            },
           );
           return await interaction.reply({
             content: `Roles have been updated.`,

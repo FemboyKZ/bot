@@ -15,7 +15,7 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel where to send the embed")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction) {

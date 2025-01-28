@@ -15,7 +15,7 @@ module.exports = {
     }
 
     console.error(
-      `Unhandled Rejection!\nPromise: ${promise}\nReason: ${reasonDetails}`
+      `Unhandled Rejection!\nPromise: ${promise}\nReason: ${reasonDetails}`,
     );
   },
 };

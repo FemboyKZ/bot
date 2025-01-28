@@ -45,7 +45,7 @@ module.exports = {
           name: "Ban Created",
           value: logData.Created || "unknown",
           inline: false,
-        }
+        },
       );
 
     try {

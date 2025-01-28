@@ -1,26 +1,25 @@
-
 name: Bump bot dev version
 
 on:
-    push:
-      branches: [misc-dev]
-      paths-ignore:
-        - LICENSE
-        - README.md
-        - .gitignore
-        - '.github/*'
-    pull_request:
-      branches: [misc-dev]
-      paths-ignore:
-        - LICENSE
-        - README.md
-        - .gitignore
-        - '.github/*'
-  
-    workflow_dispatch:
-  
+  push:
+    branches: [misc-dev]
+    paths-ignore:
+      - LICENSE
+      - README.md
+      - .gitignore
+      - ".github/*"
+  pull_request:
+    branches: [misc-dev]
+    paths-ignore:
+      - LICENSE
+      - README.md
+      - .gitignore
+      - ".github/*"
+
+  workflow_dispatch:
+
 permissions:
-    contents: write
+  contents: write
 
 jobs:
   build:

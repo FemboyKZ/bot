@@ -40,8 +40,8 @@ module.exports = {
           { name: "CS2 AS - FKZ - Public KZ", value: "cs2-fkz-9" },
           { name: "CS2 AU - FKZ - Public KZ", value: "cs2-fkz-10" },
           { name: "CS2 SA - FKZ - Public KZ", value: "cs2-fkz-11" },
-          { name: "CS2 ZA - FKZ - Public KZ", value: "cs2-fkz-12" }
-        )
+          { name: "CS2 ZA - FKZ - Public KZ", value: "cs2-fkz-12" },
+        ),
     ),
 
   async execute(interaction) {
@@ -218,7 +218,7 @@ module.exports = {
           if (error) {
             console.log(error);
             embed.setDescription(
-              `There was an error getting server status on ${name}.`
+              `There was an error getting server status on ${name}.`,
             );
             await interaction.editReply({
               embeds: [embed],

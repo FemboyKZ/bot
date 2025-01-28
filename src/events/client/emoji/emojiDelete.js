@@ -46,7 +46,7 @@ module.exports = {
           name: "Animated?",
           value: emoji.animated ? logData.Animated : "Unknown",
           inline: false,
-        }
+        },
       );
     try {
       if (logData && settingsData.Store === true) {

@@ -14,14 +14,14 @@ module.exports = {
       option
         .setName("description")
         .setDescription("specify the thing to vote for")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addChannelOption((option) =>
       option
         .setName("channel")
         .setDescription("channel you would like to send the vote poll to")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))

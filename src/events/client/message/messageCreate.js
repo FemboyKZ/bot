@@ -29,13 +29,13 @@ module.exports = {
       ) {
         try {
           const member = await message.guild.members.cache.get(
-            message.author.id
+            message.author.id,
           );
           if (member && member.permissions.has(data.Perms)) {
             return;
           } else if (member) {
             const msg = await message.channel.send(
-              `${message.author}, you can't send links here!`
+              `${message.author}, you can't send links here!`,
             );
             setTimeout(() => msg.delete(), 3000);
             await message.delete();

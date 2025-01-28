@@ -68,7 +68,7 @@ module.exports = {
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
               Name: newChannel.name,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -99,7 +99,7 @@ module.exports = {
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
               Parent: newChannel.parentId,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -130,7 +130,7 @@ module.exports = {
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
               Topic: newChannel.topic || null,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -161,7 +161,7 @@ module.exports = {
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
               Type: newChannel.type || null,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {

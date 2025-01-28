@@ -55,7 +55,7 @@ module.exports = {
           name: "Link",
           value: `${thread.url}`,
           inline: false,
-        }
+        },
       );
 
     try {

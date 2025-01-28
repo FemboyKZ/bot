@@ -61,7 +61,7 @@ module.exports = {
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
-            { Name: newEmoji.name }
+            { Name: newEmoji.name },
           );
         }
         if (settingsData.Post === true) {
@@ -80,7 +80,7 @@ module.exports = {
         if (logData && settingsData.Store === true) {
           await logs.findOneAndUpdate(
             { Guild: oldEmoji.guild.id, Emoji: oldEmoji.id },
-            { Animated: newEmoji.animated }
+            { Animated: newEmoji.animated },
           );
         }
         if (settingsData.Post === true) {

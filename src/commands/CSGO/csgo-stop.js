@@ -32,8 +32,8 @@ module.exports = {
           { name: "CS:GO EU - FKZ 2 - Public 64t", value: "csgo-fkz-2" },
           { name: "CS:GO EU - FKZ 3 - Public Nuke", value: "csgo-fkz-3" },
           { name: "CS:GO NA - FKZ 1 - Whitelist 128t", value: "csgo-fkz-4" },
-          { name: "CS:GO NA - FKZ 2 - Public 64t", value: "csgo-fkz-5" }
-        )
+          { name: "CS:GO NA - FKZ 2 - Public 64t", value: "csgo-fkz-5" },
+        ),
     ),
 
   async execute(interaction) {

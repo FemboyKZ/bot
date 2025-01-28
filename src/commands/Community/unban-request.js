@@ -52,7 +52,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Why should you get unbanned?")
       .setPlaceholder(
-        "Why were you banned? Why would we trust that you won't do it again? Etc."
+        "Why were you banned? Why would we trust that you won't do it again? Etc.",
       )
       .setStyle(TextInputStyle.Paragraph);
 

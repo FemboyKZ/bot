@@ -14,7 +14,7 @@ module.exports = {
       option
         .setName("role")
         .setDescription("The Role you want to remove from the Autoroles")
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     if (
@@ -43,14 +43,14 @@ module.exports = {
     await schema.updateOne(
       { Guild: interaction.guild.id },
       { $pull: { Roles: { $each: roleIds } } },
-      { upsert: true }
+      { upsert: true },
     );
 
     const roleNames = roles.map((role) => role.name).join(", ");
     const removed = new EmbedBuilder()
       .setColor("Green")
       .setDescription(
-        `The role ${roleNames} has been removed from the autoroles`
+        `The role ${roleNames} has been removed from the autoroles`,
       );
 
     await interaction.reply({ embeds: [removed], ephemeral: true });

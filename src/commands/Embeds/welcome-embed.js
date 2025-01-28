@@ -15,7 +15,7 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel where to send the embed")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction) {
@@ -37,7 +37,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "This is a Discord server for the Femboy KZ CS:GO and CS2 servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers."
+        "This is a Discord server for the Femboy KZ CS:GO and CS2 servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers.",
       )
       .addFields([
         {
@@ -57,7 +57,7 @@ module.exports = {
       .setImage("https://femboy.kz/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "Not following these rules can result in certain punishments."
+        "Not following these rules can result in certain punishments.",
       )
       .addFields([
         {

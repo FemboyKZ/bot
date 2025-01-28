@@ -52,7 +52,7 @@ module.exports = {
           name: "Actions",
           value: autoModerationRule.actions[0].type ? logData.Action : "None",
           inline: false,
-        }
+        },
       );
 
     try {

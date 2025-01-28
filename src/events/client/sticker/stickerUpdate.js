@@ -57,7 +57,7 @@ module.exports = {
             },
             {
               Name: newSticker.name,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -81,7 +81,7 @@ module.exports = {
             },
             {
               Description: newSticker.description,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {
@@ -103,7 +103,7 @@ module.exports = {
             },
             {
               Available: newSticker.available,
-            }
+            },
           );
         }
         if (settingsData.Post === true) {

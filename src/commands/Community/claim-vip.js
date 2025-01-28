@@ -15,17 +15,17 @@ module.exports = {
       option
         .setName("steamid")
         .setDescription(
-          "The SteamID of the account you want to claim perks for."
+          "The SteamID of the account you want to claim perks for.",
         )
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("code")
         .setDescription(
-          "The code you got in a TXT file after purchasing the Upgrade."
+          "The code you got in a TXT file after purchasing the Upgrade.",
         )
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     const { guild, options, user } = interaction;
@@ -126,7 +126,7 @@ module.exports = {
           logEmbed,
           steamId,
           perkType,
-          role
+          role,
         );
       } else if (code === vipPlusCode.Code) {
         const perkType = "vip+";
@@ -143,7 +143,7 @@ module.exports = {
           logEmbed,
           steamId,
           perkType,
-          role
+          role,
         );
       } else if (code === contributorCode.Code) {
         const perkType = "contributor";
@@ -160,7 +160,7 @@ module.exports = {
           logEmbed,
           steamId,
           perkType,
-          role
+          role,
         );
       } else {
         return await interaction.reply({
@@ -190,7 +190,7 @@ module.exports = {
             logEmbed,
             steamId,
             perkType,
-            role
+            role,
           );
         } else if (code === contributorCode.Code) {
           const perkType = "contributor";
@@ -207,7 +207,7 @@ module.exports = {
             logEmbed,
             steamId,
             perkType,
-            role
+            role,
           );
         } else {
           return await interaction.reply({
@@ -236,7 +236,7 @@ module.exports = {
             logEmbed,
             steamId,
             perkType,
-            role
+            role,
           );
         } else {
           return await interaction.reply({
@@ -269,13 +269,13 @@ module.exports = {
     logEmbed,
     steamId,
     perkType,
-    role
+    role,
   ) {
     embed.setDescription(
-      `Thank you for supporting us! You have been upgraded to **${perkType}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`
+      `Thank you for supporting us! You have been upgraded to **${perkType}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
     );
     logEmbed.setDescription(
-      `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
+      `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
     );
     try {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
@@ -289,7 +289,7 @@ module.exports = {
       });
       await uses.findOneAndUpdate(
         { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 }
+        { Uses: 1 },
       );
       await user.roles.add(role);
       if (perkType === "vip+" || perkType === "contributor") {
@@ -316,13 +316,13 @@ module.exports = {
     logEmbed,
     steamId,
     perkType,
-    role
+    role,
   ) {
     embed.setDescription(
-      `Thank you for supporting us! You have been upgraded to **${perkType}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`
+      `Thank you for supporting us! You have been upgraded to **${perkType}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`,
     );
     logEmbed.setDescription(
-      `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
+      `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`,
     );
     try {
       await perkSystem.Channel.send({ embeds: [logEmbed] });
@@ -334,11 +334,11 @@ module.exports = {
           Status: true,
           Type: perkType,
           Date: new Date(),
-        }
+        },
       );
       await uses.findOneAndUpdate(
         { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 }
+        { Uses: 1 },
       );
       await user.roles.add(role);
       await interaction.reply({ embeds: [embed], ephemeral: true });
