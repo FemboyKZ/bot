@@ -31,7 +31,7 @@ module.exports = {
           const member = await message.guild.members.cache.get(
             message.author.id,
           );
-          if (member && member.permissions.has(data.Perms)) {
+          if (member && member.permissions.has(antiLinkData.Perms)) {
             return;
           } else if (member) {
             const msg = await message.channel.send(

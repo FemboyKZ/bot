@@ -61,7 +61,7 @@ module.exports = {
         return;
       }
       if (reaction.emoji.name === "👍") {
-        await schema.findOneAndUpdate(
+        await requests.findOneAndUpdate(
           { User: user.id, Type: "Whitelist" },
           { Status: true },
         );
@@ -70,7 +70,7 @@ module.exports = {
         if (await member.roles.cache.has(oldRole.id))
           await member.roles.remove(oldRole);
       } else if (reaction.emoji.name === "👎") {
-        await schema.findOneAndUpdate(
+        await requests.findOneAndUpdate(
           { User: user.id, Type: "Whitelist" },
           { Status: false },
         );

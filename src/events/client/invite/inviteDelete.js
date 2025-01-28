@@ -48,13 +48,13 @@ module.exports = {
       } else if (logData && logData.User) {
         embed.addFields({
           name: "Creator",
-          value: `<@${logData?.User}>` || `unknown`,
+          value: `<@${logData?.User}>`,
           inline: false,
         });
       } else {
         embed.addFields({
           name: "Creator",
-          value: `<@${invite.inviter.id}>` || `unknown`,
+          value: `<@${invite.inviter.id}>`,
           inline: false,
         });
       }

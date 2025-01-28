@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const process = require("node:process");
 
 module.exports = (client) => {
   client.handleProcessEvents = async (eventsPath) => {
