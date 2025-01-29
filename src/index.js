@@ -11,7 +11,7 @@ const process = require("node:process");
 
 require("dotenv").config();
 
-//const Session = require("./schemas/session.js");
+//const Session = require("./schemas/sessions.js");
 
 const client = new Client({
   intents: [

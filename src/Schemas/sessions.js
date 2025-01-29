@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-const session = new mongoose.Schema({
+const sessions = new mongoose.Schema({
   sessionId: { type: String, required: true },
   data: { type: Object, required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("Session", session);
+module.exports = mongoose.model("sessions", sessions);

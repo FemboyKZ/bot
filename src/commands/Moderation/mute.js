@@ -4,8 +4,8 @@ const {
   PermissionFlagsBits,
 } = require("discord.js");
 const schema = require("../../schemas/base-system.js");
-const mutes = require("../../schemas/moderation/mute.js");
-const roles = require("../../schemas/moderation/mute-role.js");
+const mutes = require("../../schemas/moderation/mutes.js");
+const roles = require("../../schemas/moderation/muteRoles.js");
 //var parse = require("parse-duration");
 
 module.exports = {

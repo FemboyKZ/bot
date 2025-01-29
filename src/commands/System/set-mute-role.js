@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const schema = require("../../schemas/moderation/mute-role.js");
+const schema = require("../../schemas/moderation/muteRoles.js");
 
 module.exports = {
   data: new SlashCommandBuilder()

@@ -3,8 +3,8 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const schema = require("../../schemas/moderation/ghostping.js");
-const count = require("../../schemas/moderation/ghostnum.js");
+const schema = require("../../schemas/base-system.js");
+const count = require("../../schemas/moderation/actionCounts.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -56,6 +56,7 @@ module.exports = {
         else {
           await schema.create({
             Guild: interaction.guild.id,
+            ID: "ghostping",
           });
 
           const embed = new EmbedBuilder()
@@ -76,6 +77,7 @@ module.exports = {
         else {
           await schema.deleteMany({
             Guild: interaction.guild.id,
+            ID: "ghostping",
           });
 
           const embed = new EmbedBuilder()
@@ -92,6 +94,7 @@ module.exports = {
         const data = await count.findOne({
           Guild: interaction.guild.id,
           User: member.id,
+          Type: "ghostping",
         });
 
         if (!Data)

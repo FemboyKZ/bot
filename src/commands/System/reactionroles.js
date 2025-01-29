@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const schema = require("../../schemas/reactionrole.js");
+const schema = require("../../schemas/reactionRoles.js");
 
 module.exports = {
   data: new SlashCommandBuilder()

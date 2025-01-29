@@ -1,8 +1,8 @@
 const { model, Schema } = require("mongoose");
 
-let autorole = new Schema({
+let autoRoles = new Schema({
   Guild: { type: String, unique: true, required: true },
   Roles: { type: Array, default: [] },
 });
 
-module.exports = model("autorole", autorole);
+module.exports = model("autoRoles", autoRoles);

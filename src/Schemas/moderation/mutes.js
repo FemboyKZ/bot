@@ -1,6 +1,6 @@
 const { model, Schema } = require("mongoose");
 
-let muteSchema = new Schema({
+let mutes = new Schema({
   Guild: { type: String, required: true },
   User: { type: String, unique: true, required: true },
   Duration: { type: String, default: null },
@@ -8,4 +8,4 @@ let muteSchema = new Schema({
   Executor: { type: String, default: null },
 });
 
-module.exports = model("muteSchema", muteSchema);
+module.exports = model("mutes", mutes);
