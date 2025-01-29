@@ -47,7 +47,7 @@ module.exports = {
     const Data = await schema.findOne({ Guild: interaction.guild.id });
 
     switch (sub) {
-      case "setup":
+      case "setup": {
         if (Data)
           return await interaction.reply({
             content: "The anti-ghostping system is already set up.",
@@ -65,8 +65,9 @@ module.exports = {
           await interaction.reply({ embeds: [embed] });
         }
         break;
+      }
 
-      case "disable":
+      case "disable": {
         if (!Data)
           return await interaction.reply({
             content: "The anti-ghostping system has not yet been set up.",
@@ -84,8 +85,9 @@ module.exports = {
           await interaction.reply({ embeds: [embed] });
         }
         break;
+      }
 
-      case "number-reset":
+      case "number-reset": {
         const member = options.getUser("user");
         const data = await count.findOne({
           Guild: interaction.guild.id,
@@ -106,6 +108,8 @@ module.exports = {
             content: `${member}'s ghostping count has been reset.`,
           });
         }
+        break;
+      }
     }
   },
 };
