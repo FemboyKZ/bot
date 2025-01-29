@@ -61,6 +61,19 @@ module.exports = {
           mongoose.connection.readyState,
         );
       }
+      try {
+        console.log("Syncing client guild data...");
+        for (const [guildId, guild] of client.guilds.cache) {
+          const guildData = await client.syncGuildData(guild);
+          if (guildData) {
+            console.log(`Synced guild data for guild: ${guild.name}`);
+          } else {
+            console.warn(`Failed to sync guild data for guild: ${guild.name}`);
+          }
+        }
+      } catch (error) {
+        console.error("Error syncing client guild data:", error);
+      }
     } catch (error) {
       console.error("Error connecting to MongoDB:", error);
     }
