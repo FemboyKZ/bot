@@ -11,6 +11,8 @@ const process = require("node:process");
 
 require("dotenv").config();
 
+require(path.join(__dirname, "handleConsole.js"));
+
 //const Session = require("./schemas/session.js");
 
 const client = new Client({
@@ -53,9 +55,6 @@ exports.client = client;
 client.commands = new Collection();
 //client.cooldowns = new Collection();
 client.invites = new Collection();
-
-const consoleHandler = require(path.join(__dirname, "handleConsole.js"));
-consoleHandler.on("console", async (eventData) => {});
 
 /*
 client.loadSessionData = async (sessionId) => {

@@ -1,17 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/invites.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.InviteCreate,
   async execute(invite, client) {
-    const settingsData = await settings.findOne({
-      Guild: invite.guild.id,
-    });
-    if (settingsData.Invites === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       Guild: invite.guild?.id,
       ID: "audit-logs",
@@ -37,7 +30,7 @@ module.exports = {
       });
 
     try {
-      //const fullInvite = await invite.guild.invites.fetch();
+      await invite.guild.invites.fetch();
       const member = await invite.guild.members.cache.get(invite.inviter.id);
       if (member) {
         embed.addFields({
@@ -88,7 +81,7 @@ module.exports = {
       }
 
       try {
-        if (!logData && settingsData.Store === true) {
+        if (!logData) {
           if (invite.maxUses === 0) {
             await logs.create({
               Guild: invite.guild.id,
@@ -114,9 +107,7 @@ module.exports = {
           }
         }
 
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       } catch (error) {
         console.error("Error in InviteCreate event:", error);
       }

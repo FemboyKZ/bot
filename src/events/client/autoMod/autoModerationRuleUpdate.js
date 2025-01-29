@@ -1,19 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/automod.js");
-const settings = require("../../../schemas/events/settings.js");
 
 // TODO: make this not shit
 
 module.exports = {
   name: Events.AutoModerationRuleUpdate,
   async execute(oldAutoModerationRule, newAutoModerationRule, client) {
-    const settingsData = await settings.findOne({
-      Guild: newAutoModerationRule.guild.id,
-    });
-    if (settingsData.Automod === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       Guild: newAutoModerationRule.guild.id,
       ID: "audit-logs",
@@ -34,7 +27,7 @@ module.exports = {
     });
 
     try {
-      if (!logData && settingsData.Store === true) {
+      if (!logData) {
         await logs.create({
           Guild: newAutoModerationRule.guild.id,
           Name: newAutoModerationRule.name,
@@ -54,7 +47,7 @@ module.exports = {
           }\`  →  \`${newAutoModerationRule.name || "None"}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newAutoModerationRule.guild?.id,
@@ -63,11 +56,10 @@ module.exports = {
             { Name: newAutoModerationRule.name },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
+      /*
       if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
         embed.addFields(
           {
@@ -83,7 +75,7 @@ module.exports = {
             inline: false,
           },
         );
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newAutoModerationRule.guild?.id,
@@ -92,10 +84,10 @@ module.exports = {
             { Action: newAutoModerationRule.actions[0].type },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+
+        await channel.send({ embeds: [embed] });
       }
+      */
 
       if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
         embed.addFields({
@@ -105,7 +97,7 @@ module.exports = {
           }\`  →  \`${newAutoModerationRule.enabled || "Unknown"}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newAutoModerationRule.guild?.id,
@@ -114,9 +106,7 @@ module.exports = {
             { Enabled: newAutoModerationRule.enabled },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (
@@ -129,7 +119,7 @@ module.exports = {
           }\`  →  \`${newAutoModerationRule.triggerType || "None"}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newAutoModerationRule.guild?.id,
@@ -138,9 +128,7 @@ module.exports = {
             { Trigger: newAutoModerationRule.triggerType },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.error("Error in AutoModRuleUpdate event:", error);

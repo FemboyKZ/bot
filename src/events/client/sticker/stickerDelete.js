@@ -1,17 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/stickers.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildStickerDelete,
   async execute(sticker, client) {
-    const settingsData = await settings.findOne({
-      Guild: sticker.guild.id,
-    });
-    if (settingsData.Stickers === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       //Guild: sticker.guild.id,
       ID: "audit-logs",
@@ -39,15 +32,13 @@ module.exports = {
         },
       );
     try {
-      if (logData && settingsData.Store === true) {
+      if (logData) {
         await logs.deleteMany({
           Guild: sticker.guild.id,
           Sticker: sticker.id,
         });
       }
-      if (settingsData.Post === true) {
-        await channel.send({ embeds: [embed] });
-      }
+      await channel.send({ embeds: [embed] });
     } catch (error) {
       console.error("Error in StickerDelete event:", error);
     }

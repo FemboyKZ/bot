@@ -1,17 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/threads.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.ThreadUpdate,
   async execute(oldThread, newThread, client) {
-    const settingsData = await settings.findOne({
-      Guild: newThread.guild.id,
-    });
-    if (settingsData.Threads === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       Guild: oldThread.guild.id,
       ID: "audit-logs",
@@ -32,7 +25,7 @@ module.exports = {
       .setTitle("Thread Edited");
 
     try {
-      if (!logData && settingsData.Store === true) {
+      if (!logData) {
         await logs.create({
           Guild: newThread.guild.id,
           Thread: newThread.id,
@@ -51,7 +44,7 @@ module.exports = {
           value: `\`${oldThread.name}\` → \`${newThread.name}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newThread.guild.id,
@@ -62,9 +55,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldThread.archived !== newThread.archived) {
@@ -83,7 +74,7 @@ module.exports = {
           }\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newThread.guild.id,
@@ -94,9 +85,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldThread.locked !== newThread.locked) {
@@ -115,7 +104,7 @@ module.exports = {
           }\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newThread.guild.id,
@@ -126,9 +115,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldThread.autoArchiveDuration !== newThread.autoArchiveDuration) {
@@ -145,7 +132,7 @@ module.exports = {
           value: `\`${oldThread.autoArchiveDuration}\` → \`${newThread.autoArchiveDuration}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newThread.guild.id,
@@ -156,9 +143,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.log("Error in ThreadUpdate event:", error);

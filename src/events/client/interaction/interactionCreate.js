@@ -11,7 +11,6 @@ const {
   TextInputStyle,
 } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
-const settings = require("../../../schemas/events/settings.js");
 const status = require("../../../schemas/request-status.js");
 
 module.exports = {
@@ -571,17 +570,6 @@ module.exports = {
     if (interaction.isUserSelectMenu()) {
     }
     */
-
-    const settingsData = await settings.findOne({
-      Guild: interaction.guild.id,
-    });
-
-    if (
-      settingsData &&
-      (settingsData.Interactions === false || settingsData.Post === false)
-    ) {
-      return;
-    }
 
     const auditlogData = await schema.findOne({
       Guild: interaction.guild.id,

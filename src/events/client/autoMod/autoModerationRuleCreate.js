@@ -1,19 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/automod.js");
-const settings = require("../../../schemas/events/settings.js");
 
 // TODO: make this not shit
 
 module.exports = {
   name: Events.AutoModerationRuleCreate,
   async execute(autoModerationRule, client) {
-    const settingsData = await settings.findOne({
-      Guild: autoModerationRule.guild.id,
-    });
-    if (settingsData.Automod === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       Guild: autoModerationRule.guild?.id,
       ID: "audit-logs",
@@ -56,7 +49,7 @@ module.exports = {
       );
 
     try {
-      if (!logData && settingsData.Store) {
+      if (!logData) {
         await logs.create({
           Guild: autoModerationRule.guild.id,
           Name: autoModerationRule.name,
@@ -68,9 +61,7 @@ module.exports = {
         });
       }
 
-      if (settingsData.Post === true) {
-        await channel.send({ embeds: [embed] });
-      }
+      await channel.send({ embeds: [embed] });
     } catch (error) {
       console.error("Error in AutoModRuleCreate event:", error);
     }

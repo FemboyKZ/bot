@@ -1,17 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/threads.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.ThreadDelete,
   async execute(thread, client) {
-    const settingsData = await settings.findOne({
-      Guild: thread.guild.id,
-    });
-    if (settingsData.Threads === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       Guild: thread.guild.id,
       ID: "audit-logs",
@@ -59,15 +52,14 @@ module.exports = {
       );
 
     try {
-      if (logData && settingsData.Store === true) {
+      if (logData) {
         await logs.deleteMany({
           Guild: thread.guild.id,
           Thread: thread.id,
         });
       }
-      if (settingsData.Post === true) {
-        await channel.send({ embeds: [embed] });
-      }
+
+      await channel.send({ embeds: [embed] });
     } catch (error) {
       console.log("Error in ThreadDelete event:", error);
     }

@@ -1,17 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/roles.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildRoleUpdate,
   async execute(oldRole, newRole, client) {
-    const settingsData = await settings.findOne({
-      Guild: newRole.guild.id,
-    });
-    if (settingsData.Roles === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       Guild: oldRole.guild.id,
       ID: "audit-logs",
@@ -35,7 +28,7 @@ module.exports = {
       .setFooter({ text: `FKZ • ID: ${newRole.id}` });
 
     try {
-      if (!logData && settingsData.Store === true) {
+      if (!logData) {
         await logs.create({
           Guild: newRole.guild.id,
           Role: newRole.id,
@@ -52,15 +45,13 @@ module.exports = {
           value: `\`${oldRole.name}\` → \`${newRole.name}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
             { Name: newRole.name },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldPerms !== newPerms) {
@@ -69,15 +60,13 @@ module.exports = {
           value: `\`${oldPerms.join(", ")}\` → \`${newPerms.join(", ")}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
             { Permissions: newPerms },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldRole.mentionable !== newRole.mentionable) {
@@ -86,15 +75,13 @@ module.exports = {
           value: `\`${oldRole.mentionable}\` → \`${newRole.mentionable}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
             { Mentionable: newRole.mentionable },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldRole.hoist !== newRole.hoist) {
@@ -103,15 +90,13 @@ module.exports = {
           value: `\`${oldRole.hoist}\` → \`${newRole.hoist}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
             { Hoist: newRole.hoist },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldRole.hexColor !== newRole.hexColor) {
@@ -120,15 +105,13 @@ module.exports = {
           value: `\`${oldRole.hexColor}\` → \`${newRole.hexColor}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: oldRole.guild.id, Role: oldRole.id },
             { Color: newRole.hexColor },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.log("Error in RoleUpdate event:", error);

@@ -1,19 +1,12 @@
 const { EmbedBuilder, Events, DMChannel } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/channels.js");
-const settings = require("../../../schemas/events/settings.js");
 
 // TODO: update comapring to (db data !== newChannel data)
 
 module.exports = {
   name: Events.ChannelUpdate,
   async execute(oldChannel, newChannel, client) {
-    const settingsData = await settings.findOne({
-      Guild: newChannel.guild.id,
-    });
-    if (settingsData.Channels === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     if (oldChannel === DMChannel || newChannel === DMChannel) return;
     const auditlogData = await schema.findOne({
       Guild: oldChannel.guild.id,
@@ -34,7 +27,7 @@ module.exports = {
       .setFooter({ text: `FKZ • ID: ${newChannel.id}` });
 
     try {
-      if (!logData && settingsData.Store === true) {
+      if (!logData) {
         await logs.create({
           Guild: newChannel.guild.id,
           Channel: newChannel.id,
@@ -63,7 +56,7 @@ module.exports = {
             inline: false,
           });
         }
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
@@ -71,9 +64,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await auditChannel.send({ embeds: [embed] });
-        }
+        await auditChannel.send({ embeds: [embed] });
       }
 
       if (oldChannel.parentId !== newChannel.parentId) {
@@ -94,7 +85,7 @@ module.exports = {
             inline: false,
           });
         }
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
@@ -102,9 +93,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await auditChannel.send({ embeds: [embed] });
-        }
+        await auditChannel.send({ embeds: [embed] });
       }
 
       if (oldChannel.topic !== newChannel.topic) {
@@ -125,7 +114,7 @@ module.exports = {
             inline: false,
           });
         }
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
@@ -133,9 +122,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await auditChannel.send({ embeds: [embed] });
-        }
+        await auditChannel.send({ embeds: [embed] });
       }
 
       if (oldChannel.type !== newChannel.type) {
@@ -156,7 +143,7 @@ module.exports = {
             inline: false,
           });
         }
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newChannel.guild.id, Channel: newChannel.id },
             {
@@ -164,9 +151,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await auditChannel.send({ embeds: [embed] });
-        }
+        await auditChannel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.log("Error in ChannelUpdate event:", error);

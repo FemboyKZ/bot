@@ -1,19 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/automod.js");
-const settings = require("../../../schemas/events/settings.js");
 
 // TODO: make this not shit
 
 module.exports = {
   name: Events.AutoModerationRuleDelete,
   async execute(autoModerationRule, client) {
-    const settingsData = await settings.findOne({
-      Guild: autoModerationRule.guild.id,
-    });
-    if (settingsData.Automod === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       Guild: autoModerationRule.guild.id,
       ID: "audit-logs",
@@ -56,16 +49,14 @@ module.exports = {
       );
 
     try {
-      if (logData && settingsData.Store === true) {
+      if (logData) {
         await logs.deleteMany({
           Guild: autoModerationRule.guild?.id,
           Rule: autoModerationRule.id,
         });
       }
 
-      if (settingsData.Post === true) {
-        await channel.send({ embeds: [embed] });
-      }
+      await channel.send({ embeds: [embed] });
     } catch (error) {
       console.error("Error in AutoModRuleDelete event:", error);
     }

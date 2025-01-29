@@ -1,17 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/stickers.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildStickerUpdate,
   async execute(oldSticker, newSticker, client) {
-    const settingsData = await settings.findOne({
-      Guild: newSticker.guild.id,
-    });
-    if (settingsData.Stickers === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       //Guild: newSticker.guild.id,
       ID: "audit-logs",
@@ -32,7 +25,7 @@ module.exports = {
       .setTitle("Sticker Edited");
 
     try {
-      if (!logData && settingsData.Store === true) {
+      if (!logData) {
         await logs.create({
           Guild: newSticker.guild.id,
           Sticker: newSticker.id,
@@ -49,7 +42,7 @@ module.exports = {
           value: `\`${oldSticker.name}\` → \`${newSticker.name}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newSticker.guild.id,
@@ -60,9 +53,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldSticker.description !== newSticker.description) {
@@ -73,7 +64,7 @@ module.exports = {
           }\` → \`${newSticker.description || "none"}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newSticker.guild.id,
@@ -84,9 +75,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldSticker.available !== newSticker.available) {
@@ -95,7 +84,7 @@ module.exports = {
           value: `\`${oldSticker.available}\` → \`${newSticker.available}\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             {
               Guild: newSticker.guild.id,
@@ -106,9 +95,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.error("Error in StickerUpdate event:", error);

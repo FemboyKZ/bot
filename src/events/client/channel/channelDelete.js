@@ -1,17 +1,10 @@
 const { EmbedBuilder, Events, DMChannel } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/channels.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.ChannelDelete,
   async execute(channel, client) {
-    const settingsData = await settings.findOne({
-      Guild: channel.guild.id,
-    });
-    if (settingsData.Channels === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     if (channel === DMChannel) return;
     const auditlogData = await schema.findOne({
       Guild: channel.guild.id,
@@ -55,13 +48,11 @@ module.exports = {
       );
 
     try {
-      if (logData && settingsData.Store === true) {
+      if (logData) {
         await logs.deleteMany({ Guild: channel.guild.id, Channel: channel.id });
       }
 
-      if (settingsData.Post === true) {
-        await auditChannel.send({ embeds: [embed] });
-      }
+      await auditChannel.send({ embeds: [embed] });
     } catch (error) {
       console.log("Error in ChannelDelete event:", error);
     }

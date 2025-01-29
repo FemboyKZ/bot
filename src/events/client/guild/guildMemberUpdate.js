@@ -2,17 +2,10 @@ const { EmbedBuilder, Events } = require("discord.js");
 require("dotenv").config();
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/members.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildMemberUpdate,
   async execute(oldMember, newMember, client) {
-    const settingsData = await settings.findOne({
-      Guild: newMember.guild.id,
-    });
-    if (settingsData.Members === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
-
     const auditlogData = await schema.findOne({
       //Guild: oldMember.guild.id,
       ID: "audit-logs",
@@ -103,7 +96,7 @@ module.exports = {
     }
 
     try {
-      if (!logData && settingsData.Store === true) {
+      if (!logData) {
         await logs.create({
           Guild: newMember.guild.id,
           User: newMember.user.id,
@@ -126,7 +119,7 @@ module.exports = {
           }\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
@@ -134,9 +127,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldMember.displayName !== newMember.displayName) {
@@ -147,7 +138,7 @@ module.exports = {
           }\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
@@ -155,9 +146,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldMember.user.username !== newMember.user.username) {
@@ -168,7 +157,7 @@ module.exports = {
           }\``,
           inline: false,
         });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
@@ -176,9 +165,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       /*
@@ -202,7 +189,7 @@ module.exports = {
                 }>)  →  [New Pfp](<${newMember.avatarURL({ size: 128 })}>)`,
                 inline: false,
               });
-            if (logData && settingsData.Store === true) {
+            if (logData) {
               await logs.findOneAndUpdate(
                 { Guild: newMember.guild.id, User: newMember.user.id },
                 {
@@ -210,9 +197,7 @@ module.exports = {
                 }
               );
             }
-            if (settingsData.Post === true) {
-              await channel.send({ embeds: [embed] });
-            }
+            await channel.send({ embeds: [embed] });
           }
           */
 
@@ -236,7 +221,7 @@ module.exports = {
             }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 128 })}>)`,
             inline: false,
           });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
@@ -244,9 +229,7 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldMember.user.banner !== newMember.user.banner) {
@@ -271,7 +254,7 @@ module.exports = {
             })}>)`,
             inline: false,
           });
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {
@@ -279,13 +262,11 @@ module.exports = {
             },
           );
         }
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
+        await channel.send({ embeds: [embed] });
       }
 
       if (oldMember.roles.cache.size !== newMember.roles.cache.size) {
-        if (logData && settingsData.Store === true) {
+        if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMember.guild.id, User: newMember.user.id },
             {

@@ -5,7 +5,6 @@ const mutes = require("../../../schemas/moderation/mute.js");
 const muteRoles = require("../../../schemas/moderation/mute-role.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/members.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildMemberAdd,
@@ -47,12 +46,6 @@ module.exports = {
         return console.log(e);
       }
     }
-
-    const settingsData = await settings.findOne({
-      Guild: member.guild.id,
-    });
-    if (settingsData.Members === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
 
     const auditlogData = await schema.findOne({
       Guild: member.guild.id,
@@ -104,7 +97,7 @@ module.exports = {
     }
 
     try {
-      if (!logData && settingsData.Store === true) {
+      if (!logData) {
         await logs.create({
           Guild: member.guild.id,
           User: member.user.id,
@@ -119,37 +112,35 @@ module.exports = {
         });
       }
 
-      if (settingsData.Post === true) {
-        if (!invite) {
-          embed.addFields(
-            {
-              name: "Inviter",
-              value: "None",
-              inline: false,
-            },
-            {
-              name: "Invite",
-              value: "Unknown / Vanity",
-              inline: false,
-            },
-          );
-          await channel.send({ embeds: [embed] });
-        } else {
-          const inviter = await client.users.fetch(invite.inviter.id);
-          embed.addFields(
-            {
-              name: "Inviter",
-              value: `${inviter}`,
-              inline: false,
-            },
-            {
-              name: "Invite",
-              value: `<https://discord.gg/${invite.code}>`,
-              inline: false,
-            },
-          );
-          await channel.send({ embeds: [embed] });
-        }
+      if (!invite) {
+        embed.addFields(
+          {
+            name: "Inviter",
+            value: "None",
+            inline: false,
+          },
+          {
+            name: "Invite",
+            value: "Unknown / Vanity",
+            inline: false,
+          },
+        );
+        await channel.send({ embeds: [embed] });
+      } else {
+        const inviter = await client.users.fetch(invite.inviter.id);
+        embed.addFields(
+          {
+            name: "Inviter",
+            value: `${inviter}`,
+            inline: false,
+          },
+          {
+            name: "Invite",
+            value: `<https://discord.gg/${invite.code}>`,
+            inline: false,
+          },
+        );
+        await channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.error("Error in guildMemberAdd event:", error);

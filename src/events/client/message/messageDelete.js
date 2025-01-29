@@ -1,20 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/messages.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.MessageDelete,
   async execute(message, client) {
-    const settingsData = await settings.findOne({
-      Guild: message.guild.id,
-    });
-    if (
-      settingsData.Messages === false ||
-      (settingsData.Store === false && settingsData.Post === false)
-    )
-      return;
-
     try {
       if (message.partial && message.partial === true) await message.fetch();
     } catch (error) {
@@ -53,7 +43,7 @@ module.exports = {
 
     try {
       if (message.content.length === 0 || message.content.length > 512) {
-        if (!logData && settingsData.Store === true) {
+        if (!logData) {
           await logs.create({
             Guild: message.guild.id,
             User: message.author.id,
@@ -66,7 +56,7 @@ module.exports = {
             Edited: null,
             Edits: 0,
           });
-        } else if (logData && settingsData.Store === true) {
+        } else if (logData) {
           await logs.findOneAndUpdate(
             { Guild: message.guild.id, Message: message.id },
             {
@@ -84,12 +74,9 @@ module.exports = {
           value: `\`Message Too long to Log.\``,
           inline: false,
         });
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
-        return;
+        await channel.send({ embeds: [embed] });
       } else {
-        if (!logData && settingsData.Store === true) {
+        if (!logData) {
           await logs.create({
             Guild: message.guild.id,
             User: message.author.id,
@@ -107,11 +94,8 @@ module.exports = {
             value: `\`\`\`${message.content || "Unknown."}\`\`\``,
             inline: false,
           });
-          if (settingsData.Post === true) {
-            await channel.send({ embeds: [embed] });
-          }
-          return;
-        } else if (logData && settingsData.Store === true) {
+          await channel.send({ embeds: [embed] });
+        } else if (logData) {
           await logs.findOneAndUpdate(
             { Guild: message.guild.id, Message: message.id },
             {
@@ -132,20 +116,14 @@ module.exports = {
               }\`\`\``,
               inline: false,
             });
-            if (settingsData.Post === true) {
-              await channel.send({ embeds: [embed] });
-            }
-            return;
+            await channel.send({ embeds: [embed] });
           } else {
             embed.addFields({
               name: "Deleted Message",
               value: `\`\`\`${message.content || "Unknown."}\`\`\``,
               inline: false,
             });
-            if (settingsData.Post === true) {
-              await channel.send({ embeds: [embed] });
-            }
-            return;
+            await channel.send({ embeds: [embed] });
           }
         }
       }

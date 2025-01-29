@@ -1,21 +1,10 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/messages.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.MessageUpdate,
   async execute(oldMessage, newMessage, client) {
-    const settingsData = await settings.findOne({
-      Guild: newMessage.guild.id,
-    });
-    if (
-      (settingsData.Messages && settingsData.Messages === false) ||
-      (settingsData.Store && settingsData.Store === false) ||
-      (settingsData.Post && settingsData.Post === false)
-    )
-      return;
-
     if (newMessage.partial && newMessage.partial === true)
       await newMessage.fetch();
     if (oldMessage.partial && oldMessage.partial === true)
@@ -63,7 +52,7 @@ module.exports = {
           oldMessage.content.length > 512 ||
           newMessage.content.length > 512)
       ) {
-        if (!logData && settingsData.Store === true) {
+        if (!logData) {
           await logs.create({
             Guild: newMessage.guild.id,
             User: newMessage.author.id,
@@ -81,11 +70,9 @@ module.exports = {
             value: `\`Message Too Long or null.\``,
             inline: false,
           });
-          if (settingsData.Post === true) {
-            await channel.send({ embeds: [embed] });
-          }
-          return;
-        } else if (logData && settingsData.Store === true) {
+
+          await channel.send({ embeds: [embed] });
+        } else if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMessage.guild.id, Message: newMessage.id },
             {
@@ -104,12 +91,9 @@ module.exports = {
           value: `\`Message Too Long or null.\``,
           inline: false,
         });
-        if (settingsData.Post === true) {
-          await channel.send({ embeds: [embed] });
-        }
-        return;
+        await channel.send({ embeds: [embed] });
       } else {
-        if (!logData && settingsData.Store === true) {
+        if (!logData) {
           await logs.create({
             Guild: newMessage.guild.id,
             User: newMessage.author.id,
@@ -129,11 +113,8 @@ module.exports = {
             }\`\`\``,
             inline: false,
           });
-          if (settingsData.Post === true) {
-            await channel.send({ embeds: [embed] });
-          }
-          return;
-        } else if (logData && settingsData.Store === true) {
+          await channel.send({ embeds: [embed] });
+        } else if (logData) {
           await logs.findOneAndUpdate(
             { Guild: newMessage.guild.id, Message: newMessage.id },
             {
@@ -155,10 +136,7 @@ module.exports = {
             }\`\`\` → \`\`\`${newMessage.content || "Unknown."}\`\`\``,
             inline: false,
           });
-          if (settingsData.Post === true) {
-            await channel.send({ embeds: [embed] });
-          }
-          return;
+          await channel.send({ embeds: [embed] });
         }
       }
     } catch (error) {

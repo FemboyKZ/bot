@@ -1,7 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/members.js");
-const settings = require("../../../schemas/events/settings.js");
 
 module.exports = {
   name: Events.GuildMemberRemove,
@@ -9,12 +8,6 @@ module.exports = {
     if (!member || !client) {
       return;
     }
-
-    const settingsData = await settings.findOne({
-      Guild: member.guild.id,
-    });
-    if (settingsData.Members === false) return;
-    if (settingsData.Store === false && settingsData.Post === false) return;
 
     const auditlogData = await schema.findOne({
       Guild: member.guild.id,
@@ -53,15 +46,13 @@ module.exports = {
     }
 
     try {
-      if (logData && settingsData.Store === true) {
+      if (logData) {
         await logs.deleteMany({
           Guild: member.guild.id,
           User: member.user.id,
         });
       }
-      if (settingsData.Post === true) {
-        await channel.send({ embeds: [embed] });
-      }
+      await channel.send({ embeds: [embed] });
     } catch (error) {
       console.error(`Error in guildMemberRemove event:`, error);
     }

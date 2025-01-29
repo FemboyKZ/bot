@@ -1,8 +1,7 @@
 const { Events } = require("discord.js");
 //const schema = require("../../../schemas/base-system.js");
-//const settings = require("../../../schemas/events/settings.js");
 const antiLink = require("../../../schemas/moderation/anti-link.js");
-//const schema = require("../../../schemas/moderation/anti-spam.js");
+//const antiSpam = require("../../../schemas/moderation/anti-spam.js");
 
 module.exports = {
   name: Events.MessageCreate,

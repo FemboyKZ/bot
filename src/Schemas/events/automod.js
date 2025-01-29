@@ -7,8 +7,8 @@ let automod = new Schema({
   Name: { type: String, default: null },
   Created: { type: Date, default: Date.now },
   Enabled: { type: Boolean, default: null },
-  Trigger: { type: String, default: null },
-  Action: { type: String, default: null },
+  Triggers: { type: [String], default: [] },
+  Actions: { type: [String], default: [] },
 });
 
 module.exports = model("automod", automod);
