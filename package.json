@@ -6,7 +6,7 @@
     "xml2js": "^0.6.2"
   },
   "name": "fkz-bot",
-  "version": "1.7.109",
+  "version": "1.7.110",
   "main": "src/index.js",
   "scripts": {
     "test": "node src/index.js",
