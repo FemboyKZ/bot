@@ -8,7 +8,7 @@ let members = new Schema({
   Displayname: { type: String, default: null },
   Avatar: { type: String, default: null }, // URL
   Banner: { type: String, default: null }, // URL
-  Roles: { type: [String], default: [] },
+  Roles: { type: Array, default: [] },
   Joined: { type: Date, default: Date.now },
   Created: { type: Date, default: null },
 });

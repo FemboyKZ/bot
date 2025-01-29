@@ -7,7 +7,7 @@ let roles = new Schema({
   Color: { type: String, default: null },
   Hoist: { type: Boolean, default: false },
   Mentionable: { type: Boolean, default: false },
-  Permissions: { type: [String], default: [] },
+  Permissions: { type: Array, default: [] },
   Position: { type: Number, default: 0 },
   Created: { type: Date, default: Date.now },
 });

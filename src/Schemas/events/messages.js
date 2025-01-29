@@ -6,8 +6,8 @@ let messages = new Schema({
   User: { type: String, required: true }, // users = members
   Channel: { type: String, default: null },
   Message: { type: String, unique: true, required: true }, // ID
-  Content: { type: [String], default: [] }, // store each version of msg, only 1 if deleted
-  Images: { type: [String], default: [] }, // URL
+  Content: { type: Array, default: [] }, // store each version of msg, only 1 if deleted
+  Images: { type: Array, default: [] }, // URL
   Created: { type: Date, default: null },
   Edited: { type: Date, default: null },
   Deleted: { type: Date, default: null },

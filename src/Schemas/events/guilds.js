@@ -1,6 +1,6 @@
 const { model, Schema } = require("mongoose");
 
-let guild = new Schema({
+let guilds = new Schema({
   Guild: { type: String, unique: true, required: true }, // ID
   Name: { type: String, default: null },
   User: { type: String, default: null }, // creator/owner
@@ -8,11 +8,11 @@ let guild = new Schema({
   Icon: { type: String, default: null }, // URL
   Banner: { type: String, default: null }, // URL
   Vanity: { type: String, default: null },
-  Channels: { type: [String], default: [] },
-  Emojis: { type: [String], default: [] },
-  Stickers: { type: [String], default: [] },
-  Roles: { type: [String], default: [] },
-  Members: { type: [String], default: [] },
+  Channels: { type: Array, default: [] },
+  Emojis: { type: Array, default: [] },
+  Stickers: { type: Array, default: [] },
+  Roles: { type: Array, default: [] },
+  Members: { type: Array, default: [] },
 });
 
-module.exports = model("guild", guild);
+module.exports = model("guilds", guilds);

@@ -1,6 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
-const logs = require("../../../schemas/events/guild.js");
+const logs = require("../../../schemas/events/guilds.js");
 
 module.exports = {
   name: Events.GuildCreate,
