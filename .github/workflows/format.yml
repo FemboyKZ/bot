@@ -59,7 +59,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Set script permissions
+        run: chmod +x ./scripts/check-newlines.sh
       - name: Run check-newlines script
         run: ./scripts/check-newlines.sh
