@@ -1,7 +1,6 @@
 const { Events } = require("discord.js");
-//const schema = require("../../../schemas/base-system.js");
-const antiLink = require("../../../schemas/moderation/anti-link.js");
-//const antiSpam = require("../../../schemas/moderation/anti-spam.js");
+const schema = require("../../../schemas/base-system.js");
+//const antiSpam = require("../../../schemas/moderation/actionCounts.js");
 
 module.exports = {
   name: Events.MessageCreate,
@@ -17,8 +16,9 @@ module.exports = {
       return;
     }
 
-    const antiLinkData = await antiLink.findOne({
+    const antiLinkData = await schema.findOne({
       Guild: message.guild.id,
+      Type: "anti-link",
     });
     if (antiLinkData) {
       if (
@@ -30,7 +30,7 @@ module.exports = {
           const member = await message.guild.members.cache.get(
             message.author.id,
           );
-          if (member && member.permissions.has(antiLinkData.Perms)) {
+          if (member && member.permissions.has(antiLinkData.ByPass)) {
             return;
           } else if (member) {
             const msg = await message.channel.send(

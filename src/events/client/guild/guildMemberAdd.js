@@ -1,8 +1,8 @@
 const { EmbedBuilder, Events } = require("discord.js");
 require("dotenv").config();
-const autoroles = require("../../../schemas/autorole.js");
-const mutes = require("../../../schemas/moderation/mute.js");
-const muteRoles = require("../../../schemas/moderation/mute-role.js");
+const autoroles = require("../../../schemas/autoRoles.js");
+const mutes = require("../../../schemas/moderation/mutes.js");
+const muteRoles = require("../../../schemas/moderation/muteRoles.js");
 const schema = require("../../../schemas/base-system.js");
 const logs = require("../../../schemas/events/members.js");
 

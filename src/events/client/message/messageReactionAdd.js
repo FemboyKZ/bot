@@ -1,5 +1,5 @@
 const { PermissionFlagsBits, Events } = require("discord.js");
-const reactions = require("../../../schemas/reactionrole.js");
+const reactions = require("../../../schemas/reactionRoles.js");
 const requests = require("../../../schemas/request-status.js");
 
 module.exports = {
