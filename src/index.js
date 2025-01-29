@@ -54,7 +54,7 @@ client.commands = new Collection();
 //client.cooldowns = new Collection();
 client.invites = new Collection();
 
-require(path.join(__dirname, "handleConsole.js"))(client);
+require(path.join(__dirname, "handleConsole.js"));
 require(path.join(__dirname, "syncGuildData.js"))(client);
 
 /*
