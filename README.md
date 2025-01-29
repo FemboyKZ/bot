@@ -1,4 +1,3 @@
-
 # FemboyKZ Discord bot
 
 Really shitty Discord bot with a random assortment of features.
