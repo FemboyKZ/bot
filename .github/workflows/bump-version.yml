@@ -22,7 +22,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  bump-version:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

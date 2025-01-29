@@ -1,4 +1,4 @@
-name: Eslint
+name: Code Quality Checks and formatting
 
 on:
   push:
@@ -22,7 +22,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  eslint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,3 +38,28 @@ jobs:
         run: npm install
       - name: Run Eslint
         run: npx eslint .
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Run Prettier
+        run: npx prettier --check .
+  check-newlines:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run check-newlines script
+        run: ./scripts/check-newlines.sh
