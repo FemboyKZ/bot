@@ -117,8 +117,6 @@ if (!process.env.TOKEN) {
   client.gracefulShutdown().catch(console.error);
 }
 
-//require("./guild-scraper.js");
-
 const functionsPath = path.join(__dirname, "functions");
 const functions = fs
   .readdirSync(functionsPath)
