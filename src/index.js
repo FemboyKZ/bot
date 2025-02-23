@@ -133,11 +133,10 @@ const commandsPath = path.join(__dirname, "commands");
 (async () => {
   try {
     await client.login(process.env.TOKEN);
-    /* eslint-disable no-undef */
+    let file;
     for (file of functions) {
       require(`${functionsPath}/${file}`)(client);
     }
-    /* eslint-enable no-undef */
     await client.handleEvents(clientEventsPath);
     await client.handleProcessEvents(processEventsPath);
     await client.handleRestEvents(restEventsPath);
