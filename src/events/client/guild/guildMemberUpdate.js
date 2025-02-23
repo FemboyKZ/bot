@@ -126,7 +126,7 @@ module.exports = {
       }
 
       const embed = new EmbedBuilder()
-        .setColor(0x3498db)
+        .setColor("#ff00b3")
         .setAuthor({
           name: `${newMember.user.tag} (${newMember.id})`,
           iconURL: newValues.Avatar,
