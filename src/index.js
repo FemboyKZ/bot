@@ -131,15 +131,19 @@ const mongoEventsPath = path.join(eventsPath, "mongo");
 const commandsPath = path.join(__dirname, "commands");
 
 (async () => {
-  /* eslint-disable no-undef */
-  for (file of functions) {
-    require(`${functionsPath}/${file}`)(client);
+  try {
+    await client.login(process.env.TOKEN);
+    /* eslint-disable no-undef */
+    for (file of functions) {
+      require(`${functionsPath}/${file}`)(client);
+    }
+    /* eslint-enable no-undef */
+    await client.handleEvents(clientEventsPath);
+    await client.handleProcessEvents(processEventsPath);
+    await client.handleRestEvents(restEventsPath);
+    await client.handleMongoEvents(mongoEventsPath);
+    await client.handleCommands(commandsPath);
+  } catch (error) {
+    console.error("Error starting the bot:", error);
   }
-  /* eslint-enable no-undef */
-  client.handleEvents(clientEventsPath);
-  client.handleProcessEvents(processEventsPath);
-  client.handleRestEvents(restEventsPath);
-  client.handleMongoEvents(mongoEventsPath);
-  client.handleCommands(commandsPath);
-  client.login(process.env.TOKEN);
 })();
