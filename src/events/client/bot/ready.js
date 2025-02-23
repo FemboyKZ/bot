@@ -61,35 +61,43 @@ module.exports = {
           mongoose.connection.readyState,
         );
       }
-      try {
-        console.log("Syncing client guild data...");
-        for (const [guildId, guild] of client.guilds.cache) {
-          const guildData = await client.syncGuildData(guild);
-          if (guildData) {
-            console.log(`Synced guild data for guild: ${guild.name}`);
-          } else {
-            console.warn(`Failed to sync guild data for guild: ${guild.name}`);
-          }
-        }
-      } catch (error) {
-        console.error("Error syncing client guild data:", error);
-      }
     } catch (error) {
       console.error("Error connecting to MongoDB:", error);
     }
 
-    await client.guilds.cache.forEach(async (guild) => {
-      const clientMember = await guild.members.cache.get(client.user.id);
-      if (!clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild))
-        return;
+    try {
+      console.log("Syncing client guild data...");
+      for (const [guildId, guild] of client.guilds.cache) {
+        const guildData = await client.syncGuildData(guild);
+        if (guildData) {
+          console.log(`Synced guild data for guild: ${guild.name}`);
+        } else {
+          console.warn(`Failed to sync guild data for guild: ${guild.name}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error syncing client guild data:", error);
+    }
 
-      const firstInvites = await guild.invites.fetch().catch(console.log);
-      client.invites.set(
-        guild.id,
-        new Collection(
-          firstInvites.map((invite) => [invite.code, invite.uses]),
-        ),
-      );
-    });
+    try {
+      await client.guilds.cache.forEach(async (guild) => {
+        const clientMember = await guild.members.cache.get(client.user.id);
+        if (
+          !clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild)
+        ) {
+          return;
+        }
+
+        const firstInvites = await guild.invites.fetch().catch(console.log);
+        client.invites.set(
+          guild.id,
+          new Collection(
+            firstInvites.map((invite) => [invite.code, invite.uses]),
+          ),
+        );
+      });
+    } catch (error) {
+      console.error("Error fetching invites:", error);
+    }
   },
 };
