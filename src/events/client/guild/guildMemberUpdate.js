@@ -6,277 +6,166 @@ const logs = require("../../../schemas/events/members.js");
 module.exports = {
   name: Events.GuildMemberUpdate,
   async execute(oldMember, newMember, client) {
-    const auditlogData = await schema.findOne({
-      //Guild: oldMember.guild.id,
-      ID: "audit-logs",
-    });
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = await client.channels.cache.get(auditlogData.Channel);
-    if (!channel) return;
-
-    const logData = await logs.findOne({
-      //Guild: oldMember.guild.id,
-      User: oldMember.user.id,
-    });
-
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: `FKZ • ID: ${newMember.user.id}` })
-      .setTitle("Member Updated")
-      .addFields({
-        name: "User",
-        value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
-        inline: false,
-      });
-
-    if (logData && logData.Avatar) {
-      embed.setAuthor({
-        name: `${newMember.user.username} has updated their profile`,
-        iconURL: newMember.user.avatarURL({ size: 256 })
-          ? logData.Avatar
-          : "https://files.femboy.kz/web/images/avatars/unknown.png",
-      });
-    } else {
-      embed.setAuthor({
-        name: `${newMember.user.username} has updated their profile`,
-        iconURL:
-          newMember.user.avatarURL({ size: 256 }) ||
-          "https://files.femboy.kz/web/images/avatars/unknown.png",
-      });
-    }
-
-    const roleEmbed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: `FKZ • ID: ${newMember.user.id}` })
-      .setTitle("Member Updated");
-
     try {
-      if (oldMember.roles.cache.size > newMember.roles.cache.size) {
-        oldMember.roles.cache.forEach((role) => {
-          if (!newMember.roles.cache.has(role.id)) {
-            roleEmbed.addFields(
-              {
-                name: "Role Removed",
-                value: `${role}`,
-                inline: false,
-              },
-              {
-                name: "User",
-                value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
-                inline: false,
-              },
-            );
-            channel.send({ embeds: [roleEmbed] });
-          }
-        });
-      }
-      if (oldMember.roles.cache.size < newMember.roles.cache.size) {
-        newMember.roles.cache.forEach((role) => {
-          if (!oldMember.roles.cache.has(role.id)) {
-            roleEmbed.addFields(
-              {
-                name: "Role Added",
-                value: `${role}`,
-                inline: false,
-              },
-              {
-                name: "User",
-                value: `<@${newMember.user.id}> - \`${newMember.user.username}\``,
-                inline: false,
-              },
-            );
-            channel.send({ embeds: [roleEmbed] });
-          }
-        });
-      }
-    } catch (err) {
-      console.error("Error in MemberUpdate event:", err);
-    }
+      const data = await logs.findOne({
+        Guild: newMember.guild.id,
+        User: newMember.id,
+      });
 
-    try {
-      if (!logData) {
-        await logs.create({
-          Guild: newMember.guild.id,
-          User: newMember.user.id,
-          Name: newMember.user.username,
-          Nickname: newMember.nickname,
-          Displayname: newMember.displayName,
-          Avatar: newMember.user.displayAvatarURL({ size: 128 }),
-          Banner: newMember.user.bannerURL({ size: 128 }),
-          Roles: newMember.roles.cache.map((role) => role.id),
-          Joined: newMember.joinedAt,
-          Created: newMember.user.createdAt,
+      const oldValues = {
+        Name: data?.Name || oldMember.user.username,
+        Nickname: data?.Nickname || oldMember.nickname || "",
+        Displayname: data?.Displayname || oldMember.displayName || "",
+        Avatar: data?.Avatar || oldMember.user.displayAvatarURL(),
+        Roles: data?.Roles || oldMember.roles.cache.map((r) => r.id),
+      };
+
+      await newMember.user.fetch({ force: true });
+      const newAvatar = newMember.user.displayAvatarURL({ size: 4096 });
+      const backupAvatar =
+        "https://files.femboy.kz/web/images/avatars/unknown.png";
+      const newBanner = newMember.user.bannerURL({ size: 4096 });
+
+      const newValues = {
+        Name: newMember.user.username,
+        Nickname: newMember.nickname || oldValues.Nickname,
+        Displayname: newMember.displayName || oldValues.Displayname,
+        Avatar: newAvatar || backupAvatar,
+        Banner: newBanner || "",
+        Roles: newMember.roles.cache.map((r) => r.id),
+      };
+
+      const changes = [];
+
+      if (oldValues.Name !== newValues.Name) {
+        changes.push({
+          field: "Username",
+          old: oldValues.Name,
+          new: newValues.Name,
         });
       }
 
-      if (oldMember.nickname !== newMember.nickname) {
-        embed.addFields({
-          name: `Nickname`,
-          value: `\`${oldMember.nickname || "none"}\`  →  \`${
-            newMember.nickname || "none"
-          }\``,
-          inline: false,
+      if (oldValues.Nickname !== newValues.Nickname) {
+        changes.push({
+          field: "Nickname",
+          old: oldValues.Nickname,
+          new: newValues.Nickname,
         });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            { Guild: newMember.guild.id, User: newMember.user.id },
-            {
-              Nickname: newMember.nickname,
-            },
+      }
+
+      if (oldValues.Displayname !== newValues.Displayname) {
+        changes.push({
+          field: "Display Name",
+          old: oldValues.Displayname,
+          new: newValues.Displayname,
+        });
+      }
+
+      if (oldValues.Avatar !== newValues.Avatar) {
+        changes.push({
+          field: "Avatar",
+          old: oldValues.Avatar,
+          new: newValues.Avatar,
+        });
+      }
+
+      if ((data?.Banner || null) !== newBanner) {
+        changes.push({
+          field: "Banner",
+          old: data?.Banner || null,
+          new: newBanner,
+        });
+      }
+
+      const addedRoles = newValues.Roles.filter(
+        (id) => !oldValues.Roles.includes(id),
+      );
+      const removedRoles = oldValues.Roles.filter(
+        (id) => !newValues.Roles.includes(id),
+      );
+      if (addedRoles.length > 0 || removedRoles.length > 0) {
+        changes.push({
+          field: "Roles",
+          added: addedRoles,
+          removed: removedRoles,
+        });
+      }
+
+      if (changes.length === 0) return;
+
+      const update = {};
+      const existingData = data || {};
+
+      const hasChanged = (field) =>
+        newValues[field] !== existingData[field] &&
+        newValues[field] !== null &&
+        newValues[field] !== undefined;
+
+      if (hasChanged("Name")) update.Name = newValues.Name;
+      if (hasChanged("Nickname")) update.Nickname = newValues.Nickname;
+      if (hasChanged("Displayname")) update.Displayname = newValues.Displayname;
+      if (hasChanged("Avatar")) update.Avatar = newValues.Avatar;
+      if (hasChanged("Banner")) update.Banner = newValues.Banner;
+      if (
+        JSON.stringify(newValues.Roles) !== JSON.stringify(existingData.Roles)
+      ) {
+        update.Roles = newValues.Roles;
+      }
+
+      update.Joined = newMember.joinedAt;
+      update.Created = newMember.user.createdAt;
+
+      const minUpdates = 2;
+
+      if (Object.keys(update).length > minUpdates) {
+        await logs.findOneAndUpdate(
+          { Guild: newMember.guild.id, User: newMember.id },
+          update,
+          { upsert: true, new: true },
+        );
+      }
+
+      const embed = new EmbedBuilder()
+        .setColor(0x3498db)
+        .setAuthor({
+          name: `${newMember.user.tag} (${newMember.id})`,
+          iconURL: newValues.Avatar,
+        })
+        .setTitle("Member Profile Updated")
+        .setTimestamp();
+
+      changes.forEach((change) => {
+        if (change.field === "Roles") {
+          const added =
+            change.added.map((id) => `<@&${id}>`).join(", ") || "None";
+          const removed =
+            change.removed.map((id) => `<@&${id}>`).join(", ") || "None";
+          embed.addFields(
+            { name: "Roles Added", value: added, inline: true },
+            { name: "Roles Removed", value: removed, inline: true },
           );
-        }
-        await channel.send({ embeds: [embed] });
-      }
-
-      if (oldMember.displayName !== newMember.displayName) {
-        embed.addFields({
-          name: `Displayname`,
-          value: `\`${oldMember.displayName || "none"}\`  →  \`${
-            newMember.displayName || "none"
-          }\``,
-          inline: false,
-        });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            { Guild: newMember.guild.id, User: newMember.user.id },
-            {
-              Displayname: newMember.displayName,
-            },
-          );
-        }
-        await channel.send({ embeds: [embed] });
-      }
-
-      if (oldMember.user.username !== newMember.user.username) {
-        embed.addFields({
-          name: `Username`,
-          value: `\`${oldMember.user.username || "none"}\`  →  \`${
-            newMember.user.username || "none"
-          }\``,
-          inline: false,
-        });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            { Guild: newMember.guild.id, User: newMember.user.id },
-            {
-              Name: newMember.user.username,
-            },
-          );
-        }
-        await channel.send({ embeds: [embed] });
-      }
-
-      /*
-          if (oldMember.avatar !== newMember.avatar) {
-            embed
-              .setImage(
-                `${
-                  newMember.avatarURL({ size: 128 })
-                    ? logData.Avatar
-                    : oldMember.avatarURL({ size: 128 })
-                }`
-              )
-              .addFields({
-                name: `Profile Picture`,
-                value: `[Old Pfp](<${
-                  oldMember.avatarURL({
-                    size: 128,
-                  })
-                    ? logData.Avatar
-                    : oldMember.avatarURL({ size: 128 })
-                }>)  →  [New Pfp](<${newMember.avatarURL({ size: 128 })}>)`,
-                inline: false,
-              });
-            if (logData) {
-              await logs.findOneAndUpdate(
-                { Guild: newMember.guild.id, User: newMember.user.id },
-                {
-                  Avatar: newMember.avatarURL({ size: 128 }),
-                }
-              );
-            }
-            await channel.send({ embeds: [embed] });
-          }
-          */
-
-      if (oldMember.user.avatar !== newMember.user.avatar) {
-        embed
-          .setImage(
-            `${
-              newMember.user.avatarURL({ size: 128 })
-                ? logData.Avatar
-                : oldMember.user.avatarURL({ size: 128 })
-            }`,
-          )
-          .addFields({
-            name: `Profile Picture`,
-            value: `[Old Pfp](<${
-              oldMember.user.avatarURL({
-                size: 128,
-              })
-                ? logData.Avatar
-                : oldMember.user.avatarURL({ size: 128 })
-            }>)  →  [New Pfp](<${newMember.user.avatarURL({ size: 128 })}>)`,
+        } else {
+          const oldValue = change.old?.toString().slice(0, 1024) || "None";
+          const newValue = change.new?.toString().slice(0, 1024) || "None";
+          embed.addFields({
+            name: change.field,
+            value: `**Before:** ${oldValue}\n**After:** ${newValue}`,
             inline: false,
           });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            { Guild: newMember.guild.id, User: newMember.user.id },
-            {
-              Avatar: newMember.user.avatarURL({ size: 128 }),
-            },
-          );
         }
-        await channel.send({ embeds: [embed] });
-      }
+      });
 
-      if (oldMember.user.banner !== newMember.user.banner) {
-        embed
-          .setImage(
-            `${
-              newMember.user.bannerURL({ size: 128 })
-                ? logData.Banner
-                : oldMember.user.bannerURL({ size: 128 })
-            }`,
-          )
-          .addFields({
-            name: `Banner Image`,
-            value: `[Old Banner](<${
-              oldMember.user.bannerURL({
-                size: 128,
-              })
-                ? logData.Banner
-                : oldMember.user.bannerURL({ size: 128 })
-            }>)  →  [New Banner](<${newMember.user.bannerURL({
-              size: 128,
-            })}>)`,
-            inline: false,
-          });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            { Guild: newMember.guild.id, User: newMember.user.id },
-            {
-              Banner: newMember.user.bannerURL({ size: 128 }),
-            },
-          );
-        }
-        await channel.send({ embeds: [embed] });
-      }
+      const auditlogData = await schema.findOne({
+        Guild: newMember.guild.id,
+        ID: "audit-logs",
+      });
+      if (!auditlogData || !auditlogData.Channel) return;
+      const channel = await client.channels.cache.get(auditlogData.Channel);
+      if (!channel) return;
 
-      if (oldMember.roles.cache.size !== newMember.roles.cache.size) {
-        if (logData) {
-          await logs.findOneAndUpdate(
-            { Guild: newMember.guild.id, User: newMember.user.id },
-            {
-              Roles: newMember.roles.cache.map((role) => role.id),
-            },
-          );
-        }
-      }
+      await channel.send({ embeds: [embed] });
     } catch (error) {
-      console.error("Error in MemberUpdate event:", error);
+      console.error("Error handling GuildMemberUpdate:", error);
     }
   },
 };

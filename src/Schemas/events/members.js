@@ -3,9 +3,9 @@ const { model, Schema } = require("mongoose");
 let members = new Schema({
   Guild: { type: String, required: true },
   User: { type: String, unique: true, required: true }, // users = members
-  Name: { type: String, default: null },
-  Nickname: { type: String, default: null },
-  Displayname: { type: String, default: null },
+  Name: { type: String, required: true },
+  Nickname: { type: String, default: "" },
+  Displayname: { type: String, default: "" },
   Avatar: { type: String, default: null }, // URL
   Banner: { type: String, default: null }, // URL
   Roles: { type: Array, default: [] },
