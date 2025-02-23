@@ -41,7 +41,11 @@ module.exports = (client) => {
       client.gracefulShutdown().catch(console.error);
     }
 
+    console.log(`Starting to load commands from: ${commandsPath}`);
     loadCommands(commandsPath);
+    console.log(
+      `Finished loading commands. Total commands: ${client.commandArray.length}`,
+    );
     const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 
     (async () => {
