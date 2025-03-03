@@ -12,19 +12,34 @@ module.exports = {
         User: newMember.id,
       });
 
+      if (!data) {
+        await logs.create({
+          Guild: newMember.guild.id,
+          User: newMember.id,
+          Name: newMember.user.username,
+          Nickname: newMember.nickname || "",
+          Displayname: newMember.displayName || "",
+          Avatar: newMember.user.displayAvatarURL() || "",
+          Banner: newMember.user.bannerURL() || "",
+          Roles: newMember.roles.cache.map((r) => r.id) || [],
+          Joined: newMember.joinedAt || null,
+          Created: newMember.user.createdAt,
+        });
+      }
+
       const oldValues = {
         Name: data?.Name || oldMember.user.username,
         Nickname: data?.Nickname || oldMember.nickname || "",
         Displayname: data?.Displayname || oldMember.displayName || "",
-        Avatar: data?.Avatar || oldMember.user.displayAvatarURL(),
+        Avatar: data?.Avatar || oldMember.user.displayAvatarURL() || "",
         Roles: data?.Roles || oldMember.roles.cache.map((r) => r.id),
       };
 
       await newMember.user.fetch({ force: true });
-      const newAvatar = newMember.user.displayAvatarURL({ size: 4096 });
+      const newAvatar = newMember.user.displayAvatarURL();
       const backupAvatar =
         "https://files.femboy.kz/web/images/avatars/unknown.png";
-      const newBanner = newMember.user.bannerURL({ size: 4096 });
+      const newBanner = newMember.user.bannerURL();
 
       const newValues = {
         Name: newMember.user.username,
@@ -129,7 +144,6 @@ module.exports = {
         .setColor("#ff00b3")
         .setAuthor({
           name: `${newMember.user.tag} (${newMember.id})`,
-          iconURL: newValues.Avatar,
         })
         .setTitle("Member Profile Updated")
         .setTimestamp();
@@ -140,10 +154,29 @@ module.exports = {
             change.added.map((id) => `<@&${id}>`).join(", ") || "None";
           const removed =
             change.removed.map((id) => `<@&${id}>`).join(", ") || "None";
-          embed.addFields(
-            { name: "Roles Added", value: added, inline: true },
-            { name: "Roles Removed", value: removed, inline: true },
-          );
+
+          if (added.length > 0) {
+            embed.addFields({
+              name: "Roles Added",
+              value: added,
+              inline: true,
+            });
+          }
+          if (removed.length > 0) {
+            embed.addFields({
+              name: "Roles Removed",
+              value: removed,
+              inline: true,
+            });
+          }
+        } else if (change.field === "Avatar") {
+          embed
+            .addFields({
+              name: "Avatar",
+              value: `[Old](<${oldValues.Avatar}>)\n[New](<${newValues.Avatar}>)`,
+              inline: true,
+            })
+            .setThumbnail(newValues.Avatar);
         } else {
           const oldValue = change.old?.toString().slice(0, 1024) || "None";
           const newValue = change.new?.toString().slice(0, 1024) || "None";
