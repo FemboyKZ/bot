@@ -31,7 +31,7 @@ module.exports = {
 
     try {
       await invite.guild.invites.fetch();
-      const member = await invite.guild.members.cache.get(invite.inviter.id);
+      const member = await invite.guild.members.cache.get(invite.inviter);
       if (member) {
         embed.addFields({
           name: "Creator",
@@ -47,7 +47,7 @@ module.exports = {
       } else {
         embed.addFields({
           name: "Creator",
-          value: `<@${invite.inviter.id}>`,
+          value: `<@${invite.inviter}>`,
           inline: false,
         });
       }
@@ -86,7 +86,7 @@ module.exports = {
             await logs.create({
               Guild: invite.guild.id,
               Invite: invite.code,
-              User: invite.inviter.id,
+              User: invite.inviter,
               Uses: invite.uses,
               MaxUses: invite.maxUses,
               Permanent: true,
@@ -97,7 +97,7 @@ module.exports = {
             await logs.create({
               Guild: invite.guild.id,
               Invite: invite.code,
-              User: invite.inviter.id,
+              User: invite.inviter,
               Uses: invite.uses,
               MaxUses: invite.maxUses,
               Permanent: false,
