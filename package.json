@@ -2,7 +2,7 @@
   "dependencies": {
     "discord.js": "^14.18.0",
     "dotenv": "^16.4.7",
-    "mongoose": "^8.10.1",
+    "mongoose": "^8.11.0",
     "xml2js": "^0.6.2"
   },
   "name": "fkz-bot",
@@ -16,11 +16,11 @@
   "license": "GPL-3.0-only",
   "description": "Discord Bot for managing FKZ Discord Server, FKZ Dedicated Server and more.",
   "devDependencies": {
-    "@eslint/js": "^9.19.0",
-    "eslint": "^9.19.0",
-    "eslint-config-prettier": "^10.0.1",
+    "@eslint/js": "^9.21.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
     "eslint-plugin-prettier": "^5.2.3",
-    "globals": "^15.14.0",
-    "prettier": "^3.4.2"
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3"
   }
 }
