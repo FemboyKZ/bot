@@ -37,7 +37,7 @@ module.exports = {
 
     if (
       //!interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      !interaction.member.roles.cache.has(`${process.env.PIRATE_MANAGER_ROLE}`)
+      !interaction.member.roles.cache.has(`${process.env.BOT_MANAGER_ROLE}`)
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",

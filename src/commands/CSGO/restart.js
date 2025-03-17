@@ -5,12 +5,12 @@ require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("start")
-    .setDescription("Send a START command to a Somali Pirates CS:GO server")
+    .setName("restart")
+    .setDescription("Send a RESTART command to a Somali Pirates CS:GO server")
     .addStringOption((option) =>
       option
         .setName("server")
-        .setDescription("Which server do you want to start")
+        .setDescription("Which server do you want to restart")
         .setRequired(true)
         .addChoices(
           { name: "Somali Pirates 1", value: "csgo-somali-1" },
@@ -37,7 +37,7 @@ module.exports = {
 
     if (
       //!interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      !interaction.member.roles.cache.has(`${process.env.PIRATE_MANAGER_ROLE}`)
+      !interaction.member.roles.cache.has(`${process.env.BOT_MANAGER_ROLE}`)
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
@@ -47,11 +47,11 @@ module.exports = {
 
     try {
       await interaction.reply({
-        content: `Starting: ${name}`,
+        content: `Restarting: ${name}`,
         ephemeral: true,
       });
       exec(
-        `sudo -iu ${user} /home/${user}/csgoserver start`,
+        `sudo -iu ${user} /home/${user}/csgoserver restart`,
         async (error, stdout, stderr) => {
           if (error) console.log(error);
           //if (stderr) console.log(stderr);
@@ -60,7 +60,7 @@ module.exports = {
       );
       await wait(3000);
       return await interaction.editReply({
-        content: `Started: ${name}`,
+        content: `Restarted: ${name}`,
         ephemeral: true,
       });
     } catch (error) {
