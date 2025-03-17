@@ -3,53 +3,28 @@ const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
+const user = "csgo-pizan-1";
+const name = "sportsmenskaya razdevalka";
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("csgo-start")
-    .setDescription("Send a START command to Fruity CS:GO server")
-    .addStringOption((option) =>
-      option
-        .setName("server")
-        .setDescription("Which server do you want to start")
-        .setRequired(true)
-        .addChoices(
-          { name: "fruityboys 1", value: "csgo-salad-1" },
-          { name: "fruityboys 2", value: "csgo-salad-2" }
-        )
-    ),
+    .setDescription(`Send a START command to ${name}`),
 
   async execute(interaction) {
-    const { options } = interaction;
-    const servers = options.getString("server");
-
-    const server = {
-      "csgo-salad-1": {
-        name: "fruityboys 1",
-        user: "csgo-salad-1",
-      },
-      "csgo-salad-2": {
-        name: "fruityboys 2",
-        user: "csgo-salad-2",
-      },
-    }[servers];
-
-    const { name, user } = server;
-
-    /*
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      !interaction.member.roles.cache.has(`${process.env.SALAD_MANAGER_ROLE}`)
+      !interaction.member.roles.cache.has(`${process.env.BOT_MANAGER_ROLE}`)
     ) {
       return await interaction.reply({
-        content: "You don't have perms to use this command.",
+        content: "You don't have the perms to use this command.",
         ephemeral: true,
       });
     }
-    */
 
     try {
       await interaction.reply({
-        content: `Starting: ${name}`,
+        content: `Starting: \`${name}\``,
         ephemeral: true,
       });
       exec(
@@ -62,7 +37,7 @@ module.exports = {
       );
       await wait(3000);
       return await interaction.editReply({
-        content: `Started: ${name}`,
+        content: `Started: \`${name}\``,
         ephemeral: true,
       });
     } catch (error) {
