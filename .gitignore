@@ -131,3 +131,4 @@ dist
 
 # dev
 disabled_cmd/
+.vscode/
