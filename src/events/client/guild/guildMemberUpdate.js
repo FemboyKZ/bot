@@ -106,7 +106,13 @@ module.exports = {
         });
       }
 
-      if (changes.length === 0) return;
+      if (changes.length === 0) {
+        console.log(
+          "Member profile updated, no changes detected. Member: ",
+          newMember.id,
+        );
+        return;
+      }
 
       const update = {};
       const existingData = data || {};
@@ -198,7 +204,12 @@ module.exports = {
 
       await channel.send({ embeds: [embed] });
     } catch (error) {
-      console.error("Error handling GuildMemberUpdate:", error);
+      console.error(
+        "Error handling GuildMemberUpdate for user",
+        newMember.id,
+        "Changes detected:",
+        error.stack,
+      );
     }
   },
 };
