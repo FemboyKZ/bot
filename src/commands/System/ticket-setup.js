@@ -37,10 +37,13 @@ module.exports = {
     const channel = interaction.options.getChannel("channel");
     const category = interaction.options.getChannel("category");
 
+    const embedImage = "https://files.femboy.kz/web/images/wide.png";
+    const embedColor = "#ff00b3";
+
     const embedWhitelist = new EmbedBuilder()
       .setTitle("**FKZ Whitelist**")
-      .setImage("https://femboy.kz/images/wide.png")
-      .setColor("#ff00b3")
+      .setImage(embedImage)
+      .setColor(embedColor)
       .setDescription(
         "**What is the whitelist and how to get whitelisted?**\nThe whitelist is a list of people that can join *our* private servers.",
       )
@@ -58,8 +61,8 @@ module.exports = {
       ]);
     const embedBans = new EmbedBuilder()
       .setTitle("**FKZ Bans/Un-Bans**")
-      .setImage("https://femboy.kz/images/wide.png")
-      .setColor("#ff00b3")
+      .setImage(embedImage)
+      .setColor(embedColor)
       .setDescription(
         "If you were banned from one of the servers, you can request for an unban by using the command **/unban-request** in any of this servers channels.",
       )
@@ -72,8 +75,8 @@ module.exports = {
       ]);
     const embedVip = new EmbedBuilder()
       .setTitle("**FKZ VIP / Donations**")
-      .setImage("https://femboy.kz/images/wide.png")
-      .setColor("#ff00b3")
+      .setImage(embedImage)
+      .setColor(embedColor)
       .setDescription(
         "By choosing to **Donate** to the server you may be able to get VIP perks on the servers and here on Discord",
       )
@@ -89,34 +92,10 @@ module.exports = {
             "To claim your perks, use the command **/claim-vip** in any of this server's channels.\n\nIf you wish to gift instead, use the command **/gift-vip** in any of this server's channels.",
         },
       ]);
-    const embedClassic = new EmbedBuilder()
-      .setTitle("FKZ ClassicCounter")
-      .setImage("https://femboy.kz/images/wide.png")
-      .setColor("#ff00b3")
-      .setDescription(
-        "To be able to play on the **[ClassicCounter](https://classiccounter.cc/)** Servers, you need to be *whitelisted*, you can find more info on their [Discord](https://discord.gg/ClassicCounter).\n\nPlease do not open any tickets regarding ClassicCounter, or ping their staff on our Discord server, join theirs instead.",
-      )
-      .addFields([
-        {
-          name: "**ClassicCounter Website**",
-          value:
-            "Check out all their Servers here:\n**<https://classiccounter.cc/servers>**",
-        },
-        {
-          name: "**ClassicCounter Whitelist**",
-          value:
-            "ClassicCounter handles their whitelist via their site, apply or check it out here:\n**<https://classiccounter.cc/whitelist>**",
-        },
-        {
-          name: "**ClassicCounter Bans**",
-          value:
-            "ClassicCounter handles their bans and un-bans on their Discord, but they can be viewed here:\n**<https://classiccounter.cc/bans>**",
-        },
-      ]);
     const embedSupport = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTitle(`FKZ Support`)
-      .setImage("https://femboy.kz/images/wide.png")
+      .setTitle("FKZ Support")
+      .setImage(embedImage)
+      .setColor(embedColor)
       .addFields([
         {
           name: "Docs / Guides",
@@ -172,13 +151,7 @@ module.exports = {
           ID: "tickets",
         });
         await channel.send({
-          embeds: [
-            embedWhitelist,
-            embedClassic,
-            embedBans,
-            embedVip,
-            embedSupport,
-          ],
+          embeds: [embedWhitelist, embedBans, embedVip, embedSupport],
           components: [menu],
         });
         await interaction.reply({
