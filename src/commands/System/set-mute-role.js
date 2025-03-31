@@ -4,83 +4,56 @@ const schema = require("../../schemas/moderation/muteRoles.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("set-mute-role")
-    .setDescription("[Admin] Set or change the mute role")
+    .setDescription("[Admin] Set or update the mute role")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
         .setName("role")
-        .setDescription("Set or update the Mute Role")
+        .setDescription("Select the role")
         .setRequired(true),
     ),
+
   async execute(interaction) {
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
     ) {
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        ephemeral: true,
-      });
-    }
-
-    const roleId = interaction.options.getString("role");
-    const role = await interaction.guild.roles.cache.get(roleId);
-    const data = await schema.findOne({ Guild: interaction.guild.id });
-
-    if (!role) {
-      return await interaction.reply({
-        content: `The role ${roleId} does not exist.`,
+      return interaction.reply({
+        content: "You don't have permissions to use this command.",
         ephemeral: true,
       });
     }
 
     try {
-      if (!data) {
-        if (roleId) {
-          await schema.create({
-            Guild: interaction.guild.id,
-            Role: roleId,
-          });
-          return await interaction.reply({
-            content: "Roles have been set.",
-            ephemeral: true,
-          });
-        } else {
-          return await interaction.reply({
-            content: `No role has been set.`,
-            ephemeral: true,
-          });
-        }
+      const guild = interaction.guild;
+      const role = interaction.options.getString("role");
+
+      if (!role) {
+        return interaction.reply({
+          content: "Please provide a role to set.",
+          ephemeral: true,
+        });
       }
-      if (data) {
-        if (role.id === data.Role) {
-          return await interaction.reply({
-            content: `The role is already set to ${role}.`,
-            ephemeral: true,
-          });
-        }
-        if (roleId) {
-          await schema.findOneAndUpdate(
-            {
-              Guild: interaction.guild.id,
-            },
-            {
-              Role: roleId,
-            },
-          );
-          return await interaction.reply({
-            content: `Roles have been updated.`,
-            ephemeral: true,
-          });
-        } else {
-          return await interaction.reply({
-            content: `Roles have not been updated.`,
-            ephemeral: true,
-          });
-        }
+
+      const operations = [];
+      if (role) {
+        operations.push(
+          schema.findOneAndUpdate(
+            { Guild: guild.id },
+            { $set: { Role: role } },
+            { upsert: true, new: true },
+          ),
+        );
       }
-    } catch (err) {
-      console.error("Error executing command:", err);
-      await interaction.reply({
+
+      await Promise.all(operations);
+
+      return interaction.reply({
+        content: "Roles have been successfully updated!",
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error("Error in set-mute-role:", error);
+      return interaction.reply({
         content: "There was an error while executing this command!",
         ephemeral: true,
       });
