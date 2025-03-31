@@ -4,7 +4,7 @@ const schema = require("../../schemas/vip/vipUses.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("set-vip-codes")
-    .setDescription("[Admin] Set or change the vip codes")
+    .setDescription("[Admin] Set or Update the VIP codes")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
@@ -24,14 +24,8 @@ module.exports = {
         .setDescription("Set or update the Contributor Code")
         .setRequired(false),
     ),
+
   async execute(interaction) {
-    const guild = interaction.guild;
-    const vipCode = interaction.options.getString("code-vip");
-    const vipPlusCode = interaction.options.getString("code-vip-plus");
-    const contributorCode = interaction.options.getString("code-contributor");
-
-    const data = await schema.findOne({ Guild: guild.id });
-
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
     ) {
@@ -42,90 +36,48 @@ module.exports = {
     }
 
     try {
-      if (!data) {
-        if (vipCode) {
-          await schema.create({
-            Guild: guild.id,
-            Code: vipCode,
-            Type: "vip",
-            Uses: 0,
-          });
-        }
-        if (vipPlusCode) {
-          await schema.create({
-            Guild: guild.id,
-            Code: vipPlusCode,
-            Type: "vip+",
-            Uses: 0,
-          });
-        }
-        if (contributorCode) {
-          await schema.create({
-            Guild: guild.id,
-            Code: contributorCode,
-            Type: "contributor",
-            Uses: 0,
-          });
-        } else {
-          return interaction.reply({
-            content: "No code has been set.",
-            ephemeral: true,
-          });
-        }
+      const guild = interaction.guild;
+      const codes = {
+        vip: await interaction.options.getString("code-vip"),
+        vipPlus: await interaction.options.getString("code-vip-plus"),
+        contributor: await interaction.options.getString("code-contributor"),
+      };
+
+      if (!Object.values(codes).some((code) => code)) {
         return await interaction.reply({
-          content: "Codes have been set.",
+          content: "Please provide at least one code to set.",
           ephemeral: true,
         });
       }
 
-      if (vipCode) {
-        await schema.findOneAndUpdate(
-          {
-            Guild: guild.id,
-            Type: "vip",
-          },
-          {
-            Code: vipCode,
-            Uses: 0,
-          },
-        );
+      const operations = [];
+      const codeTypes = [
+        { type: "vip", code: codes.vip },
+        { type: "vip+", code: codes.vipPlus },
+        { type: "contributor", code: codes.contributor },
+      ];
+
+      for (const { type, code } of codeTypes) {
+        if (code) {
+          operations.push(
+            schema.findOneAndUpdate(
+              { Guild: guild.id, Type: type },
+              { $set: { Code: code, Uses: 0 } },
+              { upsert: true, new: true },
+            ),
+          );
+        }
       }
-      if (vipPlusCode) {
-        await schema.findOneAndUpdate(
-          {
-            Guild: guild.id,
-            Type: "vip+",
-          },
-          {
-            Code: vipPlusCode,
-            Uses: 0,
-          },
-        );
-      }
-      if (contributorCode) {
-        await schema.findOneAndUpdate(
-          {
-            Guild: guild.id,
-            Type: "contributor",
-          },
-          {
-            Code: contributorCode,
-            Uses: 0,
-          },
-        );
-      } else {
-        return await interaction.reply({
-          content: "No code has been set.",
-          ephemeral: true,
-        });
-      }
+
+      await Promise.all(operations);
+
       return await interaction.reply({
-        content: "Codes have been updated.",
+        content: "Codes have been successfully updated!",
         ephemeral: true,
       });
     } catch (error) {
-      console.error("Error executing command:", error);
-      return await interaction.reply({
+      console.error("Error in set-vip-codes:", error);
+      return interaction.reply({
         content: "There was an error while executing this command!",
         ephemeral: true,
       });
