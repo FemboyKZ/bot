@@ -29,12 +29,12 @@ module.exports = {
 
     const embedBanner = new EmbedBuilder()
       .setTitle("**Welcome to FemboyKZ! <3**")
-      .setImage("https://femboy.kz/images/tehe.png")
+      .setImage("https://files.femboy.kz/web/images/welcome-banner.png")
       .setColor("#ff00b3");
 
     const embedInfo = new EmbedBuilder()
       .setTitle("**FemboyKZ Info**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://files.femboy.kz/web/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "This is a Discord server for the Femboy KZ CS:GO and CS2 servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers.",
@@ -54,7 +54,7 @@ module.exports = {
 
     const embedRules = new EmbedBuilder()
       .setTitle("**FemboyKZ Rules**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://files.femboy.kz/web/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "Not following these rules can result in certain punishments.",
