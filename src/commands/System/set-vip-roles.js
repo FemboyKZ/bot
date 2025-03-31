@@ -29,7 +29,7 @@ module.exports = {
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
     ) {
-      return await interaction.reply({
+      return interaction.reply({
         content: "You don't have permissions to use this command.",
         ephemeral: true,
       });
@@ -38,13 +38,13 @@ module.exports = {
     try {
       const guild = interaction.guild;
       const roles = {
-        vip: await interaction.options.getString("role-vip"),
-        vipPlus: await interaction.options.getString("role-vip-plus"),
-        contributor: await interaction.options.getString("role-contributor"),
+        vip: interaction.options.getString("role-vip"),
+        vipPlus: interaction.options.getString("role-vip-plus"),
+        contributor: interaction.options.getString("role-contributor"),
       };
 
       if (!Object.values(roles).some((role) => role)) {
-        return await interaction.reply({
+        return interaction.reply({
           content: "Please provide at least one role to set.",
           ephemeral: true,
         });
@@ -71,7 +71,7 @@ module.exports = {
 
       await Promise.all(operations);
 
-      return await interaction.reply({
+      return interaction.reply({
         content: "Roles have been successfully updated!",
         ephemeral: true,
       });

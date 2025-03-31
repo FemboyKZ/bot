@@ -29,7 +29,7 @@ module.exports = {
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
     ) {
-      return await interaction.reply({
+      return interaction.reply({
         content: "You don't have permissions to use this command.",
         ephemeral: true,
       });
@@ -38,13 +38,13 @@ module.exports = {
     try {
       const guild = interaction.guild;
       const codes = {
-        vip: await interaction.options.getString("code-vip"),
-        vipPlus: await interaction.options.getString("code-vip-plus"),
-        contributor: await interaction.options.getString("code-contributor"),
+        vip: interaction.options.getString("code-vip"),
+        vipPlus: interaction.options.getString("code-vip-plus"),
+        contributor: interaction.options.getString("code-contributor"),
       };
 
       if (!Object.values(codes).some((code) => code)) {
-        return await interaction.reply({
+        return interaction.reply({
           content: "Please provide at least one code to set.",
           ephemeral: true,
         });
@@ -71,7 +71,7 @@ module.exports = {
 
       await Promise.all(operations);
 
-      return await interaction.reply({
+      return interaction.reply({
         content: "Codes have been successfully updated!",
         ephemeral: true,
       });
