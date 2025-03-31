@@ -72,8 +72,7 @@ module.exports = {
         },
         {
           name: "** **",
-          value:
-            " **3.** NSFW content is allowed only on specific channels marked as NSFW. Posting actual pornography, gore or vore is not allowed. NSFW content of minors is not allowed to any extent and will result in a permanent ban.\n **3.1** NSFW channels require the <@&1179794850627997706> Role. Lying about your age for this is a punishable offense.",
+          value: ` **3.** This is a "mature" server, this means swearing/cursing is permitted. Posting pornography, gore, vore or something comparable is not allowed in any extent. NSFW content of minors is not allowed to any extent and will result in a permanent ban.`,
         },
         {
           name: "** **",
