@@ -93,20 +93,6 @@ module.exports = {
             "<:cheesd2meetu:1172228027292340234>  ~  Weeb (Anime / Manga)\n<:RAT:986814917183172628>  ~  Music\n<:picljuus:1147537598466764880>  ~  Coding\n:art:  ~  Art",
         },
       ]);
-    const embedAge = new EmbedBuilder()
-      .setTitle("**Age Roles**")
-      .setImage("https://femboy.kz/images/wide.png")
-      .setColor("#ff00b3")
-      .setDescription(
-        "> Roles for showing off which age group you belong in.\n> **`18+ Role will be required to see the NSFW Channels!`**",
-      )
-      .addFields([
-        {
-          name: "** **",
-          value:
-            "<:gremlin:1179774969224372334>  ~  Minor\n<:thisfuckingthing:1152840535086735430>  ~  18+",
-        },
-      ]);
 
     await channel.send({
       embeds: [embedBanner, embedInfo],
@@ -122,9 +108,6 @@ module.exports = {
     });
     await channel.send({
       embeds: [embedInterest],
-    });
-    await channel.send({
-      embeds: [embedAge],
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
