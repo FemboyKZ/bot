@@ -33,13 +33,6 @@ module.exports = {
     const csgoWLna = "na.femboy.kz:27025";
     const csgo64na = "na.femboy.kz:27035";
 
-    const cscl128eu = "eu.femboy.kz:27099";
-    const cscl128eukzt = "eu.femboy.kz:27079";
-    const cscl64eu = "eu.femboy.kz:27089";
-
-    const cscl128na = "na.femboy.kz:27099";
-    const cscl64na = "na.femboy.kz:27089";
-
     const cs2WLeu = "eu.femboy.kz";
     const cs2KZeu = "eu.femboy.kz:27016";
     const cs2KZ2eu = "eu.femboy.kz:27017";
@@ -57,12 +50,12 @@ module.exports = {
     const embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
       .setColor("#ff00b3")
-      .setImage("https://femboy.kz/images/serverrs.png");
+      .setImage("https://files.femboy.kz/web/images/servers-banner.png");
 
     const embedCSGO = new EmbedBuilder()
       .setTitle("**CS:GO Servers**")
       .setColor("#ff00b3")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://files.femboy.kz/web/images/wide.png")
       .addFields([
         {
           name: "Whitelist Servers",
@@ -107,53 +100,6 @@ module.exports = {
         {
           name: ":flag_eu:  **64t AutoBH\n- de_nuke only**",
           value: `[*${csgoNUeu}*](<https://csgo.femboy.kz/connect?ip=${csgoNUeu}>)`,
-          inline: true,
-        },
-      ]);
-
-    const embedCSCL = new EmbedBuilder()
-      .setTitle("**ClassicCounter Servers**")
-      .setColor("#ff00b3")
-      .setImage("https://femboy.kz/images/wide.png")
-      .addFields([
-        {
-          name: "CC Whitelist Servers",
-          value: "** **",
-          inline: false,
-        },
-        {
-          name: ":flag_eu:  **128t VNL KZ**",
-          value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128eu}>)`,
-          inline: true,
-        },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **128t VNL KZ**",
-          value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128na}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_eu:  **64t VNL KZ**",
-          value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64eu}>)`,
-          inline: true,
-        },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **64t VNL KZ**",
-          value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64na}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_eu:  **128t KZTimer**",
-          value: `[*${cscl128eukzt}*](<https://classic.femboy.kz/connect?ip=${cscl128eukzt}>)`,
           inline: true,
         },
       ]);
@@ -256,7 +202,7 @@ module.exports = {
       ]);
 
     await channel.send({
-      embeds: [embedHeader, embedCSGO, embedCSCL, embedCS2],
+      embeds: [embedHeader, embedCSGO, embedCS2],
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
