@@ -3,6 +3,8 @@ const { model, Schema } = require("mongoose");
 let threads = new Schema({
   Guild: { type: String, default: null },
   Thread: { type: String, unique: true, required: true }, // ID
+  Name: { type: String, default: null },
+  Type: { type: String, default: null },
   User: { type: String, default: null }, // creator
   Locked: { type: Boolean, default: null },
   Archived: { type: Boolean, default: null },
