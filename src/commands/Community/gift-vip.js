@@ -5,8 +5,9 @@ const roles = require("../../schemas/vip/vipRoles.js");
 const status = require("../../schemas/vip/vipStatus.js");
 require("dotenv").config();
 
-const COOLDOWN = 10000; // 10 seconds
 const CLAIM_TYPES = ["vip", "vip+", "contributor"];
+const PING_ID =
+  process.env.PING_ROLE_ID || process.env.PING_USER_ID || "Not set";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -91,7 +92,7 @@ module.exports = {
 
   replyError(interaction, message) {
     return interaction.reply({
-      content: `❌ ${message}`,
+      content: `${message}`,
       ephemeral: true,
     });
   },
@@ -265,6 +266,7 @@ module.exports = {
         { name: "Recipient", value: recipient.toString(), inline: true },
         { name: "Type", value: type.toUpperCase(), inline: true },
         { name: "SteamID", value: `\`${steamId}\``, inline: true },
+        { name: "Ping", value: `<@${PING_ID}>`, inline: true },
       )
       .setTimestamp();
 
