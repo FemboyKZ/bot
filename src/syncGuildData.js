@@ -7,431 +7,362 @@ const inviteData = require("./schemas/events/invites.js");
 const memberData = require("./schemas/events/members.js");
 const roleData = require("./schemas/events/roles.js");
 const stickerData = require("./schemas/events/stickers.js");
-// const threadsData = require("./schemas/events/threads.js"); // TODO: Add threads schema
-
+const threadData = require("./schemas/events/threads.js");
 require("dotenv").config();
+
+async function syncData({
+  dbCollection,
+  guildId,
+  dbKey,
+  liveCache,
+  createNewData,
+  deleteConditions = [],
+}) {
+  const dbData =
+    (await dbCollection.find({
+      Guild: guildId,
+      ...Object.fromEntries(deleteConditions),
+    })) || [];
+  const dbMap = new Map(dbData.map((item) => [item[dbKey], item]));
+  const bulkOps = [];
+
+  for (const [id, item] of liveCache) {
+    const newData = createNewData(item);
+    if (dbMap.has(id)) {
+      bulkOps.push({
+        updateOne: {
+          filter: { [dbKey]: id, Guild: guildId },
+          update: { $set: newData },
+        },
+      });
+      dbMap.delete(id);
+    } else {
+      bulkOps.push({
+        insertOne: {
+          document: newData,
+        },
+      });
+    }
+  }
+
+  for (const [id] of dbMap) {
+    bulkOps.push({
+      deleteOne: {
+        filter: { [dbKey]: id, Guild: guildId },
+      },
+    });
+  }
+
+  if (bulkOps.length > 0) {
+    await dbCollection.bulkWrite(bulkOps, { ordered: false });
+  }
+}
 
 module.exports = (client) => {
   client.syncGuild = async (guild) => {
     try {
+      if (!guild?.id) throw new Error("Invalid guild object");
+
       await guild.fetch();
+      const dbGuild = await guildData.findOne({ Guild: guild.id });
 
-      const dbGuild = await guildData.find({ Guild: guild.id });
-      if (!dbGuild) {
-        return console.warn(`No guild data found for guild: ${guild.name}`);
-      }
+      const guildNewData = {
+        Guild: guild.id,
+        Name: guild.name,
+        User: guild.ownerId,
+        Created: guild.createdAt,
+        Icon: guild.iconURL() || null,
+        Banner: guild.bannerURL() || null,
+        Vanity: guild.vanityURLCode || null,
+        Channels: guild.channels.cache.map((channel) => channel.id),
+        Emojis: guild.emojis.cache.map((emoji) => emoji.id),
+        Stickers: guild.stickers.cache.map((sticker) => sticker.id),
+        Roles: guild.roles.cache.map((role) => role.id),
+        Members: guild.members.cache.map((member) => member.id),
+      };
 
-      const dbGuildMap = new Map(dbGuild.map((guild) => [guild.Guild, guild]));
-
-      for (const [guildId, guild] of client.guilds.cache) {
-        const guildNewData = {
-          Guild: guild.id,
-          Name: guild.name,
-          User: guild.ownerId,
-          Created: guild.createdAt,
-          Icon: guild.iconURL() || null,
-          Banner: guild.bannerURL() || null,
-          Vanity: guild.vanityURLCode || null,
-          Channels: guild.channels.cache.map((channel) => channel.id),
-          Emojis: guild.emojis.cache.map((emoji) => emoji.id),
-          Stickers: guild.stickers.cache.map((sticker) => sticker.id),
-          Roles: guild.roles.cache.map((role) => role.id),
-          Members: guild.members.cache.map((member) => member.id),
-        };
-
-        if (dbGuildMap.has(guildId)) {
-          await guildData.updateOne({ Guild: guildId }, guildNewData);
-          dbGuildMap.delete(guildId);
-        } else {
-          await guildData.create(guildNewData);
-        }
-      }
-
-      for (const [guildId] of dbGuildMap) {
-        await guildData.deleteOne({ Guild: guildId });
+      if (dbGuild) {
+        await guildData.updateOne({ Guild: guild.id }, guildNewData);
+      } else {
+        await guildData.create(guildNewData);
       }
 
       console.log(`Synced guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing data for guild: ${guild.name}`, error);
+      console.error(`Error syncing guild ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildAutomodRules = async (guild) => {
     try {
       const automodRules = await guild.autoModerationRules.fetch();
-      if (!automodRules) {
-        return console.warn(`No automod rules found for guild: ${guild.name}`);
-      }
-
-      const dbAutoModRules = await automodData.find({ Guild: guild.id });
-      if (!dbAutoModRules) {
-        return console.warn(`No automod data found for guild: ${guild.name}`);
-      }
-
-      const dbAutoModRuleMap = new Map(
-        dbAutoModRules.map((rule) => [rule.Rule, rule]),
-      );
-
-      for (const [ruleId, rule] of automodRules) {
-        const triggers = [];
-        if (rule.triggerMetadata) {
-          if (rule.triggerMetadata.keywordFilter) {
-            triggers.push({
-              Type: "KEYWORD",
-              Keywords: rule.triggerMetadata.keywordFilter,
-            });
-          }
-          if (rule.triggerMetadata.mentionTotalLimit) {
-            triggers.push({
-              Type: "MENTION_SPAM",
-              MentionLimit: rule.triggerMetadata.mentionTotalLimit,
-            });
-          }
-          if (rule.triggerMetadata.presets) {
-            triggers.push({
-              Type: "KEYWORD_PRESET",
-              Presets: rule.triggerMetadata.presets,
-            });
-          }
-          if (rule.triggerMetadata.regexPatterns) {
-            triggers.push({
-              Type: "REGEX",
-              RegexPatterns: rule.triggerMetadata.regexPatterns,
-            });
-          }
-        }
-
-        const actions = rule.actions.map((action) => ({
-          Type: action.type,
-          Metadata: action.metadata || {},
-        }));
-
-        const automodNewData = {
+      await syncData({
+        dbCollection: automodData,
+        guildId: guild.id,
+        dbKey: "Rule",
+        liveCache: automodRules,
+        createNewData: (rule) => ({
           Guild: guild.id,
-          Rule: ruleId,
+          Rule: rule.id,
           User: rule.creatorId,
           Name: rule.name,
           Created: rule.createdAt,
           Enabled: rule.enabled,
-          Triggers: triggers,
-          Actions: actions,
-        };
-
-        if (dbAutoModRuleMap.has(ruleId)) {
-          await automodData.updateOne({ Rule: ruleId }, automodNewData);
-          dbAutoModRuleMap.delete(ruleId);
-        } else {
-          await automodData.create(automodNewData);
-        }
-      }
-
-      for (const [ruleId] of dbAutoModRuleMap) {
-        await automodData.deleteOne({ Rule: ruleId });
-      }
-
-      console.log(`Synced AutoMod rules for guild: ${guild.name}`);
+          Triggers: processTriggers(rule),
+          Actions: rule.actions.map((action) => ({
+            Type: action.type,
+            Metadata: action.metadata || {},
+          })),
+        }),
+      });
+      console.log(`Synced automod rules for guild: ${guild.name}`);
     } catch (error) {
-      console.error(
-        `Error syncing AutoMod rules for guild ${guild.name}:`,
-        error,
-      );
+      console.error(`Error syncing automod rules for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildBans = async (guild) => {
     try {
-      await guild.bans.fetch();
-
-      const dbBans = await banData.find({ Guild: guild.id });
-      if (!dbBans) {
-        return console.warn(`No bans data found for guild: ${guild.name}`);
-      }
-
-      const dbBanMap = new Map(dbBans.map((ban) => [ban.User, ban]));
-
-      for (const [userId, ban] of guild.bans.cache) {
-        const banNewData = {
+      const bans = await guild.bans.fetch();
+      await syncData({
+        dbCollection: banData,
+        guildId: guild.id,
+        dbKey: "User",
+        liveCache: bans,
+        createNewData: (ban) => ({
           Guild: guild.id,
-          User: userId,
+          User: ban.user.id,
           Created: ban.createdAt,
-          Reason: ban.reason,
-        };
-
-        if (dbBanMap.has(userId)) {
-          await banData.updateOne({ User: userId }, banNewData);
-          dbBanMap.delete(userId);
-        } else {
-          await banData.create(banNewData);
-        }
-      }
-
-      for (const [userId] of dbBanMap) {
-        await banData.deleteOne({ User: userId });
-      }
-
+          Reason: ban.reason || null,
+        }),
+      });
       console.log(`Synced bans for guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing bans for guild ${guild.name}:`, error);
+      console.error(`Error syncing bans for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildChannels = async (guild) => {
     try {
-      await guild.channels.fetch();
-
-      const dbChannels = await channelData.find({ Guild: guild.id });
-      if (!dbChannels) {
-        return console.warn(`No channels data found for guild: ${guild.name}`);
-      }
-
-      const dbChannelMap = new Map(
-        dbChannels.map((channel) => [channel.Channel, channel]),
-      );
-
-      for (const [channelId, channel] of guild.channels.cache) {
-        const channelNewData = {
+      const channels = await guild.channels.fetch();
+      await syncData({
+        dbCollection: channelData,
+        guildId: guild.id,
+        dbKey: "Channel",
+        liveCache: channels,
+        createNewData: (channel) => ({
           Guild: guild.id,
-          Channel: channelId,
+          Channel: channel.id,
           Name: channel.name,
-          Parent: channel.parentId,
           Type: channel.type,
-          Topic: channel.topic,
-        };
-
-        if (dbChannelMap.has(channelId)) {
-          await channelData.updateOne({ Channel: channelId }, channelNewData);
-          dbChannelMap.delete(channelId);
-        } else {
-          await channelData.create(channelNewData);
-        }
-      }
-
-      for (const [channelId] of dbChannelMap) {
-        await channelData.deleteOne({ Channel: channelId });
-      }
-
+          Created: channel.createdAt,
+          Parent: channel.parentId || null,
+          Topic: channel.topic || null,
+        }),
+      });
       console.log(`Synced channels for guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing channels for guild ${guild.name}:`, error);
+      console.error(`Error syncing channels for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildEmojis = async (guild) => {
     try {
-      const dbEmojis = await emojiData.find({ Guild: guild.id });
-      if (!dbEmojis) {
-        return console.warn(`No emojis data found for guild: ${guild.name}`);
-      }
-
-      const dbEmojiMap = new Map(dbEmojis.map((emoji) => [emoji.Emoji, emoji]));
-
-      for (const [emojiId, emoji] of guild.emojis.cache) {
-        const emojiNewData = {
+      const emojis = await guild.emojis.fetch();
+      await syncData({
+        dbCollection: emojiData,
+        guildId: guild.id,
+        dbKey: "Emoji",
+        liveCache: emojis,
+        createNewData: (emoji) => ({
           Guild: guild.id,
-          Emoji: emojiId,
+          Emoji: emoji.id,
           Name: emoji.name,
           Animated: emoji.animated,
           Created: emoji.createdAt,
-          Image: emoji.url,
-        };
-
-        if (dbEmojiMap.has(emojiId)) {
-          await emojiData.updateOne({ Emoji: emojiId }, emojiNewData);
-          dbEmojiMap.delete(emojiId);
-        } else {
-          await emojiData.create(emojiNewData);
-        }
-      }
-
-      for (const [emojiId] of dbEmojiMap) {
-        await emojiData.deleteOne({ Emoji: emojiId });
-      }
-
+          Image: emoji.imageURL({ size: 128 }) || null,
+        }),
+      });
       console.log(`Synced emojis for guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing emojis for guild ${guild.name}:`, error);
+      console.error(`Error syncing emojis for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildInvites = async (guild) => {
     try {
-      const dbInvites = await inviteData.find({ Guild: guild.id });
-      if (!dbInvites) {
-        return console.warn(`No invites data found for guild: ${guild.name}`);
-      }
-
-      const dbInviteMap = new Map(
-        dbInvites.map((invite) => [invite.Code, invite]),
-      );
-
       const invites = await guild.invites.fetch();
-      for (const [inviteCode, invite] of invites) {
-        const inviteNewData = {
+      await syncData({
+        dbCollection: inviteData,
+        guildId: guild.id,
+        dbKey: "Code",
+        liveCache: invites,
+        createNewData: (invite) => ({
           Guild: guild.id,
-          Invite: inviteCode,
-          //User: invite.inviter.id,
+          Invite: invite.code,
+          User: invite.inviter.id,
+          Created: invite.createdAt,
           Uses: invite.uses,
           MaxUses: invite.maxUses,
-          Expires: invite.expiresAt,
-          Created: invite.createdAt,
-        };
-
-        if (dbInviteMap.has(inviteCode)) {
-          await inviteData.updateOne({ Code: inviteCode }, inviteNewData);
-          dbInviteMap.delete(inviteCode);
-        } else {
-          await inviteData.create(inviteNewData);
-        }
-      }
-
-      for (const [inviteCode] of dbInviteMap) {
-        await inviteData.deleteOne({ Code: inviteCode });
-      }
-
+          Permanent: invite.maxAge === 0,
+          Expires: invite.expiresAt || null,
+        }),
+      });
       console.log(`Synced invites for guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing invites for guild ${guild.name}:`, error);
+      console.error(`Error syncing invites for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildMembers = async (guild) => {
     try {
-      await guild.members.fetch();
-
-      const dbMembers = await memberData.find({ Guild: guild.id });
-      if (!dbMembers) {
-        return console.warn(`No members data found for guild: ${guild.name}`);
-      }
-
-      const dbMemberMap = new Map(
-        dbMembers.map((member) => [member.User, member]),
-      );
-
-      for (const [userId, guildMember] of guild.members.cache) {
-        const memberNewData = {
+      const members = await guild.members.fetch();
+      await syncData({
+        dbCollection: memberData,
+        guildId: guild.id,
+        dbKey: "User",
+        liveCache: members,
+        createNewData: (member) => ({
           Guild: guild.id,
-          User: userId,
-          Name: guildMember.user.username,
-          Nickname: guildMember.nickname,
-          Displayname: guildMember.displayName,
-          Avatar: guildMember.user.displayAvatarURL(),
-          Banner: guildMember.user.bannerURL() || null,
-          Roles: guildMember.roles.cache.map((role) => role.id),
-          Joined: guildMember.joinedAt,
-          Created: guildMember.user.createdAt,
-        };
-
-        if (dbMemberMap.has(userId)) {
-          await memberData.updateOne({ User: userId }, memberNewData);
-          dbMemberMap.delete(userId);
-        } else {
-          await memberData.create(memberNewData);
-        }
-      }
-
-      for (const [userId] of dbMemberMap) {
-        await memberData.deleteOne({ User: userId });
-      }
-
+          User: member.id,
+          Name: member.user.username,
+          Joined: member.joinedAt,
+          Created: member.user.createdAt,
+          Nickname: member.nickname || null,
+          Displayname: member.displayName || null,
+          Avatar: member.avatarURL({ size: 128 }) || null,
+          Banner: member.bannerURL({ size: 128 }) || null,
+          Roles: member.roles.cache.map((role) => role.id),
+        }),
+      });
       console.log(`Synced members for guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing members for guild ${guild.name}:`, error);
+      console.error(`Error syncing members for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildRoles = async (guild) => {
     try {
-      await guild.roles.fetch();
-
-      const dbRoles = await roleData.find({ Guild: guild.id });
-      if (!dbRoles) {
-        return console.warn(`No roles data found for guild: ${guild.name}`);
-      }
-
-      const dbRoleMap = new Map(dbRoles.map((role) => [role.Role, role]));
-
-      for (const [roleId, role] of guild.roles.cache) {
-        const roleNewData = {
+      const roles = await guild.roles.fetch();
+      await syncData({
+        dbCollection: roleData,
+        guildId: guild.id,
+        dbKey: "Role",
+        liveCache: roles,
+        createNewData: (role) => ({
           Guild: guild.id,
-          Role: roleId,
+          Role: role.id,
           Name: role.name,
           Color: role.hexColor,
           Hoist: role.hoist,
+          Created: role.createdAt,
           Mentionable: role.mentionable,
           Permissions: role.permissions.toArray(),
           Position: role.position,
-        };
-
-        if (dbRoleMap.has(roleId)) {
-          await roleData.updateOne({ Role: roleId }, roleNewData);
-          dbRoleMap.delete(roleId);
-        } else {
-          await roleData.create(roleNewData);
-        }
-      }
-
-      for (const [roleId] of dbRoleMap) {
-        await roleData.deleteOne({ Role: roleId });
-      }
-
+        }),
+      });
       console.log(`Synced roles for guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing roles for guild ${guild.name}:`, error);
+      console.error(`Error syncing roles for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildStickers = async (guild) => {
     try {
-      await guild.stickers.fetch();
-
-      const dbStickers = await stickerData.find({ Guild: guild.id });
-      if (!dbStickers) {
-        return console.warn(`No stickers data found for guild: ${guild.name}`);
-      }
-
-      const dbStickerMap = new Map(
-        dbStickers.map((sticker) => [sticker.Sticker, sticker]),
-      );
-
-      for (const [stickerId, sticker] of guild.stickers.cache) {
-        const stickerNewData = {
+      const stickers = await guild.stickers.fetch();
+      await syncData({
+        dbCollection: stickerData,
+        guildId: guild.id,
+        dbKey: "Sticker",
+        liveCache: stickers,
+        createNewData: (sticker) => ({
           Guild: guild.id,
-          Sticker: stickerId,
+          Sticker: sticker.id,
           Name: sticker.name,
-          Description: sticker.description,
-          Tags: sticker.tags,
+          Description: sticker.description || null,
+          Tags: sticker.tags || [],
           Available: sticker.available,
           Created: sticker.createdAt,
-        };
-
-        if (dbStickerMap.has(stickerId)) {
-          await stickerData.updateOne({ Sticker: stickerId }, stickerNewData);
-          dbStickerMap.delete(stickerId);
-        } else {
-          await stickerData.create(stickerNewData);
-        }
-      }
-
-      for (const [stickerId] of dbStickerMap) {
-        await stickerData.deleteOne({ Sticker: stickerId });
-      }
-
+        }),
+      });
       console.log(`Synced stickers for guild: ${guild.name}`);
     } catch (error) {
-      console.error(`Error syncing stickers for guild ${guild.name}:`, error);
+      console.error(`Error syncing stickers for ${guild.name}:`, error);
+      throw error;
+    }
+  };
+
+  client.syncGuildThreads = async (guild) => {
+    try {
+      const threads = await guild.threads.fetch();
+      await syncData({
+        dbCollection: threadData,
+        guildId: guild.id,
+        dbKey: "Thread",
+        liveCache: threads,
+        createNewData: (thread) => ({
+          Guild: guild.id,
+          Thread: thread.id,
+          Name: thread.name,
+          Type: thread.type,
+          Created: thread.createdAt,
+          User: thread.ownerId || null,
+          Locked: thread.locked,
+          Archived: thread.archived,
+          Auto: thread.autoArchiveDuration || null,
+          Parent: thread.parentId || null,
+        }),
+      });
+      console.log(`Synced threads for guild: ${guild.name}`);
+    } catch (error) {
+      console.error(`Error syncing threads for ${guild.name}:`, error);
+      throw error;
     }
   };
 
   client.syncGuildData = async (guild) => {
-    await client.syncGuild(guild);
-    await client.syncGuildAutomodRules(guild);
-    await client.syncGuildBans(guild);
-    await client.syncGuildChannels(guild);
-    await client.syncGuildEmojis(guild);
-    await client.syncGuildInvites(guild);
-    await client.syncGuildMembers(guild);
-    await client.syncGuildRoles(guild);
-    await client.syncGuildStickers(guild);
+    try {
+      if (!guild?.id) throw new Error("Invalid guild object");
+
+      await Promise.all([
+        client.syncGuild(guild),
+        client.syncGuildAutomodRules(guild),
+        client.syncGuildBans(guild),
+        client.syncGuildChannels(guild),
+        client.syncGuildEmojis(guild),
+        client.syncGuildInvites(guild),
+        client.syncGuildMembers(guild),
+        client.syncGuildRoles(guild),
+        client.syncGuildStickers(guild),
+        client.syncGuildThreads(guild),
+      ]);
+
+      console.log(`Completed full sync for guild: ${guild.name}`);
+    } catch (error) {
+      console.error(`Failed to sync guild ${guild.name}:`, error);
+      throw error;
+    }
   };
+
+  function processTriggers(rule) {
+    const triggers = [];
+    const triggerMetadata = rule.triggerMetadata || {};
+
+    if (triggerMetadata.keywordFilter) {
+      triggers.push({
+        Type: "KEYWORD",
+        Keywords: triggerMetadata.keywordFilter,
+      });
+    }
+
+    return triggers;
+  }
 };
