@@ -76,18 +76,25 @@ module.exports = {
 
           payload.embeds = parsed.map((embed) => new EmbedBuilder(embed));
         } catch (error) {
-          return await interaction.reply(`Embed error: ${error.message}`);
+          return await interaction.reply({
+            content: `Embed error: ${error.message}`,
+            ephemeral: true,
+          });
         }
       }
 
       if (!Object.keys(payload).length) {
-        return await interaction.reply("No changes specified!");
+        return await interaction.reply({
+          content: "No changes specified!",
+          ephemeral: true,
+        });
       }
 
       await target.edit(payload);
-      return await interaction.reply(
-        `Message updated successfully! [Jump to Message](${target.url})`,
-      );
+      return await interaction.reply({
+        content: `Message updated successfully! [Jump to Message](${target.url})`,
+        ephemeral: true,
+      });
     } catch (error) {
       console.error(error);
       return await interaction.reply(`Error: ${error.message}`);

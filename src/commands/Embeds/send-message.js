@@ -65,7 +65,10 @@ module.exports = {
 
           payload.embeds = parsed.map((embed) => new EmbedBuilder(embed));
         } catch (error) {
-          return await interaction.reply(`Embed error: ${error.message}`);
+          return await interaction.reply({
+            content: `Embed error: ${error.message}`,
+            ephemeral: true,
+          });
         }
       }
 
@@ -83,7 +86,10 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error sending message:", error);
-      return await interaction.reply(`Error: ${error.message}`);
+      return await interaction.reply({
+        content: `Error: ${error.message}`,
+        ephemeral: true,
+      });
     }
   },
 };
