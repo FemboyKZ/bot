@@ -55,9 +55,10 @@ module.exports = {
       const target = await channel.messages.fetch(message);
 
       if (target.author.id !== interaction.client.user.id) {
-        return await interaction.reply(
-          "The specified message is not owned by FKZ bot.",
-        );
+        return await interaction.reply({
+          content: "The specified message is not owned by FKZ bot.",
+          ephemeral: true,
+        });
       }
 
       const payload = {};
