@@ -1,103 +1,114 @@
 const { Events, PermissionsBitField, Collection } = require("discord.js");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const mongodbURI = process.env.MONGODB_URI;
-const sessionId = process.env.SESSION_ID;
 
+const { MONGODB_URI, SESSION_ID } = process.env;
+
+// mongoose global cfg
 mongoose.set("strictQuery", false);
 mongoose.set("debug", false);
+
+/**
+ * Establishes MongoDB connection
+ * @param {Client} client Discord client instance
+ */
+async function connectToDatabase(client) {
+  if (!MONGODB_URI) {
+    console.error("MONGODB_URI is not defined in environment variables");
+    return client.gracefulShutdown();
+  }
+
+  if (mongoose.connection.readyState !== 0) {
+    console.warn(
+      `MongoDB connection already in state: ${mongoose.connection.readyState}`,
+    );
+    return;
+  }
+
+  try {
+    console.log("Attempting MongoDB connection...");
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 3000,
+    });
+    console.log("MongoDB connection established");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error);
+    client.gracefulShutdown();
+  }
+}
+
+/**
+ * Syncs guild data with the database
+ * @param {Client} client Discord client instance
+ */
+async function syncGuildData(client) {
+  try {
+    console.log("Starting guild data sync...");
+
+    for (const [guildId, guild] of client.guilds.cache) {
+      try {
+        await client.syncGuildData(guild);
+        console.log(`Synced data for: ${guild.name} (${guildId})`);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Rate limit buffer
+      } catch (guildError) {
+        console.error(`Failed to sync ${guild.name} (${guildId}):`, guildError);
+      }
+    }
+
+    console.log("Guild data sync complete");
+  } catch (error) {
+    console.error("Global guild sync failed:", error);
+  }
+}
+
+/**
+ * Initializes invite tracking system
+ * @param {Client} client Discord client instance
+ */
+async function initializeInvites(client) {
+  try {
+    console.log("Initializing invite tracking...");
+    client.invites = new Collection();
+
+    for (const [guildId, guild] of client.guilds.cache) {
+      try {
+        const clientMember = await guild.members.fetch(client.user.id);
+
+        if (
+          !clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild)
+        ) {
+          console.log(
+            `Skipping invites for ${guild.name} (missing permissions)`,
+          );
+          continue;
+        }
+
+        const invites = await guild.invites.fetch().catch(console.error);
+        if (!invites) continue;
+
+        client.invites.set(
+          guildId,
+          new Collection(invites.map((invite) => [invite.code, invite.uses])),
+        );
+        console.log(`Loaded ${invites.size} invites for ${guild.name}`);
+      } catch (guildError) {
+        console.error(`Failed to process ${guild.name}:`, guildError);
+      }
+    }
+  } catch (error) {
+    console.error("Invite initialization failed:", error);
+  }
+}
 
 module.exports = {
   name: Events.ClientReady,
   async execute(client) {
-    console.log(`Ready! Logged in as ${client.user.tag}`);
+    console.log(`Client ready as ${client.user.tag} (${client.user.id})`);
 
-    if (!mongodbURI) {
-      console.warn("Setup mongodbURI in .env");
-      client.gracefulShutdown();
-    }
-
-    try {
-      console.log("Checking connection to MongoDB...");
-      if (mongoose.connection.readyState === 0) {
-        console.log("Not connected, attempting to connect to MongoDB...");
-        const result = await mongoose.connect(mongodbURI, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          serverSelectionTimeoutMS: 3000,
-        });
-
-        if (result) {
-          console.log(
-            "Connection successful, The MongoDB Database is running.",
-          );
-
-          /*
-          if (!sessionId) {
-            console.warn("Setup your session ID in .env");
-            //client.gracefulShutdown();
-          }
-          try {
-            console.log("Loading session data...");
-            const session = await client.loadSessionData(sessionId);
-            if (session) {
-              console.log("Session data loaded successfully.");
-            } else {
-              console.warn("No session data found. Starting fresh.");
-              client.sessionData = {};
-              await client.saveSessionData(sessionId, client.sessionData);
-            }
-          } catch (error) {
-            console.error("Failed to load session data:", error);
-          }
-          */
-        } else {
-          console.error("Failed to connect to MongoDB.");
-          client.gracefulShutdown();
-        }
-      } else {
-        return console.log(
-          "Already connected/connecting to MongoDB, stuck disconnecting or uninitialized.\nreadyState: ",
-          mongoose.connection.readyState,
-        );
-      }
-    } catch (error) {
-      console.error("Error connecting to MongoDB:", error);
-    }
-
-    try {
-      console.log("Syncing client guild data...");
-      for (const [guildId, guild] of client.guilds.cache) {
-        const guildData = await client.syncGuildData(guild);
-        if (guildData) {
-          console.log(`Synced guild data for guild: ${guild.name}`);
-        } else {
-          console.warn(`Failed to sync guild data for guild: ${guild.name}`);
-        }
-      }
-    } catch (error) {
-      console.error("Error syncing client guild data:", error);
-    }
-
-    try {
-      await client.guilds.cache.forEach(async (guild) => {
-        const clientMember = await guild.members.cache.get(client.user.id);
-        if (
-          !clientMember.permissions.has(PermissionsBitField.Flags.ManageGuild)
-        ) {
-          return;
-        }
-
-        const firstInvites = await guild.invites.fetch().catch(console.log);
-        client.invites.set(
-          guild.id,
-          new Collection(
-            firstInvites.map((invite) => [invite.code, invite.uses]),
-          ),
-        );
-      });
-    } catch (error) {
-      console.error("Error fetching invites:", error);
-    }
+    await connectToDatabase(client);
+    await syncGuildData(client);
+    await initializeInvites(client);
   },
 };
