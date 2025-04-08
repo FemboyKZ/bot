@@ -132,3 +132,6 @@ dist
 # dev
 disabled_cmd/
 .vscode/
+
+# configuration
+*server-config.json
