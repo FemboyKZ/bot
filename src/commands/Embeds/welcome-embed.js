@@ -35,7 +35,10 @@ module.exports = {
         ephemeral: true,
       });
     }
-    const channel = interaction.options.getChannel("channel");
+    const channel =
+      interaction.options.getChannel("channel") ||
+      message?.channel ||
+      interaction.channel;
     const message = interaction.options.getString("message");
 
     if (!channel && !message) {
