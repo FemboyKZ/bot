@@ -7,6 +7,7 @@ const { spawn } = require("child_process");
 const { promisify } = require("util");
 const path = require("path");
 const execAsync = promisify(require("child_process").exec);
+
 const config = require("./cs2-server-config.json")[0];
 require("dotenv").config();
 
@@ -31,17 +32,31 @@ function createEmbed(description, color = EMBED_COLOR) {
 }
 
 const resolveServerConfig = (serverId) => {
-  if (serverId) {
-    const server = config[serverId];
-    if (!server) throw new Error("Invalid server selection");
-    return {
+  if (serverId === "all") {
+    return Object.values(config).map((server) => ({
       ip: server.ip,
       port: server.port,
       type: server.type,
       user: server.user,
       id: server.id,
-    };
+    }));
   }
+
+  if (serverId) {
+    const server = config[serverId];
+    if (!server) throw new Error("Invalid server selection");
+    return [
+      {
+        ip: server.ip,
+        port: server.port,
+        type: server.type,
+        user: server.user,
+        id: server.id,
+      },
+    ];
+  }
+
+  return [];
 };
 
 const queryServerStatus = async (ip, port) => {
@@ -121,7 +136,7 @@ module.exports = {
         .setName("server")
         .setDescription("Select configured server")
         .setRequired(true)
-        .addChoices(...serverChoices),
+        .addChoices(...serverChoices, { name: "All Servers", value: "all" }),
     )
     .addBooleanOption((option) =>
       option
@@ -134,49 +149,73 @@ module.exports = {
     await interaction.deferReply({ ephemeral: true });
 
     try {
+      if (!config || Object.keys(config).length === 0) {
+        return interaction.editReply({
+          embeds: [createEmbed("No servers configured", EMBED_COLOR)],
+          ephemeral: true,
+        });
+      }
+
       const options = {
         action: interaction.options.getString("action"),
         serverId: interaction.options.getString("server"),
         force: interaction.options.getBoolean("force") || false,
       };
 
-      const server = resolveServerConfig(options.serverId);
+      const servers = resolveServerConfig(options.serverId);
 
-      const status = await queryServerStatus(server.ip, server.port);
       const allowedActions = {
         start: ["OFFLINE"],
         restart: ["ACTIVE", "EMPTY"],
         stop: ["ACTIVE", "EMPTY"],
       };
 
-      if (!options.force && !allowedActions[options.action].includes(status)) {
-        return interaction.editReply({
-          embeds: [
-            createEmbed(
-              `Cannot ${options.action} server (Status: ${status}) - Use force to override`,
-              EMBED_COLOR,
-            ),
-          ],
-          ephemeral: true,
+      const results = [];
+      for (const server of servers) {
+        try {
+          let status;
+          if (!options.force) {
+            status = await queryServerStatus(server.ip, server.port);
+            if (!allowedActions[options.action].includes(status)) {
+              results.push({
+                server,
+                success: false,
+                error: `Cannot ${options.action} (Status: ${status})`,
+              });
+              continue;
+            }
+          }
+
+          if (commandHandlers[server.type]) {
+            await commandHandlers[server.type](options.action, server);
+            results.push({ server, success: true });
+          } else {
+            throw new Error(`Unsupported server type: ${server.type}`);
+          }
+        } catch (error) {
+          results.push({ server, success: false, error: error.message });
+        }
+      }
+
+      const successful = results.filter((r) => r.success);
+      const failed = results.filter((r) => !r.success);
+
+      let description = `Action **${options.action}** executed on **${successful.length}** server${successful.length !== 1 ? "s" : ""}.`;
+      if (successful.length > 0) {
+        description += `\n\nSuccessful:`;
+        successful.forEach((s) => {
+          description += `\n- ${s.server.id} (${s.server.ip}:${s.server.port})`;
+        });
+      }
+      if (failed.length > 0) {
+        description += `\n\nFailed:`;
+        failed.forEach((f) => {
+          description += `\n- ${f.server.id}: ${f.error}`;
         });
       }
 
-      if (commandHandlers[server.type]) {
-        await commandHandlers[server.type](options.action, server);
-      } else {
-        throw new Error(`Unsupported server type: ${server.type}`);
-      }
-
       await interaction.editReply({
-        embeds: [
-          createEmbed(
-            `Server ${options.action} executed successfully!\n` +
-              `${server.ip}:${server.port}\n` +
-              `Type: ${server.type}\n` +
-              `Force: ${options.force ? "Yes" : "No"}`,
-            EMBED_COLOR,
-          ),
-        ],
+        embeds: [createEmbed(description, EMBED_COLOR)],
         ephemeral: true,
       });
     } catch (error) {
