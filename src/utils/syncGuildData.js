@@ -1,13 +1,13 @@
-const automodData = require("./schemas/events/automodRules.js");
-const banData = require("./schemas/events/bans.js");
-const channelData = require("./schemas/events/channels.js");
-const emojiData = require("./schemas/events/emojis.js");
-const guildData = require("./schemas/events/guilds.js");
-const inviteData = require("./schemas/events/invites.js");
-const memberData = require("./schemas/events/members.js");
-const roleData = require("./schemas/events/roles.js");
-const stickerData = require("./schemas/events/stickers.js");
-const threadData = require("./schemas/events/threads.js");
+const automodData = require("../schemas/events/automodRules.js");
+const banData = require("../schemas/events/bans.js");
+const channelData = require("../schemas/events/channels.js");
+const emojiData = require("../schemas/events/emojis.js");
+const guildData = require("../schemas/events/guilds.js");
+const inviteData = require("../schemas/events/invites.js");
+const memberData = require("../schemas/events/members.js");
+const roleData = require("../schemas/events/roles.js");
+const stickerData = require("../schemas/events/stickers.js");
+const threadData = require("../schemas/events/threads.js");
 require("dotenv").config();
 
 async function syncData({

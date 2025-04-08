@@ -11,8 +11,6 @@ const process = require("node:process");
 
 require("dotenv").config();
 
-//const Session = require("./schemas/sessions.js");
-
 const client = new Client({
   intents: [
     GatewayIntentBits.AutoModerationConfiguration,
@@ -54,54 +52,11 @@ client.commands = new Collection();
 //client.cooldowns = new Collection();
 client.invites = new Collection();
 
-require(path.join(__dirname, "handleConsole.js"));
-require(path.join(__dirname, "syncGuildData.js"))(client);
-
-/*
-client.loadSessionData = async (sessionId) => {
-  try {
-    const session = await Session.findOne({ sessionId: sessionId });
-    if (session) {
-      console.log("Session data loaded.");
-    } else {
-      console.warn("No session data found. Starting fresh.");
-    }
-    return session || { sessionId: null, seq: null };
-  } catch (error) {
-    console.error("Error loading session data:", error);
-    return { sessionId: null, seq: null };
-  }
-};
-
-client.sessionData = await loadSessionData();
-
-client.saveSessionData = async (sessionId, data) => {
-  try {
-    const session = await Session.findOneAndUpdate(
-      { sessionId: sessionId },
-      { data: data, updatedAt: new Date() },
-      { upsert: true, new: true }
-    );
-    console.log("Session data saved.");
-    return session;
-  } catch (error) {
-    console.error("Error saving session data:", error);
-  }
-};
-*/
+const utilsPath = path.join(__dirname, "utils");
+require(path.join(utilsPath, "handleConsole.js"));
+require(path.join(utilsPath, "syncGuildData.js"))(client);
 
 client.gracefulShutdown = async function () {
-  /*
-  try {
-    await client.saveSessionData(
-      client.sessionData.sessionId,
-      client.sessionData
-    );
-  } catch (error) {
-    console.error("Error saving session data during shutdown:", error);
-  }
-  */
-
   try {
     await mongoose.connection.close();
     console.log("Database connection closed successfully.");
