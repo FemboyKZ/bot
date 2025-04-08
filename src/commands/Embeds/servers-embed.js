@@ -15,16 +15,33 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel where to send the embed")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true),
+        .setRequired(false),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("message")
+        .setDescription("The message to update with the embed")
+        .setRequired(false),
     ),
 
   async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });
+    }
     const channel = interaction.options.getChannel("channel");
+    const message = interaction.options.getString("message");
+
+    if (!channel && !message) {
+      return await interaction.reply({
+        content: "Please provide a channel or message.",
+        ephemeral: true,
+      });
+    }
 
     const csgoWLeu = "eu.femboy.kz:27025";
     const csgo64eu = "eu.femboy.kz:27035";
@@ -201,9 +218,23 @@ module.exports = {
         },
       ]);
 
-    await channel.send({
-      embeds: [embedHeader, embedCSGO, embedCS2],
-    });
+    if (message) {
+      const target = await channel.messages.fetch(message);
+
+      if (target.author.id !== interaction.client.user.id) {
+        return await interaction.reply({
+          content: "The specified message is not owned by FKZ bot.",
+          ephemeral: true,
+        });
+      }
+      await target.edit({
+        embeds: [embedHeader, embedCSGO, embedCS2],
+      });
+    } else {
+      await channel.send({
+        embeds: [embedHeader, embedCSGO, embedCS2],
+      });
+    }
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
       ephemeral: true,
