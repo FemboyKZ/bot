@@ -3,8 +3,8 @@ const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
-const user = "csgo-pizan-1";
-const name = "sportsmenskaya razdevalka";
+const user = "csgo-nikita-1";
+const name = "chvk rehab";
 
 module.exports = {
   data: new SlashCommandBuilder()
