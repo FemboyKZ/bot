@@ -16,26 +16,30 @@ async function syncData({
   dbKey,
   liveCache,
   createNewData,
-  deleteConditions = [],
+  deleteConditions = {},
 }) {
-  const dbData =
-    (await dbCollection.find({
-      Guild: guildId,
-      ...Object.fromEntries(deleteConditions),
-    })) || [];
+  const baseFilter = {
+    Guild: guildId,
+    ...deleteConditions,
+  };
+  const dbData = (await dbCollection.find(baseFilter)) || [];
   const dbMap = new Map(dbData.map((item) => [item[dbKey], item]));
+
   const bulkOps = [];
+  const seenIds = new Set();
 
   for (const [id, item] of liveCache) {
+    const existing = dbMap.get(id);
     const newData = createNewData(item);
-    if (dbMap.has(id)) {
+
+    if (existing) {
       bulkOps.push({
         updateOne: {
-          filter: { [dbKey]: id, Guild: guildId },
+          filter: { _id: existing._id },
           update: { $set: newData },
         },
       });
-      dbMap.delete(id);
+      seenIds.add(existing._id.toString());
     } else {
       bulkOps.push({
         insertOne: {
@@ -45,16 +49,52 @@ async function syncData({
     }
   }
 
-  for (const [id] of dbMap) {
+  const toDelete = dbData.filter((doc) => !seenIds.has(doc._id.toString()));
+  for (const doc of toDelete) {
     bulkOps.push({
       deleteOne: {
-        filter: { [dbKey]: id, Guild: guildId },
+        filter: {
+          _id: doc._id,
+          ...baseFilter,
+        },
       },
     });
   }
 
   if (bulkOps.length > 0) {
-    await dbCollection.bulkWrite(bulkOps, { ordered: false });
+    try {
+      await dbCollection.bulkWrite(bulkOps, { ordered: false });
+    } catch (error) {
+      if (error.code === 11000) {
+        console.warn(
+          "Duplicate key error, retrying with individual operations...",
+        );
+        await handleDuplicateKeys(error, dbCollection, bulkOps);
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
+async function handleDuplicateKeys(error, collection, bulkOps) {
+  const successOps = [];
+
+  for (const op of bulkOps) {
+    try {
+      if (op.insertOne) {
+        await collection.create(op.insertOne.document);
+      } else {
+        await collection.updateOne(op.updateOne.filter, op.updateOne.update);
+      }
+      successOps.push(op);
+    } catch (err) {
+      if (err.code === 11000) {
+        console.warn(`Skipping duplicate document: ${err.message}`);
+      } else {
+        throw err;
+      }
+    }
   }
 }
 
@@ -200,18 +240,19 @@ module.exports = (client) => {
       await syncData({
         dbCollection: inviteData,
         guildId: guild.id,
-        dbKey: "Code",
+        dbKey: "Invite",
         liveCache: invites,
         createNewData: (invite) => ({
           Guild: guild.id,
           Invite: invite.code,
-          User: invite.inviter.id,
+          User: invite.inviter?.id || null,
           Created: invite.createdAt,
           Uses: invite.uses,
           MaxUses: invite.maxUses,
           Permanent: invite.maxAge === 0,
           Expires: invite.expiresAt || null,
         }),
+        deleteConditions: [["Guild", guild.id]],
       });
       console.log(`Synced invites for guild: ${guild.name}`);
     } catch (error) {
@@ -302,25 +343,31 @@ module.exports = (client) => {
 
   client.syncGuildThreads = async (guild) => {
     try {
-      const threads = await guild.threads.fetch();
-      await syncData({
-        dbCollection: threadData,
-        guildId: guild.id,
-        dbKey: "Thread",
-        liveCache: threads,
-        createNewData: (thread) => ({
-          Guild: guild.id,
-          Thread: thread.id,
-          Name: thread.name,
-          Type: thread.type,
-          Created: thread.createdAt,
-          User: thread.ownerId || null,
-          Locked: thread.locked,
-          Archived: thread.archived,
-          Auto: thread.autoArchiveDuration || null,
-          Parent: thread.parentId || null,
-        }),
-      });
+      const threads = await guild.channels.cache.filter((channel) =>
+        channel.isThread(),
+      );
+      // const threads = await guild.threads.fetch();
+      // TODO: use thread.fetchActive() and thread.fetchArchived() instead?
+      if (threads) {
+        await syncData({
+          dbCollection: threadData,
+          guildId: guild.id,
+          dbKey: "Thread",
+          liveCache: threads,
+          createNewData: (thread) => ({
+            Guild: guild.id,
+            Thread: thread.id,
+            Name: thread.name,
+            Type: thread.type,
+            Created: thread.createdAt,
+            User: thread.ownerId || null,
+            Locked: thread.locked,
+            Archived: thread.archived,
+            Auto: thread.autoArchiveDuration || null,
+            Parent: thread.parentId || null,
+          }),
+        });
+      }
       console.log(`Synced threads for guild: ${guild.name}`);
     } catch (error) {
       console.error(`Error syncing threads for ${guild.name}:`, error);
