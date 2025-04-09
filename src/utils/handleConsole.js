@@ -13,6 +13,7 @@ class ConsoleHandler extends EventEmitter {
     this.originalConsoleLog = console.log;
     this.originalConsoleWarn = console.warn;
     this.originalConsoleError = console.error;
+    this.originalConsoleDebug = console.debug;
 
     const override =
       (type, original) =>
@@ -27,6 +28,7 @@ class ConsoleHandler extends EventEmitter {
     console.log = override("log", this.originalConsoleLog);
     console.warn = override("warn", this.originalConsoleWarn);
     console.error = override("error", this.originalConsoleError);
+    console.debug = override("debug", this.originalConsoleDebug);
   }
 
   handleConsoleEvent(type, args, timestamp) {
