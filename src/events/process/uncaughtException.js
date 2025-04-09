@@ -1,6 +1,6 @@
 module.exports = {
   name: "uncaughtException",
   async execute(err, origin, client) {
-    console.error(`Uncaught Exception! - Error: ${err} - Origin: ${origin}`);
+    console.error("Uncaught Exception! Error: ", err, "\nOrigin: ", origin);
   },
 };
