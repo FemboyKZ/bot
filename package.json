@@ -1,6 +1,6 @@
 {
   "name": "fkz-bot",
-  "version": "1.7.156",
+  "version": "1.7.157",
   "main": "src/index.js",
   "author": "jvnipers",
   "license": "GPL-3.0-only",
