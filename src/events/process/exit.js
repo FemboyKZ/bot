@@ -1,6 +1,6 @@
 module.exports = {
   name: "exit",
-  async execute(info, client) {
-    console.log(`Exit: ${JSON.stringify(info)}`);
+  async execute(code, client) {
+    console.log(`Process exit event with code: ${code}`);
   },
 };
