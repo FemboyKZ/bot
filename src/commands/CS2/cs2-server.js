@@ -11,6 +11,7 @@ const execAsync = promisify(require("child_process").exec);
 const config = require("./cs2-server-config.json")[0];
 require("dotenv").config();
 
+const MANAGER_ROLE = process.env.CSGO_MANAGER_ROLE;
 const EMBED_COLOR = "#ff00b3";
 const API_URL = new URL(process.env.API_URL);
 const API_FULL_URL = `${API_URL.origin}:${process.env.API_PORT || 8080}${API_URL.pathname}`;
@@ -119,7 +120,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("cs2-server")
     .setDescription("[ADMIN] Manage CS2 servers")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
         .setName("action")
@@ -146,6 +146,16 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
+      !interaction.member.roles.cache.has(MANAGER_ROLE)
+    ) {
+      return await interaction.reply({
+        content: "You don't have perms to use this command.",
+        ephemeral: true,
+      });
+    }
+
     await interaction.deferReply({ ephemeral: true });
 
     try {
