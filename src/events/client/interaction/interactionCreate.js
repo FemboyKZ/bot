@@ -402,7 +402,7 @@ module.exports = {
       if (interaction.customId === "ticket-modal") {
         const data = await schema.findOne({
           Guild: interaction.guild.id,
-          Type: "tickets",
+          ID: "tickets",
         });
         if (!data) return;
 
