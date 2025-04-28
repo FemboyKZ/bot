@@ -146,9 +146,10 @@ module.exports = {
     ),
 
   async execute(interaction) {
+    const role = await interaction.guild.roles.cache.get(MANAGER_ROLE);
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator) ||
-      !interaction.member.roles.cache.has(MANAGER_ROLE)
+      !interaction.member.roles.cache.has(role)
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
