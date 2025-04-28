@@ -11,7 +11,7 @@ const execAsync = promisify(require("child_process").exec);
 const config = require("./cs2-server-config.json")[0];
 require("dotenv").config();
 
-const MANAGER_ROLE = process.env.CSGO_MANAGER_ROLE;
+const MANAGER_ROLE = process.env.CS2_MANAGER_ROLE;
 const EMBED_COLOR = "#ff00b3";
 const API_URL = new URL(process.env.API_URL);
 const API_FULL_URL = `${API_URL.origin}:${process.env.API_PORT || 8080}${API_URL.pathname}`;
