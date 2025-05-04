@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const schema = require("../../Schemas/reactionrole.js");
+const schema = require("../../schemas/reactionRoles.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -55,7 +55,7 @@ module.exports = {
 
         const membersWithRole = await reaction.users.fetch();
         const membersToAddRole = membersWithRole.filter(
-          (member) => !member.roles.cache.has(role.id)
+          (member) => !member.roles.cache.has(role.id),
         );
 
         for (const member of membersToAddRole.values()) {
@@ -67,7 +67,7 @@ module.exports = {
         (member) =>
           !member.user.bot &&
           !member.roles.cache.has(guild.id) &&
-          !reactionsData.some((data) => member.roles.cache.has(data.Role))
+          !reactionsData.some((data) => member.roles.cache.has(data.Role)),
       );
 
       for (const member of membersWithExtraRoles.values()) {
@@ -75,7 +75,7 @@ module.exports = {
           (role) =>
             !role.managed &&
             role.id !== guild.id &&
-            !reactionsData.some((data) => role.id === data.Role)
+            !reactionsData.some((data) => role.id === data.Role),
         );
 
         for (const role of rolesToRemove.values()) {

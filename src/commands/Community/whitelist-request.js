@@ -5,8 +5,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const status = require("../../Schemas/request-status.js");
+const schema = require("../../schemas/base-system.js");
+const status = require("../../schemas/request-status.js");
 require("dotenv").config();
 
 const whitelistRole = process.env.WHITELIST_ROLE;
@@ -53,7 +53,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Why should you get whitelisted")
       .setPlaceholder(
-        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc."
+        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc.",
       )
       .setStyle(TextInputStyle.Paragraph);
 
@@ -66,16 +66,16 @@ module.exports = {
 
     const firstActionRow = new ActionRowBuilder().addComponents(steamWhitelist);
     const secondActionRow = new ActionRowBuilder().addComponents(
-      reasonWhitelist
+      reasonWhitelist,
     );
     const thirdActionRow = new ActionRowBuilder().addComponents(
-      requestWhitelist
+      requestWhitelist,
     );
 
     modalWhitelist.addComponents(
       firstActionRow,
       secondActionRow,
-      thirdActionRow
+      thirdActionRow,
     );
 
     try {

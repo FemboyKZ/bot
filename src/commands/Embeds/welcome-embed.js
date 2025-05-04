@@ -8,36 +8,57 @@ const {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("welcome-embed")
-    .setDescription("[Admin] Posts the embeds the for Welcome channel")
+    .setDescription(
+      "[Admin] Posts or updates the embeds the for Welcome channel",
+    )
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addChannelOption((option) =>
       option
         .setName("channel")
-        .setDescription("The channel where to send the embed")
+        .setDescription("The channel where to send the embeds")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(false),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("message")
+        .setDescription("The message to update with the embeds")
+        .setRequired(false),
     ),
 
   async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });
+    }
+    const channel =
+      interaction.options.getChannel("channel") ||
+      message?.channel ||
+      interaction.channel;
+    const message = interaction.options.getString("message");
 
-    const channel = interaction.options.getChannel("channel");
+    if (!channel && !message) {
+      return await interaction.reply({
+        content: "Please provide a channel or message.",
+        ephemeral: true,
+      });
+    }
 
     const embedBanner = new EmbedBuilder()
       .setTitle("**Welcome to FemboyKZ! <3**")
-      .setImage("https://femboy.kz/images/tehe.png")
+      .setImage("https://files.femboy.kz/web/images/welcome-banner.png")
       .setColor("#ff00b3");
 
     const embedInfo = new EmbedBuilder()
       .setTitle("**FemboyKZ Info**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://files.femboy.kz/web/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "This is a Discord server for the Femboy KZ CS:GO and CS2 servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers."
+        "This is a Discord server for the Femboy KZ CS:GO and CS2 servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers.",
       )
       .addFields([
         {
@@ -54,10 +75,10 @@ module.exports = {
 
     const embedRules = new EmbedBuilder()
       .setTitle("**FemboyKZ Rules**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://files.femboy.kz/web/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
-        "Not following these rules can result in certain punishments."
+        "Not following these rules can result in certain punishments.",
       )
       .addFields([
         {
@@ -72,8 +93,7 @@ module.exports = {
         },
         {
           name: "** **",
-          value:
-            " **3.** NSFW content is allowed only on specific channels marked as NSFW. Posting actual pornography, gore or vore is not allowed. NSFW content of minors is not allowed to any extent and will result in a permanent ban.\n **3.1** NSFW channels require the <@&1179794850627997706> Role. Lying about your age for this is a punishable offense.",
+          value: ` **3.** This is a "mature" server, this means swearing/cursing is permitted. Posting pornography, gore, vore or something comparable is not allowed in any extent. NSFW content of minors is not allowed to any extent and will result in a permanent ban.`,
         },
         {
           name: "** **",
@@ -115,9 +135,24 @@ module.exports = {
         },
       ]);
 
-    await channel.send({
-      embeds: [embedBanner, embedInfo, embedRules],
-    });
+    if (message) {
+      const target = await channel.messages.fetch(message);
+
+      if (target.author.id !== interaction.client.user.id) {
+        return await interaction.reply({
+          content: "The specified message is not owned by FKZ bot.",
+          ephemeral: true,
+        });
+      }
+
+      await target.edit({
+        embeds: [embedBanner, embedInfo, embedRules],
+      });
+    } else {
+      await channel.send({
+        embeds: [embedBanner, embedInfo, embedRules],
+      });
+    }
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
       ephemeral: true,

@@ -1,11 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const vip = require("../../Schemas/base-system.js");
-const uses = require("../../Schemas/vip/vip-uses.js");
-const roles = require("../../Schemas/vip/vip-roles.js");
-const status = require("../../Schemas/vip/vip-status.js");
+const vip = require("../../schemas/base-system.js");
+const uses = require("../../schemas/vip/vipUses.js");
+const roles = require("../../schemas/vip/vipRoles.js");
+const status = require("../../schemas/vip/vipStatus.js");
 require("dotenv").config();
 
-// TODO: MAKE THIS NOT SO SHITTY
+const CLAIM_TYPES = ["vip", "vip+", "contributor"];
+const PING_ID =
+  process.env.PING_ROLE_ID || process.env.PING_USER_ID || "Not set";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,340 +16,175 @@ module.exports = {
     .addStringOption((option) =>
       option
         .setName("steamid")
-        .setDescription(
-          "The SteamID of the account you want to claim perks for."
-        )
+        .setDescription("SteamID of the account to claim perks for")
         .setRequired(true)
+        .setMaxLength(50),
     )
     .addStringOption((option) =>
       option
         .setName("code")
-        .setDescription(
-          "The code you got in a TXT file after purchasing the Upgrade."
-        )
+        .setDescription("Code from TXT file after purchase")
         .setRequired(true)
+        .setMaxLength(40),
     ),
+
   async execute(interaction) {
-    const { guild, options, user } = interaction;
-
-    const steamId = options.getString("steamid");
-    const code = options.getString("code");
-
-    if (!code || !steamId) {
-      return await interaction.reply({
-        content: "Please enter both a code and a SteamID.",
-        ephemeral: true,
-      });
-    }
-
-    if (code.length > 40 || steamId.length > 50) {
-      return await interaction.reply({
-        content: "Please enter a valid code and SteamID.",
-        ephemeral: true,
-      });
-    }
-
-    const perkSystem = await vip.findOne({ Guild: guild.id, ID: "vip" });
-    if (!perkSystem) {
-      return await interaction.reply({
-        content:
-          "The perk claim system is currently disabled, please try again later.",
-        ephemeral: true,
-      });
-    }
-
-    const vipCode = await uses.findOne({ Guild: guild.id, Type: "vip" });
-    const vipPlusCode = await uses.findOne({ Guild: guild.id, Type: "vip+" });
-    const contributorCode = await uses.findOne({
-      Guild: guild.id,
-      Type: "contributor",
-    });
-    if (!vipCode || !vipPlusCode || !contributorCode) {
-      return await interaction.reply({
-        content:
-          "The perk claim system is currently disabled, please try again later.",
-        ephemeral: true,
-      });
-    }
-
-    const validCodes = [vipCode.Code, vipPlusCode.Code, contributorCode.Code];
-    if (!validCodes.includes(code)) {
-      const embed = new EmbedBuilder()
-        .setTitle("Perks Claimed!")
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setDescription(`The code you entered is invalid.`);
-
-      return await interaction.reply({ embeds: [embed], ephemeral: true });
-    }
-
-    if (code === vipCode.Code && vipCode.Uses > 0) {
-      const embed = new EmbedBuilder()
-        .setTitle("Perks Claimed!")
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setDescription(`The code you entered has been used already.`);
-
-      return await interaction.reply({ embeds: [embed], ephemeral: true });
-    }
-    if (code === vipPlusCode.Code && vipPlusCode.Uses > 0) {
-      const embed = new EmbedBuilder()
-        .setTitle("Perks Claimed!")
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setDescription(`The code you entered has been used already.`);
-
-      return await interaction.reply({ embeds: [embed], ephemeral: true });
-    }
-    if (code === contributorCode.Code && contributorCode.Uses > 0) {
-      const embed = new EmbedBuilder()
-        .setTitle("Perks Claimed!")
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setDescription(`The code you entered has been used already.`);
-
-      return await interaction.reply({ embeds: [embed], ephemeral: true });
-    }
-
-    const perkStatus = await status.findOne({ Claimer: user.id });
-    if (!perkStatus) {
-      if (code === vipCode.Code) {
-        const perkType = "vip";
-        const roleType = await roles.findOne({
-          Guild: guild.id,
-          Type: perkType,
-        });
-        const role = await guild.roles.fetch(roleType.Role);
-        await handleClaim(
-          interaction,
-          user,
-          perkSystem,
-          embed,
-          logEmbed,
-          steamId,
-          perkType,
-          role
-        );
-      } else if (code === vipPlusCode.Code) {
-        const perkType = "vip+";
-        const roleType = await roles.findOne({
-          Guild: guild.id,
-          Type: perkType,
-        });
-        const role = await guild.roles.fetch(roleType.Role);
-        await handleClaim(
-          interaction,
-          user,
-          perkSystem,
-          embed,
-          logEmbed,
-          steamId,
-          perkType,
-          role
-        );
-      } else if (code === contributorCode.Code) {
-        const perkType = "contributor";
-        const roleType = await roles.findOne({
-          Guild: guild.id,
-          Type: perkType,
-        });
-        const role = await guild.roles.fetch(roleType.Role);
-        await handleClaim(
-          interaction,
-          user,
-          perkSystem,
-          embed,
-          logEmbed,
-          steamId,
-          perkType,
-          role
-        );
-      } else {
-        return await interaction.reply({
-          content: `Something you entered is invalid, please try again.`,
-          ephemeral: true,
-        });
-      }
-    } else if (perkStatus) {
-      if (perkStatus.Type === "vip" && perkStatus.Status === true) {
-        if (code === vipCode.Code) {
-          await interaction.reply({
-            content: `You've already claimed those perks. If you want to gift, use the \`/gift\` command.`,
-            ephemeral: true,
-          });
-        } else if (code === vipPlusCode.Code) {
-          const perkType = "vip+";
-          const roleType = await roles.findOne({
-            Guild: guild.id,
-            Type: perkType,
-          });
-          const role = await guild.roles.fetch(roleType.Role);
-          await handleExistingClaim(
-            interaction,
-            user,
-            perkSystem,
-            embed,
-            logEmbed,
-            steamId,
-            perkType,
-            role
-          );
-        } else if (code === contributorCode.Code) {
-          const perkType = "contributor";
-          const roleType = await roles.findOne({
-            Guild: guild.id,
-            Type: perkType,
-          });
-          const role = await guild.roles.fetch(roleType.Role);
-          await handleExistingClaim(
-            interaction,
-            user,
-            perkSystem,
-            embed,
-            logEmbed,
-            steamId,
-            perkType,
-            role
-          );
-        } else {
-          return await interaction.reply({
-            content: `Something you entered is invalid, please try again.`,
-            ephemeral: true,
-          });
-        }
-      } else if (perkStatus.Type === "vip+" && perkStatus.Status === true) {
-        if (code === vipCode.Code || code === vipPlusCode.Code) {
-          await interaction.reply({
-            content: `You've already claimed those perks. If you want to gift, use the \`/gift\` command.`,
-            ephemeral: true,
-          });
-        } else if (code === contributorCode.Code) {
-          const perkType = "contributor";
-          const roleType = await roles.findOne({
-            Guild: guild.id,
-            Type: perkType,
-          });
-          const role = await guild.roles.fetch(roleType.Role);
-          await handleExistingClaim(
-            interaction,
-            user,
-            perkSystem,
-            embed,
-            logEmbed,
-            steamId,
-            perkType,
-            role
-          );
-        } else {
-          return await interaction.reply({
-            content: `Something you entered is invalid, please try again.`,
-            ephemeral: true,
-          });
-        }
-      } else if (
-        perkStatus.Type === "contributor" &&
-        perkStatus.Status === true
-      ) {
-        return await interaction.reply({
-          content: `You've already claimed your perks. If you want to gift, use the \`/gift\` command.`,
-          ephemeral: true,
-        });
-      } else {
-        return await interaction.reply({
-          content: `Something you entered is invalid, please try again.`,
-          ephemeral: true,
-        });
-      }
-    }
-  },
-
-  async handleClaim(
-    interaction,
-    user,
-    perkSystem,
-    embed,
-    logEmbed,
-    steamId,
-    perkType,
-    role
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have been upgraded to **${perkType}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`
-    );
-    logEmbed.setDescription(
-      `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
-    );
     try {
-      await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await status.create({
-        Claimer: user.id,
-        Status: true,
-        Type: perkType,
-        Gifted: null,
-        Steam: steamId,
-        Date: new Date(),
-      });
-      await uses.findOneAndUpdate(
-        { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 }
-      );
-      await user.roles.add(role);
-      if (perkType === "vip+" || perkType === "contributor") {
-        const vipRole = await roles.findOne({ Guild: guild.id, Type: "vip" });
-        const vipRoleId = vipRole.Role;
-        const role2 = await guild.roles.fetch(vipRoleId);
-        await user.roles.add(role2);
+      const { guild, options, user } = interaction;
+      const steamId = options.getString("steamid");
+      const code = options.getString("code");
+
+      if (!(await this.validateSystem(guild))) {
+        return this.replyError(
+          interaction,
+          "System disabled - Please try again later",
+        );
       }
-      await interaction.reply({ embeds: [embed], ephemeral: true });
+
+      const codeData = await this.getCodeData(guild, code);
+      if (!codeData) {
+        return this.replyError(interaction, "Invalid code");
+      }
+
+      const existingStatus = await status.findOne({ Claimer: user.id });
+      if (existingStatus?.Status) {
+        return this.handleExistingUser(interaction, existingStatus, codeData);
+      }
+
+      return this.processNewClaim(interaction, user, steamId, codeData);
     } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
+      console.error("Claim VIP Error:", error);
+      return this.replyError(interaction, "An error occurred");
     }
   },
 
-  async handleExistingClaim(
-    interaction,
-    user,
-    perkSystem,
-    embed,
-    logEmbed,
-    steamId,
-    perkType,
-    role
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have been upgraded to **${perkType}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`
-    );
-    logEmbed.setDescription(
-      `**${user}** has claimed **${perkType}**.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
-    );
-    try {
-      await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await status.findOneAndUpdate(
-        {
-          Claimer: user.id,
-        },
+  async validateSystem(guild) {
+    const [system, codeEntries] = await Promise.all([
+      vip.findOne({ Guild: guild.id, ID: "vip" }),
+      uses.find({ Guild: guild.id, Type: { $in: CLAIM_TYPES } }),
+    ]);
+
+    return system && codeEntries.length === CLAIM_TYPES.length;
+  },
+
+  async getCodeData(guild, code) {
+    const codeEntry = await uses.findOne({
+      Guild: guild.id,
+      Code: code,
+      Uses: 0,
+    });
+
+    if (!codeEntry) return null;
+    return {
+      type: codeEntry.Type,
+      role: await this.getRole(guild, codeEntry.Type),
+      codeEntry,
+    };
+  },
+
+  async getRole(guild, type) {
+    const roleConfig = await roles.findOne({ Guild: guild.id, Type: type });
+    return roleConfig ? guild.roles.fetch(roleConfig.Role) : null;
+  },
+
+  async processNewClaim(interaction, user, steamId, { type, role, codeEntry }) {
+    if (!role) {
+      return this.replyError(interaction, "Role configuration error");
+    }
+
+    await Promise.all([
+      status.findOneAndUpdate(
+        { Claimer: user.id },
         {
           Status: true,
-          Type: perkType,
+          Type: type,
+          Steam: steamId,
           Date: new Date(),
-        }
-      );
-      await uses.findOneAndUpdate(
-        { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 }
-      );
-      await user.roles.add(role);
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
+          Gifted: null,
+        },
+        { upsert: true },
+      ),
+      uses.updateOne({ _id: codeEntry._id }, { $inc: { Uses: 1 } }),
+    ]);
+
+    await this.assignRoles(user, role, type);
+
+    await this.sendSuccessResponse(interaction, type, steamId, codeEntry.Code);
+    await this.sendLog(interaction, user, type, steamId, codeEntry.Code);
+  },
+
+  async assignRoles(user, mainRole, type) {
+    const rolesToAdd = [mainRole];
+
+    if (["vip+", "contributor"].includes(type)) {
+      const vipRole = await roles.findOne({
+        Guild: mainRole.guild.id,
+        Type: "vip",
       });
+      if (vipRole)
+        rolesToAdd.push(await mainRole.guild.roles.fetch(vipRole.Role));
     }
+
+    await user.roles.add(rolesToAdd);
+  },
+
+  async sendSuccessResponse(interaction, type, steamId, code) {
+    const embed = new EmbedBuilder()
+      .setTitle("Perks Claimed!")
+      .setColor("#ff00b3")
+      .setDescription(
+        `Thank you for supporting us! You've been upgraded to **${type}**!\n` +
+          `Ingame perks for SteamID \`${steamId}\` will be applied within a few hours.` +
+          `\nIf you have issues, please contact an admin.`,
+      )
+      .setTimestamp();
+
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+  },
+
+  async sendLog(interaction, user, type, steamId, code) {
+    const systemConfig = await vip.findOne({
+      Guild: interaction.guild.id,
+      ID: "vip",
+    });
+    if (!systemConfig?.Channel) return;
+
+    const logEmbed = new EmbedBuilder()
+      .setTitle("Perks Claimed")
+      .setColor("#ff00b3")
+      .setDescription(
+        `**${user}** claimed **${type}**\n` +
+          `SteamID: \`${steamId}\`\n` +
+          `Code: \`${code}\`\n` +
+          `Ping: <@${PING_ID}>, remember to apply ingame perks!`,
+      )
+      .setTimestamp();
+
+    await systemConfig.Channel.send({ embeds: [logEmbed] });
+  },
+
+  handleExistingUser(interaction, status, codeData) {
+    const validUpgrade = this.checkValidUpgrade(status.Type, codeData.type);
+
+    if (!validUpgrade) {
+      return this.replyError(
+        interaction,
+        `You've already claimed ${status.Type} perks. Use \`/gift\` to share it instead.`,
+      );
+    }
+
+    return this.processUpgrade(interaction, status.Claimer, codeData);
+  },
+
+  checkValidUpgrade(currentType, newType) {
+    const typeHierarchy = ["vip", "vip+", "contributor"];
+    return typeHierarchy.indexOf(newType) > typeHierarchy.indexOf(currentType);
+  },
+
+  replyError(interaction, message) {
+    return interaction.reply({
+      content: `${message}`,
+      ephemeral: true,
+    });
   },
 };

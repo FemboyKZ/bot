@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
+const schema = require("../../schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,13 +20,13 @@ module.exports = {
             .setName("channel")
             .setDescription("The logging channel")
             .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText)
-        )
+            .addChannelTypes(ChannelType.GuildText),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the invite-logs")
+        .setDescription("[Admin] Disable the invite-logs"),
     ),
   async execute(interaction) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
@@ -50,11 +50,11 @@ module.exports = {
         try {
           if (data)
             embed.setDescription(
-              `The invite logger is already enabled. Logs will be sent to ${channel}.`
+              `The invite logger is already enabled. Logs will be sent to ${channel}.`,
             );
           else if (!data) {
             embed.setDescription(
-              `The invite-logger has been enabled, logs will be sent to ${channel}`
+              `The invite-logger has been enabled, logs will be sent to ${channel}`,
             );
             await schema.create({
               Guild: guild.id,
@@ -79,7 +79,7 @@ module.exports = {
         try {
           if (!data)
             embed.setDescription(
-              "The invite-logger has not been enabled yet, or is already disabled."
+              "The invite-logger has not been enabled yet, or is already disabled.",
             );
           else if (data) {
             embed.setDescription("The invite-logger has been disabled.");

@@ -3,9 +3,9 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const mutes = require("../../Schemas/moderation/mute.js");
-const roles = require("../../Schemas/moderation/mute-role.js");
+const schema = require("../../schemas/base-system.js");
+const mutes = require("../../schemas/moderation/mutes.js");
+const roles = require("../../schemas/moderation/muteRoles.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,7 +16,7 @@ module.exports = {
       option
         .setName("user")
         .setDescription("The user to unmute")
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     if (
@@ -47,7 +47,7 @@ module.exports = {
       .setFooter({ text: "FKZ" })
       .setTitle("User Unmuted")
       .setDescription(
-        `**User:** <@${user.id}>\n**Executor:** <@${interaction.user.id}>`
+        `**User:** <@${user.id}>\n**Executor:** <@${interaction.user.id}>`,
       );
 
     const roleId = await roles.findOne({ Guild: interaction.guild.id });

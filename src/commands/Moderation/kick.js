@@ -13,13 +13,13 @@ module.exports = {
       option
         .setName("user")
         .setDescription("The user to kick")
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("reason")
         .setDescription("Reason for the kick")
-        .setRequired(false)
+        .setRequired(false),
     ),
   async execute(interaction) {
     if (
@@ -30,7 +30,7 @@ module.exports = {
         .setTimestamp()
         .setTitle("Error")
         .setDescription(
-          "You do not have the required permissions to use this command"
+          "You do not have the required permissions to use this command",
         )
         .setFooter({ text: "FKZ" });
 

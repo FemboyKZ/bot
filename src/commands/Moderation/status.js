@@ -14,7 +14,7 @@ module.exports = {
         .setName("status")
         .setDescription(`Status text`)
         .setMaxLength(128)
-        .setRequired(true)
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
@@ -25,9 +25,9 @@ module.exports = {
           { name: "Streaming", value: `${2}` },
           { name: "Listening", value: `${3}` },
           { name: "Watching", value: `${4}` },
-          { name: "Competing", value: `${6}` }
+          { name: "Competing", value: `${6}` },
         )
-        .setRequired(true)
+        .setRequired(true),
     ),
   //.addStringOption(option => option.setName('url').setDescription(`Stream url (twitch)`).setMaxLength(128).setRequired(false))
   async execute(interaction, client) {
@@ -53,7 +53,7 @@ module.exports = {
         .setDescription(
           `The Bot's status has been set to \`${status}\`, and the type to \`${
             type - 1
-          }\``
+          }\``,
         );
 
       await interaction.reply({ embeds: [embed], ephemeral: true });

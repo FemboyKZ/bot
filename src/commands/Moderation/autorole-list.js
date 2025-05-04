@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const schema = require("../../Schemas/autorole.js");
+const schema = require("../../schemas/autoRoles.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -29,7 +29,7 @@ module.exports = {
       .setColor("#ff00b3")
       .setTitle("Autoroles")
       .setDescription(
-        autoroles.map((role) => `<@&${role}>`).join("\n") || "None"
+        autoroles.map((role) => `<@&${role}>`).join("\n") || "None",
       );
 
     await interaction.reply({ embeds: [embed], ephemeral: true });

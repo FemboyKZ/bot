@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const schema = require("../../Schemas/moderation/anti-link.js");
+const schema = require("../../schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,7 +19,7 @@ module.exports = {
             .setName("permissions")
             .setRequired(true)
             .setDescription(
-              "Choose the permissions to bypass the anti-link system"
+              "Choose the permissions to bypass the anti-link system",
             )
             .addChoices(
               { name: "Manage Channel", value: "ManageChannels" },
@@ -27,19 +27,19 @@ module.exports = {
               { name: "Embed Links", value: "EmbedLinks" },
               { name: "Attach File", value: "AttachFiles" },
               { name: "Manage Messages", value: "ManageMessages" },
-              { name: "Administrator", value: "Administrator" }
-            )
-        )
+              { name: "Administrator", value: "Administrator" },
+            ),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the anti-link system")
+        .setDescription("[Admin] Disable the anti-link system"),
     )
     .addSubcommand((command) =>
       command
         .setName("check")
-        .setDescription("[Admin] Checks the status of the anti-link system")
+        .setDescription("[Admin] Checks the status of the anti-link system"),
     )
     .addSubcommand((command) =>
       command
@@ -50,7 +50,7 @@ module.exports = {
             .setName("permissions")
             .setRequired(true)
             .setDescription(
-              "Choose the permissions to bypass the anti-link system"
+              "Choose the permissions to bypass the anti-link system",
             )
             .addChoices(
               { name: "Manage Channel", value: "ManageChannels" },
@@ -58,9 +58,9 @@ module.exports = {
               { name: "Embed Links", value: "EmbedLinks" },
               { name: "Attach File", value: "AttachFiles" },
               { name: "Manage Messages", value: "ManageMessages" },
-              { name: "Administrator", value: "Administrator" }
-            )
-        )
+              { name: "Administrator", value: "Administrator" },
+            ),
+        ),
     ),
 
   async execute(interaction) {
@@ -75,10 +75,13 @@ module.exports = {
     const sub = options.getSubcommand();
 
     switch (sub) {
-      case "setup":
+      case "setup": {
         const permissions = options.getString("permissions");
 
-        const Data = await schema.findOne({ Guild: interaction.guild.id });
+        const Data = await schema.findOne({
+          Guild: interaction.guild.id,
+          ID: "anti-link",
+        });
 
         if (Data)
           return await interaction.reply({
@@ -89,40 +92,47 @@ module.exports = {
         if (!Data) {
           schema.create({
             Guild: interaction.guild.id,
-            Perms: permissions,
+            ID: "anti-link",
+            ByPass: permissions,
           });
         }
 
         const embed = new EmbedBuilder()
           .setColor("#ff00b3")
           .setDescription(
-            `The anti-link system has been enabled with the bypass permissions set to ${permissions}.`
+            `The anti-link system has been enabled with the bypass permissions set to ${permissions}.`,
           );
 
         await interaction.reply({ embeds: [embed] });
-    }
+        break;
+      }
 
-    switch (sub) {
-      case "disable":
-        await schema.deleteMany();
+      case "disable": {
+        await schema.deleteMany({
+          Guild: interaction.guild.id,
+          ID: "anti-link",
+        });
 
         const embed2 = new EmbedBuilder()
           .setColor("#ff00b3")
           .setDescription(`The anti-link system has been disabled.`);
 
         await interaction.reply({ embeds: [embed2] });
-    }
+        break;
+      }
 
-    switch (sub) {
-      case "check":
-        const Data = await schema.findOne({ Guild: interaction.guild.id });
+      case "check": {
+        const Data = await schema.findOne({
+          Guild: interaction.guild.id,
+          ID: "anti-link",
+        });
         if (!Data)
           return await interaction.reply({
             content: "The anti-link system has not been setup.",
             ephemeral: true,
           });
 
-        const permissions = Data.Perms;
+        const permissions = Data.ByPass;
         if (!permissions)
           return await interaction.reply({
             content: "The anti-link system has not been setup.",
@@ -133,11 +143,14 @@ module.exports = {
             content: `The anti-link system is set up. Members with **${permissions}** can bypass it.`,
             ephemeral: true,
           });
-    }
+        break;
+      }
 
-    switch (sub) {
-      case "edit":
-        const Data = await schema.findOne({ Guild: interaction.guild.id });
+      case "edit": {
+        const Data = await schema.findOne({
+          Guild: interaction.guild.id,
+          ID: "anti-link",
+        });
         const permissions = options.getString("permissions");
 
         if (!Data)
@@ -146,21 +159,27 @@ module.exports = {
             ephemeral: true,
           });
         else {
-          await schema.deleteMany();
+          await schema.deleteMany({
+            Guild: interaction.guild.id,
+            ID: "anti-link",
+          });
 
           await schema.create({
             Guild: interaction.guild.id,
-            Perms: permissions,
+            ID: "anti-link",
+            ByPass: permissions,
           });
 
           const embed3 = new EmbedBuilder()
             .setColor("#ff00b3")
             .setDescription(
-              `The anti-link system bypass permissions have been set to ${permissions}.`
+              `The anti-link system bypass permissions have been set to ${permissions}.`,
             );
 
           await interaction.reply({ embeds: [embed3] });
         }
+        break;
+      }
     }
   },
 };

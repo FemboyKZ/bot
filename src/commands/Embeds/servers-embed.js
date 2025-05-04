@@ -15,16 +15,36 @@ module.exports = {
         .setName("channel")
         .setDescription("The channel where to send the embed")
         .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
+        .setRequired(false),
+    )
+    .addStringOption((option) =>
+      option
+        .setName("message")
+        .setDescription("The message to update with the embed")
+        .setRequired(false),
     ),
 
   async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
         ephemeral: true,
       });
-    const channel = interaction.options.getChannel("channel");
+    }
+    const channel =
+      interaction.options.getChannel("channel") ||
+      message?.channel ||
+      interaction.channel;
+    const message = interaction.options.getString("message");
+
+    if (!channel && !message) {
+      return await interaction.reply({
+        content: "Please provide a channel or message.",
+        ephemeral: true,
+      });
+    }
 
     const csgoWLeu = "eu.femboy.kz:27025";
     const csgo64eu = "eu.femboy.kz:27035";
@@ -32,13 +52,6 @@ module.exports = {
 
     const csgoWLna = "na.femboy.kz:27025";
     const csgo64na = "na.femboy.kz:27035";
-
-    const cscl128eu = "eu.femboy.kz:27099";
-    const cscl128eukzt = "eu.femboy.kz:27079";
-    const cscl64eu = "eu.femboy.kz:27089";
-
-    const cscl128na = "na.femboy.kz:27099";
-    const cscl64na = "na.femboy.kz:27089";
 
     const cs2WLeu = "eu.femboy.kz";
     const cs2KZeu = "eu.femboy.kz:27016";
@@ -57,12 +70,12 @@ module.exports = {
     const embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
       .setColor("#ff00b3")
-      .setImage("https://femboy.kz/images/serverrs.png");
+      .setImage("https://files.femboy.kz/web/images/servers-banner.png");
 
     const embedCSGO = new EmbedBuilder()
       .setTitle("**CS:GO Servers**")
       .setColor("#ff00b3")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://files.femboy.kz/web/images/wide.png")
       .addFields([
         {
           name: "Whitelist Servers",
@@ -107,53 +120,6 @@ module.exports = {
         {
           name: ":flag_eu:  **64t AutoBH\n- de_nuke only**",
           value: `[*${csgoNUeu}*](<https://csgo.femboy.kz/connect?ip=${csgoNUeu}>)`,
-          inline: true,
-        },
-      ]);
-
-    const embedCSCL = new EmbedBuilder()
-      .setTitle("**ClassicCounter Servers**")
-      .setColor("#ff00b3")
-      .setImage("https://femboy.kz/images/wide.png")
-      .addFields([
-        {
-          name: "CC Whitelist Servers",
-          value: "** **",
-          inline: false,
-        },
-        {
-          name: ":flag_eu:  **128t VNL KZ**",
-          value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128eu}>)`,
-          inline: true,
-        },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **128t VNL KZ**",
-          value: `[*${cscl128eu}*](<https://classic.femboy.kz/connect?ip=${cscl128na}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_eu:  **64t VNL KZ**",
-          value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64eu}>)`,
-          inline: true,
-        },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **64t VNL KZ**",
-          value: `[*${cscl64eu}*](<https://classic.femboy.kz/connect?ip=${cscl64na}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_eu:  **128t KZTimer**",
-          value: `[*${cscl128eukzt}*](<https://classic.femboy.kz/connect?ip=${cscl128eukzt}>)`,
           inline: true,
         },
       ]);
@@ -255,9 +221,23 @@ module.exports = {
         },
       ]);
 
-    await channel.send({
-      embeds: [embedHeader, embedCSGO, embedCSCL, embedCS2],
-    });
+    if (message) {
+      const target = await channel.messages.fetch(message);
+
+      if (target.author.id !== interaction.client.user.id) {
+        return await interaction.reply({
+          content: "The specified message is not owned by FKZ bot.",
+          ephemeral: true,
+        });
+      }
+      await target.edit({
+        embeds: [embedHeader, embedCSGO, embedCS2],
+      });
+    } else {
+      await channel.send({
+        embeds: [embedHeader, embedCSGO, embedCS2],
+      });
+    }
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
       ephemeral: true,

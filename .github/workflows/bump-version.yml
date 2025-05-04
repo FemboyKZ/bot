@@ -1,4 +1,3 @@
-
 name: Bump bot dev version
 
 on:
@@ -23,7 +22,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  bump-version:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

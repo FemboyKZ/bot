@@ -10,13 +10,16 @@ module.exports = {
     .setDescription("Ban a user")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addUserOption((option) =>
-      option.setName("user").setDescription("The user to ban").setRequired(true)
+      option
+        .setName("user")
+        .setDescription("The user to ban")
+        .setRequired(true),
     )
     .addStringOption((option) =>
       option
         .setName("reason")
         .setDescription("Reason for the ban")
-        .setRequired(false)
+        .setRequired(false),
     ),
   async execute(interaction) {
     if (
@@ -27,7 +30,7 @@ module.exports = {
         .setTimestamp()
         .setTitle("Error")
         .setDescription(
-          "You do not have the required permissions to use this command"
+          "You do not have the required permissions to use this command",
         )
         .setFooter({ text: "FKZ" });
 

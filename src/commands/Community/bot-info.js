@@ -28,7 +28,7 @@ module.exports = {
 
     let servercount = await client.guilds.cache.reduce(
       (a, b) => a + b.memberCount,
-      0
+      0,
     );
 
     let totalSeconds = client.uptime / 1000;
@@ -52,7 +52,7 @@ module.exports = {
       new ButtonBuilder()
         .setLabel("Femboy KZ Steam Group")
         .setStyle(ButtonStyle.Link)
-        .setURL("https://steamcommunity.com/groups/FemboyKZ")
+        .setURL("https://steamcommunity.com/groups/FemboyKZ"),
     );
 
     const embed = new EmbedBuilder()

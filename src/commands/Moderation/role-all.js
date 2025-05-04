@@ -13,7 +13,7 @@ module.exports = {
       option
         .setName("role")
         .setDescription("The role you want to give everyone")
-        .setRequired(true)
+        .setRequired(true),
     ),
   async execute(interaction) {
     const { options, guild } = interaction;

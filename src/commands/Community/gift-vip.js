@@ -1,532 +1,281 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const vip = require("../../Schemas/base-system.js");
-const uses = require("../../Schemas/vip/vip-uses.js");
-const roles = require("../../Schemas/vip/vip-roles.js");
-const status = require("../../Schemas/vip/vip-status.js");
+const vip = require("../../schemas/base-system.js");
+const uses = require("../../schemas/vip/vipUses.js");
+const roles = require("../../schemas/vip/vipRoles.js");
+const status = require("../../schemas/vip/vipStatus.js");
 require("dotenv").config();
 
-var timeout = [];
+const CLAIM_TYPES = ["vip", "vip+", "contributor"];
+const PING_ID =
+  process.env.PING_ROLE_ID || process.env.PING_USER_ID || "Not set";
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("gift-vip")
-    .setDescription(
-      "Gift your VIP+ or Contributor extras, or with a purchased code."
-    )
+    .setDescription("Gift VIP perks using your existing benefits or a code")
     .addSubcommand((command) =>
       command
-        .setName("gift")
-        .setDescription("Gift your VIP+ or Contributor extras.")
-        .addStringOption((option) =>
-          option
-            .setName("steamid")
-            .setDescription(
-              "The SteamID of the account you want to gift perks for."
-            )
-            .setRequired(true)
-        )
+        .setName("benefit")
+        .setDescription("Gift using your VIP+ or Contributor benefits")
         .addUserOption((option) =>
           option
             .setName("user")
-            .setDescription("The user you want to gift perks for.")
-            .setRequired(true)
+            .setDescription("User to receive perks")
+            .setRequired(true),
         )
+        .addStringOption((option) =>
+          option
+            .setName("steamid")
+            .setDescription("Recipient's SteamID")
+            .setRequired(true)
+            .setMaxLength(50),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("code")
-        .setDescription("Gift VIP, VIP+ or Contributor with a purchased code.")
+        .setDescription("Gift using a purchased code")
         .addStringOption((option) =>
           option
             .setName("code")
-            .setDescription(
-              "The code you got in a TXT file after purchasing the Upgrade."
-            )
+            .setDescription("Purchased code from TXT file")
             .setRequired(true)
-        )
-        .addStringOption((option) =>
-          option
-            .setName("steamid")
-            .setDescription(
-              "The SteamID of the account you want to gift perks for."
-            )
-            .setRequired(true)
+            .setMaxLength(40),
         )
         .addUserOption((option) =>
           option
             .setName("user")
-            .setDescription("The user you want to gift perks for.")
-            .setRequired(true)
+            .setDescription("User to receive perks")
+            .setRequired(true),
         )
+        .addStringOption((option) =>
+          option
+            .setName("steamid")
+            .setDescription("Recipient's SteamID")
+            .setRequired(true)
+            .setMaxLength(50),
+        ),
     ),
 
   async execute(interaction) {
-    if (!interaction || !interaction.user || !interaction.guild) {
-      return;
+    try {
+      const { guild, options, user } = interaction;
+      const subcommand = options.getSubcommand();
+
+      if (!(await this.validateSystem(guild))) {
+        return this.replyError(
+          interaction,
+          "VIP system is currently unavailable",
+        );
+      }
+
+      if (subcommand === "benefit") {
+        return this.handleBenefitGift(interaction);
+      }
+      if (subcommand === "code") {
+        return this.handleCodeGift(interaction);
+      }
+    } catch (error) {
+      console.error("Gift VIP Error:", error);
+      return this.replyError(interaction, "An unexpected error occurred");
+    }
+  },
+
+  async validateSystem(guild) {
+    const [system, codeEntries, roleEntries] = await Promise.all([
+      vip.findOne({ Guild: guild.id, ID: "vip" }),
+      uses.find({ Guild: guild.id, Type: { $in: CLAIM_TYPES } }),
+      roles.find({ Guild: guild.id, Type: { $in: CLAIM_TYPES } }),
+    ]);
+    return system && codeEntries.length === 3 && roleEntries.length === 3;
+  },
+
+  replyError(interaction, message) {
+    return interaction.reply({
+      content: `${message}`,
+      ephemeral: true,
+    });
+  },
+
+  async handleBenefitGift(interaction) {
+    const { guild, options, user } = interaction;
+    const recipient = options.getUser("user");
+    const steamId = options.getString("steamid");
+
+    const senderStatus = await status.findOne({ Claimer: user.id });
+    if (
+      !senderStatus?.Status ||
+      !["vip+", "contributor"].includes(senderStatus.Type)
+    ) {
+      return this.replyError(interaction, "You don't have giftable benefits");
     }
 
+    if (recipient.id === user.id) {
+      return this.replyError(interaction, "Cannot gift yourself");
+    }
+
+    const recipientStatus = await status.findOne({ Claimer: recipient.id });
+    if (recipientStatus?.Status) {
+      return this.replyError(interaction, "Recipient already has VIP perks");
+    }
+
+    const [vipRole, senderRole] = await Promise.all([
+      this.getRole(guild, "vip"),
+      this.getRole(guild, senderStatus.Type),
+    ]);
+
+    if (!vipRole || !senderRole) {
+      return this.replyError(interaction, "Role configuration error");
+    }
+
+    try {
+      await Promise.all([
+        status.findOneAndUpdate(
+          { Claimer: user.id },
+          { $set: { Gifted: true } },
+          { upsert: true },
+        ),
+        status.create({
+          Claimer: recipient.id,
+          Status: true,
+          Type: "vip",
+          Steam: steamId,
+          Date: new Date(),
+        }),
+        guild.members.addRole({
+          user: recipient.id,
+          role: vipRole.id,
+        }),
+        guild.members.removeRole({
+          user: user.id,
+          role: senderRole.id,
+        }),
+      ]);
+
+      await this.sendSuccessResponse(interaction, "vip", recipient, steamId);
+      await this.sendLog(interaction, user, "vip", recipient, steamId);
+    } catch (error) {
+      console.error("Benefit Gift Error:", error);
+      return this.replyError(interaction, "Failed to process gift");
+    }
+  },
+
+  async handleCodeGift(interaction) {
     const { guild, options, user } = interaction;
-    const sub = options.getSubcommand();
-    const steamId = options.getString("steamid");
     const code = options.getString("code");
-    const target = options.getUser("user");
+    const recipient = options.getUser("user");
+    const steamId = options.getString("steamid");
 
-    const perkStatus = await status.findOne({ Claimer: user.id });
-    const targetStatus = await status.findOne({ Claimer: target.id });
-    const perkSystem = await vip.findOne({ Guild: guild.id, ID: "vip" });
-
-    const vipCode = await uses.findOne({ Guild: guild.id, Type: "vip" });
-    const vipPlusCode = await uses.findOne({
+    const codeEntry = await uses.findOne({
       Guild: guild.id,
-      Type: "vip+",
-    });
-    const contributorCode = await uses.findOne({
-      Guild: guild.id,
-      Type: "contributor",
+      Code: code,
+      Uses: 0,
     });
 
-    const vipRole = await roles.findOne({ Guild: guild.id, Type: "vip" });
-    const vipPlusRole = await roles.findOne({
-      Guild: guild.id,
-      Type: "vip+",
-    });
-    const contributorRole = await roles.findOne({
-      Guild: guild.id,
-      Type: "contributor",
-    });
+    if (!codeEntry) {
+      return this.replyError(interaction, "Invalid or used code");
+    }
 
-    const member = await guild.members.fetch(target.id);
+    const recipientStatus = await status.findOne({ Claimer: recipient.id });
+    if (recipientStatus?.Status) {
+      return this.replyError(interaction, "Recipient already has VIP perks");
+    }
 
+    const role = await this.getRole(guild, codeEntry.Type);
+    if (!role) {
+      return this.replyError(interaction, "Role configuration error");
+    }
+
+    try {
+      await Promise.all([
+        uses.updateOne({ _id: codeEntry._id }, { $inc: { Uses: 1 } }),
+        status.create({
+          Claimer: recipient.id,
+          Status: true,
+          Type: codeEntry.Type,
+          Steam: steamId,
+          Date: new Date(),
+        }),
+        guild.members.addRole({
+          user: recipient.id,
+          role: role.id,
+        }),
+      ]);
+
+      if (codeEntry.Type !== "vip") {
+        const vipRole = await this.getRole(guild, "vip");
+        if (vipRole) {
+          await guild.members.addRole({
+            user: recipient.id,
+            role: vipRole.id,
+          });
+        }
+      }
+
+      await this.sendSuccessResponse(
+        interaction,
+        codeEntry.Type,
+        recipient,
+        steamId,
+      );
+      await this.sendLog(
+        interaction,
+        user,
+        codeEntry.Type,
+        recipient,
+        steamId,
+        code,
+      );
+    } catch (error) {
+      console.error("Code Gift Error:", error);
+      return this.replyError(interaction, "Failed to process gift code");
+    }
+  },
+
+  async getRole(guild, type) {
+    const roleConfig = await roles.findOne({ Guild: guild.id, Type: type });
+    return roleConfig ? guild.roles.fetch(roleConfig.Role) : null;
+  },
+
+  async sendSuccessResponse(interaction, type, recipient, steamId) {
     const embed = new EmbedBuilder()
-      .setTitle("Perks Gifted!")
-      .setColor("#ff00b3")
+      .setTitle("Gift Successful!")
+      .setColor("#00ff9d")
+      .setDescription(
+        `**${recipient}** has received **${type.toUpperCase()}** perks!\n` +
+          `SteamID: \`${steamId}\`\n` +
+          `Perks will be applied within 24 hours`,
+      )
       .setTimestamp();
+
+    await interaction.reply({ embeds: [embed], ephemeral: true });
+  },
+
+  async sendLog(interaction, sender, type, recipient, steamId, code) {
+    const system = await vip.findOne({
+      Guild: interaction.guild.id,
+      ID: "vip",
+    });
+    if (!system?.Channel) return;
 
     const logEmbed = new EmbedBuilder()
-      .setTitle("Perks Gifted")
-      .setColor("#ff00b3")
+      .setTitle("VIP Gift Processed")
+      .setColor("#00ff9d")
+      .addFields(
+        { name: "Sender", value: sender.toString(), inline: true },
+        { name: "Recipient", value: recipient.toString(), inline: true },
+        { name: "Type", value: type.toUpperCase(), inline: true },
+        { name: "SteamID", value: `\`${steamId}\``, inline: true },
+        { name: "Ping", value: `<@${PING_ID}>`, inline: true },
+      )
       .setTimestamp();
 
-    try {
-      if (timeout.includes(user)) {
-        return await interaction.reply({
-          content: `You are on a cooldown! Try again in a few seconds.`,
-          ephemeral: true,
-        });
-      }
-      if (!perkSystem) {
-        return await interaction.reply({
-          content:
-            "The perk claim/gift system is currently disabled, please try again later.",
-          ephemeral: true,
-        });
-      }
-
-      switch (sub) {
-        case "gift":
-          if (!perkStatus) {
-            return await interaction.reply({
-              content:
-                "The perk system is currently disabled, or you don't have any perks to gift.",
-              ephemeral: true,
-            });
-          } else if (perkStatus) {
-            if (!target) {
-              return await interaction.reply({
-                content: "Please mention the user you want to gift perks for.",
-                ephemeral: true,
-              });
-            }
-            if (target.id === user.id) {
-              return await interaction.reply({
-                content: "You can't gift perks for yourself.",
-                ephemeral: true,
-              });
-            }
-            if (member.roles.cache.has(vipRole)) {
-              return await interaction.reply({
-                content: "That user already has VIP perks.",
-                ephemeral: true,
-              });
-            }
-            if (perkStatus.Gifted === true) {
-              return await interaction.reply({
-                content: "You have already used your perk's gifting extras.",
-                ephemeral: true,
-              });
-            }
-            const role = await guild.roles.fetch(vipRole);
-            return await handleGift(
-              interaction,
-              perkSystem,
-              target,
-              user,
-              embed,
-              logEmbed,
-              steamId,
-              role
-            );
-          }
-          break;
-
-        case "code":
-          if (!vipCode || !vipPlusCode || !contributorCode) {
-            return await interaction.reply({
-              content:
-                "The perk claim system is currently disabled, please try again later.",
-              ephemeral: true,
-            });
-          }
-          if (
-            code !== vipCode &&
-            code !== vipPlusCode &&
-            code !== contributorCode
-          ) {
-            return await interaction.reply({
-              content: "You've entered an invalid code.",
-              ephemeral: true,
-            });
-          }
-          if (vipCode.Uses > 0 && code === vipCode) {
-            return await interaction.reply({
-              content: `The code you entered has been used already.`,
-              ephemeral: true,
-            });
-          }
-          if (vipPlusCode.Uses > 0 && code === vipPlusCode) {
-            return await interaction.reply({
-              content: `The code you entered has been used already.`,
-              ephemeral: true,
-            });
-          }
-          if (contributorCode.Uses > 0 && code === contributorCode) {
-            return await interaction.reply({
-              content: `The code you entered has been used already.`,
-              ephemeral: true,
-            });
-          }
-          if (!targetStatus) {
-            if (code === vipCode) {
-              let role = await guild.roles.fetch(vipRole.Role);
-              let perkType = "vip";
-              await handleCode(
-                interaction,
-                perkSystem,
-                target,
-                user,
-                embed,
-                logEmbed,
-                steamId,
-                perkType,
-                role
-              );
-            } else if (code === vipPlusCode) {
-              let role = await guild.roles.fetch(vipPlusRole.Role);
-              let perkType = "vip+";
-              await handleCode(
-                interaction,
-                perkSystem,
-                target,
-                user,
-                embed,
-                logEmbed,
-                steamId,
-                perkType,
-                role
-              );
-            } else if (code === contributorCode) {
-              let role = await guild.roles.fetch(contributorRole.Role);
-              let perkType = "contributor";
-              await handleCode(
-                interaction,
-                perkSystem,
-                target,
-                user,
-                embed,
-                logEmbed,
-                steamId,
-                perkType,
-                role
-              );
-            } else {
-              await interaction.reply({
-                content: `Something went wrong, please try again later.`,
-                ephemeral: true,
-              });
-            }
-          } else if (targetStatus) {
-            if (targetStatus.Type === "vip" && targetStatus.Status === true) {
-              let role = await guild.roles.fetch(vipRole.Role);
-              if (code === vipCode || member.roles.cache.has(role)) {
-                return await interaction.reply({
-                  content: `${target} already has VIP perms.`,
-                  ephemeral: true,
-                });
-              } else if (code === vipPlusCode) {
-                let role = await guild.roles.fetch(vipPlusRole.Role);
-                let perkType = "vip+";
-                if (member.roles.cache.has(role)) {
-                  return await interaction.reply({
-                    content: `${target} already has VIP+ perms.`,
-                    ephemeral: true,
-                  });
-                } else {
-                  await handleCodeExisting(
-                    interaction,
-                    perkSystem,
-                    target,
-                    user,
-                    embed,
-                    logEmbed,
-                    steamId,
-                    perkType,
-                    role
-                  );
-                }
-              } else if (code === contributorCode) {
-                let role = await guild.roles.fetch(contributorRole.Role);
-                let perkType = "contributor";
-                if (member.roles.cache.has(role)) {
-                  return await interaction.reply({
-                    content: `${target} already has Contributor perms.`,
-                    ephemeral: true,
-                  });
-                } else {
-                  await handleCodeExisting(
-                    interaction,
-                    perkSystem,
-                    target,
-                    user,
-                    embed,
-                    logEmbed,
-                    steamId,
-                    perkType,
-                    role
-                  );
-                }
-              } else {
-                await interaction.reply({
-                  content: `Something went wrong, please try again later.`,
-                  ephemeral: true,
-                });
-              }
-            } else if (
-              perkStatus.Type === "vip+" &&
-              perkStatus.Status === true
-            ) {
-              let role = await guild.roles.fetch(vipRole.Role);
-              let role2 = await guild.roles.fetch(vipPlusRole.Role);
-              if (
-                code === vipCode ||
-                code === vipPlusCode ||
-                member.roles.cache.has(role) ||
-                member.roles.cache.has(role2)
-              ) {
-                return await interaction.reply({
-                  content: `${target} already has VIP+ perks.`,
-                  ephemeral: true,
-                });
-              }
-              if (code === contributorCode) {
-                let role = await guild.roles.fetch(contributorRole);
-                let perkType = "contributor";
-                if (member.roles.cache.has(role)) {
-                  return await interaction.reply({
-                    content: `${target} already has Contributor perks.`,
-                    ephemeral: true,
-                  });
-                } else {
-                  await handleCodeExisting(
-                    interaction,
-                    perkSystem,
-                    target,
-                    user,
-                    embed,
-                    logEmbed,
-                    steamId,
-                    perkType,
-                    role
-                  );
-                }
-              } else {
-                await interaction.reply({
-                  content: `Something went wrong, please try again later.`,
-                  ephemeral: true,
-                });
-              }
-            } else if (
-              perkStatus.Type === "contributor" &&
-              perkStatus.Status === true
-            ) {
-              let role = await guild.roles.fetch(vipRole.Role);
-              let role2 = await guild.roles.fetch(vipPlusRole.Role);
-              let role3 = await guild.roles.fetch(contributorRole.Role);
-              if (
-                code === vipCode ||
-                code === vipPlusCode ||
-                code === contributorCode ||
-                member.roles.cache.has(role) ||
-                member.roles.cache.has(role2) ||
-                member.roles.cache.has(role3)
-              ) {
-                return await interaction.reply({
-                  content: `${target} already has Contributor perks.`,
-                  ephemeral: true,
-                });
-              } else {
-                await interaction.reply({
-                  content: `Something went wrong, please try again later.`,
-                  ephemeral: true,
-                });
-              }
-            } else {
-              await interaction.reply({
-                content: `Something went wrong, please try again later.`,
-                ephemeral: true,
-              });
-            }
-          }
-          break;
-      }
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
-    } finally {
-      timeout.push(user);
-      setTimeout(() => {
-        timeout.shift();
-      }, 10000);
+    if (code) {
+      logEmbed.addFields({ name: "Code", value: `\`${code}\``, inline: true });
+    } else {
+      logEmbed.addFields({ name: "Code", value: "N/A", inline: true });
     }
-  },
 
-  async handleGift(
-    interaction,
-    perkSystem,
-    target,
-    user,
-    embed,
-    logEmbed,
-    steamId,
-    role
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have gifted **VIP** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`
-    );
-    logEmbed.setDescription(
-      `**${user}** has gifted **${target}** **VIP**, using their VIP+/Contributor perk.\nSteamID: \`${steamId}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
-    );
-    try {
-      await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await status.create({
-        Claimer: target.id,
-        Status: true,
-        Type: "vip",
-        Gifted: null,
-        Steam: steamId,
-        Date: new Date(),
-      });
-      await status.findOneAndUpdate({ Claimer: user }, { Gifted: true });
-      await target.roles.add(role);
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
-    }
-  },
-
-  async handleCode(
-    interaction,
-    perkSystem,
-    target,
-    user,
-    embed,
-    logEmbed,
-    steamId,
-    perkType,
-    role
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have gifted **${perkType}** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`
-    );
-    logEmbed.setDescription(
-      `**${user}** has gifted **${perkType}** to **${target}**, using a code.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
-    );
-    await perkSystem.Channel.send({ embeds: [logEmbed] });
-    try {
-      await status.create({
-        Claimer: target.id,
-        Status: true,
-        Type: perkType,
-        Gifted: null,
-        Steam: steamId,
-        Date: new Date(),
-      });
-      await uses.findOneAndUpdate(
-        { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 }
-      );
-      await target.roles.add(role);
-      if (perkType === "vip+" || perkType === "contributor") {
-        let role2 = await guild.roles.fetch(vipRole.Role);
-        await target.roles.add(role2);
-      }
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
-    }
-  },
-
-  async handleCodeExisting(
-    interaction,
-    perkSystem,
-    target,
-    user,
-    embed,
-    logEmbed,
-    steamId,
-    perkType,
-    role
-  ) {
-    embed.setDescription(
-      `Thank you for supporting us! You have gifted **${perkType}** to **${target}**!\nIngame perks will be applied within a few hours. If you have any issues, please contact an admin.`
-    );
-    logEmbed.setDescription(
-      `**${user}** has gifted **${perkType}** to **${target}**, using a code.\nSteamID: \`${steamId}\`\nCode: \`${code}\`\nPing: <@289767921956290580>, remember to apply ingame perks!`
-    );
-    try {
-      await perkSystem.Channel.send({ embeds: [logEmbed] });
-      await status.findOneAndUpdate(
-        {
-          Claimer: target.id,
-        },
-        {
-          Status: true,
-          Type: perkType,
-          Date: new Date(),
-        }
-      );
-      await uses.findOneAndUpdate(
-        { Guild: perkSystem.Guild, Type: perkType },
-        { Uses: 1 }
-      );
-      await target.roles.add(role);
-      await interaction.reply({ embeds: [embed], ephemeral: true });
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: "An error occurred while processing your request.",
-        ephemeral: true,
-      });
-    }
+    await system.Channel.send({ embeds: [logEmbed] });
   },
 };

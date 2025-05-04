@@ -5,7 +5,7 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
+const schema = require("../../schemas/base-system.js");
 
 var timeout = [];
 
@@ -46,7 +46,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Explain what/who you're suggesting/reporting.")
       .setPlaceholder(
-        "What happened? Where? / What makes your suggestion worth adding."
+        "What happened? Where? / What makes your suggestion worth adding.",
       )
       .setStyle(TextInputStyle.Paragraph);
 

@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   ChannelType,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
+const schema = require("../../schemas/base-system.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,13 +20,13 @@ module.exports = {
             .setName("channel")
             .setDescription("The channel for unban requests")
             .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText)
-        )
+            .addChannelTypes(ChannelType.GuildText),
+        ),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the unban system")
+        .setDescription("[Admin] Disable the unban system"),
     ),
   async execute(interaction, client) {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
@@ -50,7 +50,7 @@ module.exports = {
         try {
           if (!data) {
             embed.setDescription(
-              `All submitted unban requests will be sent in ${channel}`
+              `All submitted unban requests will be sent in ${channel}`,
             );
             await schema.create({
               Guild: guild.id,
@@ -60,7 +60,7 @@ module.exports = {
           } else if (data) {
             const existingChannel = client.channels.cache.get(data.Channel);
             embed.setDescription(
-              `Your unban channel has already been set to ${existingChannel}`
+              `Your unban channel has already been set to ${existingChannel}`,
             );
           }
 

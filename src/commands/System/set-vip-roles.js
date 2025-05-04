@@ -1,110 +1,84 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const schema = require("../../Schemas/vip/vip-roles.js");
+const schema = require("../../schemas/vip/vipRoles.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("set-vip-roles")
-    .setDescription("[Admin] Set or change the vip roles")
+    .setDescription("[Admin] Set or update the VIP roles")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addStringOption((option) =>
       option
         .setName("role-vip")
         .setDescription("Set or update the VIP Role")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("role-vip-plus")
         .setDescription("Set or update the VIP+ Role")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("role-contributor")
         .setDescription("Set or update the Contributor Role")
-        .setRequired(false)
+        .setRequired(false),
     ),
-  async execute(interaction) {
-    const guild = interaction.guild;
-    const vipRole = interaction.options.getString("role-vip");
-    const vipPlusRole = interaction.options.getString("role-vip-plus");
-    const contributorRole = interaction.options.getString("role-contributor");
-    const data = await schema.findOne({ Guild: guild.id });
 
-    if (!data) {
-      if (vipRole) {
-        await schema.create({
-          Guild: guild.id,
-          Role: vipRole,
-          Type: "vip",
-        });
-      }
-      if (vipPlusRole) {
-        await schema.create({
-          Guild: guild.id,
-          Role: vipPlusRole,
-          Type: "vip+",
-        });
-      }
-      if (contributorRole) {
-        await schema.create({
-          Guild: guild.id,
-          Role: contributorRole,
-          Type: "contributor",
-        });
-      } else {
-        return await interaction.reply({
-          content: `No role has been set.`,
-          ephemeral: true,
-        });
-      }
-      return await interaction.reply({
-        content: "Roles have been set.",
+  async execute(interaction) {
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
+      return interaction.reply({
+        content: "You don't have permissions to use this command.",
         ephemeral: true,
       });
     }
 
-    if (data) {
-      if (vipRole) {
-        await schema.findOneAndUpdate(
-          {
-            Guild: guild.id,
-            Type: "vip",
-          },
-          {
-            Role: vipRole,
-          }
-        );
-      }
-      if (vipPlusRole) {
-        await schema.findOneAndUpdate(
-          {
-            Guild: guild.id,
-            Type: "vip+",
-          },
-          {
-            Role: vipPlusRole,
-          }
-        );
-      }
-      if (contributorRole) {
-        await schema.findOneAndUpdate(
-          {
-            Guild: guild.id,
-            Type: "contributor",
-          },
-          {
-            Role: contributorRole,
-          }
-        );
-      } else {
-        return await interaction.reply({
-          content: `No role has been set.`,
+    try {
+      const guild = interaction.guild;
+      const roles = {
+        vip: interaction.options.getString("role-vip"),
+        vipPlus: interaction.options.getString("role-vip-plus"),
+        contributor: interaction.options.getString("role-contributor"),
+      };
+
+      if (!Object.values(roles).some((role) => role)) {
+        return interaction.reply({
+          content: "Please provide at least one role to set.",
           ephemeral: true,
         });
       }
-      return await interaction.reply({
-        content: `Roles have been updated.`,
+
+      const operations = [];
+      const roleTypes = [
+        { type: "vip", role: roles.vip },
+        { type: "vip+", role: roles.vipPlus },
+        { type: "contributor", role: roles.contributor },
+      ];
+
+      for (const { type, role } of roleTypes) {
+        if (role) {
+          operations.push(
+            schema.findOneAndUpdate(
+              { Guild: guild.id, Type: type },
+              { $set: { Role: role } },
+              { upsert: true, new: true },
+            ),
+          );
+        }
+      }
+
+      await Promise.all(operations);
+
+      return interaction.reply({
+        content: "Roles have been successfully updated!",
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error("Error in set-vip-roles:", error);
+      return interaction.reply({
+        content: "There was an error while executing this command!",
         ephemeral: true,
       });
     }

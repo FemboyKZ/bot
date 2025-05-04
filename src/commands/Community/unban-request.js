@@ -5,8 +5,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const status = require("../../Schemas/request-status.js");
+const schema = require("../../schemas/base-system.js");
+const status = require("../../schemas/request-status.js");
 
 var timeout = [];
 
@@ -52,7 +52,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Why should you get unbanned?")
       .setPlaceholder(
-        "Why were you banned? Why would we trust that you won't do it again? Etc."
+        "Why were you banned? Why would we trust that you won't do it again? Etc.",
       )
       .setStyle(TextInputStyle.Paragraph);
 

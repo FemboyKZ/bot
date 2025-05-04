@@ -3,8 +3,8 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const schema = require("../../Schemas/moderation/ghostping.js");
-const count = require("../../Schemas/moderation/ghostnum.js");
+const schema = require("../../schemas/base-system.js");
+const count = require("../../schemas/moderation/actionCounts.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,12 +14,12 @@ module.exports = {
     .addSubcommand((command) =>
       command
         .setName("setup")
-        .setDescription("[Admin] Set up the anti-ghostping system")
+        .setDescription("[Admin] Set up the anti-ghostping system"),
     )
     .addSubcommand((command) =>
       command
         .setName("disable")
-        .setDescription("[Admin] Disable the anti-ghostping system")
+        .setDescription("[Admin] Disable the anti-ghostping system"),
     )
     .addSubcommand((command) =>
       command
@@ -29,8 +29,8 @@ module.exports = {
           option
             .setName("user")
             .setDescription("The user you want to reset the ghostpings of")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     ),
 
   async execute(interaction) {
@@ -47,7 +47,7 @@ module.exports = {
     const Data = await schema.findOne({ Guild: interaction.guild.id });
 
     switch (sub) {
-      case "setup":
+      case "setup": {
         if (Data)
           return await interaction.reply({
             content: "The anti-ghostping system is already set up.",
@@ -56,6 +56,7 @@ module.exports = {
         else {
           await schema.create({
             Guild: interaction.guild.id,
+            ID: "ghostping",
           });
 
           const embed = new EmbedBuilder()
@@ -65,8 +66,9 @@ module.exports = {
           await interaction.reply({ embeds: [embed] });
         }
         break;
+      }
 
-      case "disable":
+      case "disable": {
         if (!Data)
           return await interaction.reply({
             content: "The anti-ghostping system has not yet been set up.",
@@ -75,6 +77,7 @@ module.exports = {
         else {
           await schema.deleteMany({
             Guild: interaction.guild.id,
+            ID: "ghostping",
           });
 
           const embed = new EmbedBuilder()
@@ -84,12 +87,14 @@ module.exports = {
           await interaction.reply({ embeds: [embed] });
         }
         break;
+      }
 
-      case "number-reset":
+      case "number-reset": {
         const member = options.getUser("user");
         const data = await count.findOne({
           Guild: interaction.guild.id,
           User: member.id,
+          Type: "ghostping",
         });
 
         if (!Data)
@@ -106,6 +111,8 @@ module.exports = {
             content: `${member}'s ghostping count has been reset.`,
           });
         }
+        break;
+      }
     }
   },
 };

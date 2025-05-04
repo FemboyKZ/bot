@@ -5,8 +5,8 @@ const {
   TextInputStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const schema = require("../../Schemas/base-system.js");
-const status = require("../../Schemas/request-status.js");
+const schema = require("../../schemas/base-system.js");
+const status = require("../../schemas/request-status.js");
 
 var timeout = [];
 
@@ -52,7 +52,7 @@ module.exports = {
       .setRequired(true)
       .setLabel("Why should you get whitelisted?")
       .setPlaceholder(
-        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc."
+        "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc.",
       )
       .setStyle(TextInputStyle.Paragraph);
 
