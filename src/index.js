@@ -78,12 +78,6 @@ const functions = fs
   .filter((file) => file.endsWith(".js"));
 
 const eventsPath = path.join(__dirname, "events");
-const clientEventsPath = path.join(eventsPath, "client");
-const processEventsPath = path.join(eventsPath, "process");
-const restEventsPath = path.join(eventsPath, "rest");
-const mongoEventsPath = path.join(eventsPath, "mongo");
-
-const commandsPath = path.join(__dirname, "commands");
 
 (async () => {
   try {
@@ -92,11 +86,11 @@ const commandsPath = path.join(__dirname, "commands");
     for (file of functions) {
       require(`${functionsPath}/${file}`)(client);
     }
-    await client.handleEvents(clientEventsPath);
-    await client.handleProcessEvents(processEventsPath);
-    await client.handleRestEvents(restEventsPath);
-    await client.handleMongoEvents(mongoEventsPath);
-    await client.handleCommands(commandsPath);
+    await client.handleEvents(path.join(eventsPath, "client"));
+    await client.handleProcessEvents(path.join(eventsPath, "process"));
+    await client.handleRestEvents(path.join(eventsPath, "rest"));
+    await client.handleMongoEvents(path.join(eventsPath, "mongo"));
+    await client.handleCommands(path.join(__dirname, "commands"));
   } catch (error) {
     console.error("Error starting the bot:", error);
   }
