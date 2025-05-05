@@ -236,7 +236,7 @@ module.exports = {
       if (failed.length > 0) {
         description += `\n\nFailed:`;
         failed.forEach((f) => {
-          description += `\n\`${f.server.name}: ${results?.error}, ${f.error}\``;
+          description += `\n\`${f.server.name}: ${f.error}\``;
         });
       }
 
