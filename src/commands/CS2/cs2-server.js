@@ -37,6 +37,7 @@ const resolveServerConfig = (serverId) => {
     return Object.values(config).map((server) => ({
       ip: server.ip,
       port: server.port,
+      name: server.name,
       type: server.type,
       user: server.user,
       id: server.id,
@@ -50,6 +51,7 @@ const resolveServerConfig = (serverId) => {
       {
         ip: server.ip,
         port: server.port,
+        name: server.name,
         type: server.type,
         user: server.user,
         id: server.id,
@@ -234,7 +236,7 @@ module.exports = {
       if (failed.length > 0) {
         description += `\n\nFailed:`;
         failed.forEach((f) => {
-          description += `\n\`${f.server.name}: ${results.toString()}, ${f.error}\``;
+          description += `\n\`${f.server.name}: ${results?.error}, ${f.error}\``;
         });
       }
 
