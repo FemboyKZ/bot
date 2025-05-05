@@ -228,13 +228,13 @@ module.exports = {
       if (successful.length > 0) {
         description += `\n\nSuccessful:`;
         successful.forEach((s) => {
-          description += `\n- ${s.server.id} (${s.server.ip}:${s.server.port})`;
+          description += `\n\`${s.server.name} (${s.server.ip}:${s.server.port})\``;
         });
       }
       if (failed.length > 0) {
         description += `\n\nFailed:`;
         failed.forEach((f) => {
-          description += `\n- ${f.server.id}: ${f.error}`;
+          description += `\n\`${f.server.name}: ${results.toString()}, ${f.error}\``;
         });
       }
 
