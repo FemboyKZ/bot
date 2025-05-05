@@ -147,15 +147,15 @@ module.exports = {
 
   async execute(interaction) {
     try {
-      const role = await interaction.guild.roles.cache.get(MANAGER_ROLE);
+      const role = await interaction.guild.roles.fetch(MANAGER_ROLE);
       if (!role) {
         console.log("Manager role not found in guild", MANAGER_ROLE);
       }
       if (
         !interaction.member.permissions.has(
           PermissionFlagsBits.Administrator,
-        ) ||
-        !interaction.member.roles.cache.has(role)
+        ) &&
+        !interaction.member.roles.cache.has(MANAGER_ROLE)
       ) {
         return await interaction.reply({
           content: "You don't have perms to use this command.",
