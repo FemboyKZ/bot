@@ -3,7 +3,7 @@ const { exec } = require("child_process");
 const wait = require("timers/promises").setTimeout;
 require("dotenv").config();
 
-const user = "csgo-pizan-1";
+const user = "csgo-p1zan";
 const name = "sportsmenskaya razdevalka";
 
 module.exports = {
@@ -31,8 +31,6 @@ module.exports = {
         `sudo -iu ${user} /home/${user}/csgoserver start`,
         async (error, stdout, stderr) => {
           if (error) console.log(error);
-          //if (stderr) console.log(stderr);
-          //if (stdout) console.log(stdout);
         }
       );
       await wait(3000);
