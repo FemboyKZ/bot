@@ -1,4 +1,5 @@
-[{
+[
+  {
     "cs2-server-1": {
       "type": "local",
       "name": "CS2 Server 1",
@@ -19,5 +20,6 @@
       "id": "serverid",
       "ip": "somedomain.com",
       "port": "27017"
-    },
-}]
+    }
+  }
+]
