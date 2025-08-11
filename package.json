@@ -11,12 +11,12 @@
   "dependencies": {
     "discord.js": "^14.21.0",
     "dotenv": "^16.6.1",
-    "mongoose": "^8.17.0",
+    "mongoose": "^8.17.1",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
-    "eslint": "^9.32.0",
+    "@eslint/js": "^9.33.0",
+    "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.3.0",
