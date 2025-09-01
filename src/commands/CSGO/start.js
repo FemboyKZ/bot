@@ -14,7 +14,8 @@ module.exports = {
         .setRequired(true)
         .addChoices(
           { name: "Somali Pirates 1", value: "csgo-somali-1" },
-          { name: "Somali Pirates 2", value: "csgo-somali-2" }
+          { name: "Somali Pirates 2", value: "csgo-somali-2" },
+          { name: "Somali Pirates Public", value: "csgo-somali-3" }
         )
     ),
 
@@ -30,6 +31,10 @@ module.exports = {
       "csgo-somali-2": {
         name: "Somali Pirates 2",
         user: "csgo-somali-2",
+      },
+      "csgo-somali-3": {
+        name: "Somali Pirates Public",
+        user: "csgo-somali-3",
       },
     }[servers];
 
