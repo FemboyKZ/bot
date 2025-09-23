@@ -58,21 +58,112 @@ module.exports = {
 
     if (interaction.isButton()) {
       if (interaction.customId === "ticket-close") {
-        if (
-          !interaction.member.permissions.has(
-            PermissionsBitField.Flags.Administrator,
-          )
-        ) {
-          return await interaction.reply({
-            content: `You don't have perms to use this command.`,
+        try {
+          if (
+            !interaction.member.permissions.has(
+              PermissionsBitField.Flags.Administrator,
+            )
+          ) {
+            return await interaction.reply({
+              content: `You don't have perms to use this command.`,
+              ephemeral: true,
+            });
+          }
+          await interaction.reply({
+            content: `Ticket closed.`,
+            ephemeral: true,
+          });
+          await interaction.message.delete();
+          await interaction.channel.delete();
+        } catch (error) {
+          console.error("Error closing ticket:", error);
+          await interaction.reply({
+            content: "There was an error while closing the ticket.",
             ephemeral: true,
           });
         }
-        await interaction.reply({
-          content: `Ticket closed.`,
-          ephemeral: true,
-        });
-        await interaction.message.delete();
+      }
+      if (interaction.customId === "accept-request") {
+        try {
+          if (
+            !interaction.member.permissions.has(
+              PermissionsBitField.Flags.Administrator,
+            )
+          ) {
+            return await interaction.reply({
+              content: `You don't have perms to use this command.`,
+              ephemeral: true,
+            });
+          }
+          const data = await status.findOne({
+            Message: interaction.message.id,
+          });
+          if (!data) {
+            return await interaction.reply({
+              content: `No pending request found for this user.`,
+              ephemeral: true,
+            });
+          }
+          await status.findOneAndUpdate(
+            { Message: interaction.message.id },
+            { Status: true },
+          );
+          await interaction.reply({
+            content: `Request accepted.`,
+            ephemeral: true,
+          });
+          await interaction.message.edit({
+            content: `**REQUEST ACCEPTED**`,
+            components: [],
+          });
+        } catch (error) {
+          console.error("Error accepting request:", error);
+          await interaction.reply({
+            content: "There was an error while accepting the request.",
+            ephemeral: true,
+          });
+        }
+      }
+      if (interaction.customId === "deny-request") {
+        try {
+          if (
+            !interaction.member.permissions.has(
+              PermissionsBitField.Flags.Administrator,
+            )
+          ) {
+            return await interaction.reply({
+              content: `You don't have perms to use this command.`,
+              ephemeral: true,
+            });
+          }
+          const data = await status.findOne({
+            Message: interaction.message.id,
+          });
+          if (!data) {
+            return await interaction.reply({
+              content: `No pending request found for this user.`,
+              ephemeral: true,
+            });
+          }
+          await status.findOneAndUpdate(
+            { Message: interaction.message.id },
+            { Status: false },
+          );
+          await interaction.reply({
+            content: `Request denied.`,
+            ephemeral: true,
+          });
+          await interaction.message.edit({
+            content: `**REQUEST DENIED**`,
+            components: [],
+          });
+        } catch (error) {
+          console.error("Error denying request:", error);
+          await interaction.reply({
+            content: "There was an error while denying the request.",
+            ephemeral: true,
+          });
+        }
       }
     }
 
@@ -164,6 +255,20 @@ module.exports = {
           )
           .setTimestamp();
 
+        const buttonAccept = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("accept-request")
+            .setLabel("Accept Request")
+            .setStyle(ButtonStyle.Success),
+        );
+
+        const buttonDeny = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("deny-request")
+            .setLabel("Deny Request")
+            .setStyle(ButtonStyle.Danger),
+        );
+
         const data = await schema.findOne({
           Guild: interaction.guild.id,
           ID: "mc-whitelist",
@@ -175,7 +280,10 @@ module.exports = {
         if (!channel) return;
 
         try {
-          await channel.send({ embeds: [embed] });
+          const msg = await channel.send({
+            embeds: [embed],
+            components: [buttonAccept, buttonDeny],
+          });
           await interaction.reply({
             content: "Your request has been submitted.",
             ephemeral: true,
@@ -183,6 +291,7 @@ module.exports = {
           await status.create({
             User: interaction.user.id,
             Type: "mc-whitelist",
+            Message: msg?.id,
             Status: null,
           });
         } catch (error) {
@@ -233,6 +342,20 @@ module.exports = {
           )
           .setTimestamp();
 
+        const buttonAccept = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("accept-request")
+            .setLabel("Accept Request")
+            .setStyle(ButtonStyle.Success),
+        );
+
+        const buttonDeny = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("deny-request")
+            .setLabel("Deny Request")
+            .setStyle(ButtonStyle.Danger),
+        );
+
         const data = await schema.findOne({
           Guild: interaction.guild.id,
           ID: "whitelist",
@@ -244,7 +367,10 @@ module.exports = {
         if (!channel) return;
 
         try {
-          await channel.send({ embeds: [embed] });
+          const msg = await channel.send({
+            embeds: [embed],
+            components: [buttonAccept, buttonDeny],
+          });
           await interaction.reply({
             content: "Your request has been submitted.",
             ephemeral: true,
@@ -252,6 +378,7 @@ module.exports = {
           await status.create({
             User: interaction.user.id,
             Type: "whitelist",
+            Message: msg?.id,
             Status: null,
           });
         } catch (error) {
@@ -301,6 +428,20 @@ module.exports = {
           )
           .setTimestamp();
 
+        const buttonAccept = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("accept-request")
+            .setLabel("Accept Request")
+            .setStyle(ButtonStyle.Success),
+        );
+
+        const buttonDeny = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("deny-request")
+            .setLabel("Deny Request")
+            .setStyle(ButtonStyle.Danger),
+        );
+
         const data = await schema.findOne({
           Guild: interaction.guild.id,
           ID: "unban",
@@ -312,7 +453,10 @@ module.exports = {
         if (!channel) return;
 
         try {
-          await channel.send({ embeds: [embed] });
+          const msg = await channel.send({
+            embeds: [embed],
+            components: [buttonAccept, buttonDeny],
+          });
           await interaction.reply({
             content: "Your request has been submitted.",
             ephemeral: true,
@@ -320,6 +464,7 @@ module.exports = {
           await status.create({
             User: interaction.user.id,
             Type: "unban",
+            Message: msg?.id,
             Status: null,
           });
         } catch (error) {
