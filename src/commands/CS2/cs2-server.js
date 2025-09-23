@@ -82,7 +82,7 @@ const queryServerStatus = async (ip, port) => {
 
 const commandHandlers = {
   local: async (action, { user }) => {
-    const command = `sudo -iu cs2-${user} /home/cs2-${user}/cs2server ${action}`;
+    const command = `sudo -iu cs2-fkz docker exec -it cs2-${user} ${action}`;
     const { stderr } = await execAsync(command);
     if (stderr) throw new Error(`Local command failed: ${stderr}`);
   },
