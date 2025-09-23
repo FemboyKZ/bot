@@ -13,6 +13,85 @@ const {
 const schema = require("../../../schemas/base-system.js");
 const status = require("../../../schemas/request-status.js");
 
+function isValidMinecraftUUID(uuid) {
+  const uuidRegex =
+    /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+function isValidSteamID(steamId) {
+  if (typeof steamId !== "string") return false;
+
+  steamId = steamId.trim();
+
+  if (steamId.includes("steamcommunity.com")) {
+    const urlResult = extractSteamIdFromUrl(steamId);
+    if (urlResult === "custom_id") {
+      return "custom_id";
+    }
+    if (urlResult) {
+      steamId = urlResult;
+    }
+  }
+
+  const steamId64Regex = /^7656119\d{10}$/;
+  if (steamId64Regex.test(steamId)) {
+    return true;
+  }
+
+  const steamId2Regex = /^STEAM_[0-5]:[01]:\d+$/;
+  if (steamId2Regex.test(steamId.toUpperCase())) {
+    return true;
+  }
+
+  const steamId3Regex = /^\[U:1:\d+\]$/;
+  if (steamId3Regex.test(steamId)) {
+    return true;
+  }
+
+  return false;
+}
+
+function steamIDTo64(steamId) {
+  if (!isValidSteamID(steamId)) return null;
+  steamId = steamId.trim();
+
+  if (/^7656119\d{10}$/.test(steamId)) {
+    return steamId;
+  }
+  if (/^STEAM_[0-5]:[01]:\d+$/i.test(steamId)) {
+    const parts = steamId.split(":");
+    const y = parseInt(parts[1]);
+    const z = parseInt(parts[2]);
+    return (76561197960265728n + BigInt(z) * 2n + BigInt(y)).toString();
+  }
+  if (/^\[U:1:\d+\]$/i.test(steamId)) {
+    const accountId = parseInt(steamId.match(/\d+/)[0]);
+    return (76561197960265728n + BigInt(accountId)).toString();
+  }
+
+  return null;
+}
+
+function extractSteamIdFromUrl(url) {
+  try {
+    const profileRegex = /steamcommunity\.com\/profiles\/(7656119\d{10})/;
+    const profileMatch = url.match(profileRegex);
+    if (profileMatch) {
+      return profileMatch[1];
+    }
+
+    const customRegex = /steamcommunity\.com\/id\/([a-zA-Z0-9_-]+)/;
+    const customMatch = url.match(customRegex);
+    if (customMatch) {
+      return "custom_id";
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
 module.exports = {
   name: Events.InteractionCreate,
   async execute(interaction, client) {
@@ -222,6 +301,13 @@ module.exports = {
         const reason = interaction.fields.getTextInputValue("reasonMc");
         const request = interaction.fields.getTextInputValue("requestMc");
 
+        if (!isValidMinecraftUUID(uuid)) {
+          return await interaction.reply({
+            content: `The provided UUID is not valid. Please provide a valid Minecraft UUID.`,
+            ephemeral: true,
+          });
+        }
+
         if (reason.length > 500 || request.length > 500) {
           return await interaction.reply({
             content: `You have entered too much text, please shorten it and try again.`,
@@ -309,9 +395,39 @@ module.exports = {
         const request =
           interaction.fields.getTextInputValue("requestWhitelist");
 
+        if (isValidSteamID(steam) === false) {
+          return await interaction.reply({
+            content: `Please enter a valid SteamID or Profile URL`,
+            ephemeral: true,
+          });
+        }
+        if (isValidSteamID(steam) === "custom_id") {
+          return await interaction.reply({
+            content: `Please enter a valid SteamID or Profile URL, not a custom URL.`,
+            ephemeral: true,
+          });
+        }
+
         if (reason.length > 500 || request.length > 500) {
           return await interaction.reply({
             content: `You have entered too much text, please shorten it and try again.`,
+            ephemeral: true,
+          });
+        }
+
+        if (
+          !request.toLowerCase().includes("yes") &&
+          !request.toLowerCase().includes("no")
+        ) {
+          return await interaction.reply({
+            content: `Please specify if you have requested to join the group with a simple "yes" or "no".`,
+            ephemeral: true,
+          });
+        }
+
+        if (request.toLowerCase().includes("no")) {
+          return await interaction.reply({
+            content: `Not requesting to the group will get you automatically denied.\nIf you want to request without joining the group, please create a ticket instead.`,
             ephemeral: true,
           });
         }
@@ -326,7 +442,7 @@ module.exports = {
           .addFields(
             {
               name: "SteamID / Profile URL",
-              value: `${steam}`,
+              value: `${await steamIDTo64(steam)}`,
               inline: false,
             },
             {
@@ -394,6 +510,19 @@ module.exports = {
         const steam = interaction.fields.getTextInputValue("steamUnban");
         const reason = interaction.fields.getTextInputValue("reasonUnban");
         const server = interaction.fields.getTextInputValue("serverUnban");
+
+        if (isValidSteamID(steam) === false) {
+          return await interaction.reply({
+            content: `Please enter a valid SteamID or Profile URL`,
+            ephemeral: true,
+          });
+        }
+        if (isValidSteamID(steam) === "custom_id") {
+          return await interaction.reply({
+            content: `Please enter a valid SteamID or Profile URL, not a custom URL.`,
+            ephemeral: true,
+          });
+        }
 
         if (reason.length > 500) {
           return await interaction.reply({
@@ -601,11 +730,6 @@ module.exports = {
             {
               name: `Additional Info`,
               value: `${additionalInput}`,
-              inline: false,
-            },
-            {
-              name: `Type`,
-              value: `${data.Ticket}`,
               inline: false,
             },
           ])
