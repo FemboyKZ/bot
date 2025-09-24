@@ -6,7 +6,7 @@ const {
   ActionRowBuilder,
 } = require("discord.js");
 const schema = require("../../schemas/base-system.js");
-const status = require("../../schemas/request-status.js");
+const status = require("../../schemas/requestStatus.js");
 require("dotenv").config();
 
 const whitelistRole = process.env.WHITELIST_ROLE;

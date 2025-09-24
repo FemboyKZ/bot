@@ -11,7 +11,7 @@ const {
   TextInputStyle,
 } = require("discord.js");
 const schema = require("../../../schemas/base-system.js");
-const status = require("../../../schemas/request-status.js");
+const status = require("../../../schemas/requestStatus.js");
 
 function isValidMinecraftUUID(uuid) {
   const uuidRegex =
