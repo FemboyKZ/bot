@@ -1,6 +1,5 @@
-const { PermissionFlagsBits, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const reactions = require("../../../schemas/reactionRoles.js");
-const requests = require("../../../schemas/request-status.js");
 
 module.exports = {
   name: Events.MessageReactionAdd,
@@ -37,45 +36,6 @@ module.exports = {
         await member.roles.add(reactData.Role);
       } catch (e) {
         console.error(e);
-      }
-    }
-
-    const requestData = await requests.findOne({
-      User: user.id,
-      Type: "Whitelist",
-    });
-    if (requestData) {
-      const guild = reaction.message.guild;
-      const newRole = await guild.roles.cache.find(
-        (role) => role.name === "Femmy",
-      );
-      const oldRole = await member.roles.cache.find(
-        (role) => role.name === "Wannabe Fem",
-      );
-
-      const member = await reaction.message.guild.members.cache.get(user.id);
-      if (
-        !member ||
-        !member.permissions.has(PermissionFlagsBits.Administrator)
-      ) {
-        return;
-      }
-      if (reaction.emoji.name === "👍") {
-        await requests.findOneAndUpdate(
-          { User: user.id, Type: "Whitelist" },
-          { Status: true },
-        );
-        if (await member.roles.cache.has(newRole.id))
-          await member.roles.add(newRole);
-        if (await member.roles.cache.has(oldRole.id))
-          await member.roles.remove(oldRole);
-      } else if (reaction.emoji.name === "👎") {
-        await requests.findOneAndUpdate(
-          { User: user.id, Type: "Whitelist" },
-          { Status: false },
-        );
-      } else {
-        return;
       }
     }
   },
