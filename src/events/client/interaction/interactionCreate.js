@@ -10,7 +10,7 @@ const {
   TextInputBuilder,
   TextInputStyle,
 } = require("discord.js");
-const schema = require("../../../schemas/base-system.js");
+const schema = require("../../../schemas/baseSystem.js");
 const status = require("../../../schemas/requestStatus.js");
 
 function isValidMinecraftUUID(uuid) {

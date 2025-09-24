@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const schema = require("../../schemas/base-system.js");
+const schema = require("../../schemas/baseSystem.js");
 const mutes = require("../../schemas/moderation/mutes.js");
 const roles = require("../../schemas/moderation/muteRoles.js");
 //var parse = require("parse-duration");

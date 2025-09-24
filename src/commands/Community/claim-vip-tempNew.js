@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const vip = require("../../schemas/base-system.js");
+const vip = require("../../schemas/baseSystem.js");
 const codes = require("../../schemas/vip/vipCodes.js");
 const roles = require("../../schemas/vip/vipRoles.js");
 const status = require("../../schemas/vip/vipStatus.js");

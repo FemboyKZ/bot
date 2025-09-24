@@ -1,5 +1,5 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/base-system.js");
+const schema = require("../../../schemas/baseSystem.js");
 const logs = require("../../../schemas/events/automodRules.js");
 
 // TODO: make this not shit

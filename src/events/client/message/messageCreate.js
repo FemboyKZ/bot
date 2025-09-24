@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const schema = require("../../../schemas/base-system.js");
+const schema = require("../../../schemas/baseSystem.js");
 //const antiSpam = require("../../../schemas/moderation/actionCounts.js");
 
 module.exports = {

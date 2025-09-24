@@ -1,5 +1,5 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/base-system.js");
+const schema = require("../../../schemas/baseSystem.js");
 const logs = require("../../../schemas/events/bans.js");
 
 module.exports = {
