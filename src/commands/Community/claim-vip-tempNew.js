@@ -34,7 +34,7 @@ module.exports = {
       const steamId = options.getString("steamid");
       const code = options.getString("code");
 
-      if (!(await this.validateSystem(guild))) {
+      if (!(await this.validateSystem(guild, code))) {
         return this.replyError(
           interaction,
           "System disabled - Please try again later",
@@ -44,6 +44,17 @@ module.exports = {
       const codeData = await this.getCodeData(guild, code);
       if (!codeData) {
         return this.replyError(interaction, "Invalid code");
+      }
+
+      if (codeData.type === "used") {
+        return this.replyError(interaction, "Used code");
+      }
+
+      if (!(await this.isValidSteamId(steamId))) {
+        return this.replyError(
+          interaction,
+          "Invalid SteamID, correct format: 7656119XXXXXXXXX / STEAM_1:0:XXXXXXXXX",
+        );
       }
 
       const existingStatus = await status.findOne({ Claimer: user.id });
@@ -58,32 +69,79 @@ module.exports = {
     }
   },
 
-  async validateSystem(guild) {
+  async validateSystem(guild, code) {
     const [system, codeEntries] = await Promise.all([
       vip.findOne({ Guild: guild.id, ID: "vip" }),
-      codes.find({ Guild: guild.id, Type: { $in: CLAIM_TYPES } }),
+      codes.find({
+        Guild: guild.id,
+        $or: [
+          { vipCodes: code },
+          { vipPlusCodes: code },
+          { contributorCodes: code },
+        ],
+      }),
     ]);
 
     return system && codeEntries.length === CLAIM_TYPES.length;
+  },
+
+  async isValidSteamId(input) {
+    const str = String(input);
+    if (/^7656119\d{10}$/.test(str)) {
+      return true;
+    }
+    if (/^STEAM_[0-5]:[0-1]:\d+$/.test(str)) {
+      return true;
+    }
+    return false;
+  },
+
+  async formatSteamId(input) {
+    const str = String(input);
+    if (/^7656119\d{10}$/.test(str)) {
+      const steamid64ident = BigInt("76561197960265728");
+      const steamidacct = BigInt(input) - steamid64ident;
+
+      const part2 = steamidacct % 2n === 0n ? "0:" : "1:";
+      const part3 = steamidacct / 2n;
+
+      return `STEAM_0:${part2}${part3}`;
+    }
+    if (/^STEAM_[0-5]:[0-1]:\d+$/.test(str)) {
+      return input;
+    }
+
+    return null;
   },
 
   async getCodeData(guild, code) {
     const allCodes = await codes.find({
       Guild: guild.id,
     });
+    if (!allCodes) return null;
 
     if (allCodes.vipCodes && allCodes.vipCodes.includes(code)) {
       return { type: "vip", role: await this.getRole(guild, "vip"), allCodes };
     } else if (allCodes.vipPlusCodes && allCodes.vipPlusCodes.includes(code)) {
       return { type: "vip+", role: await this.getRole(guild, "vip"), allCodes };
+    } else if (
+      allCodes.contributorCodes &&
+      allCodes.contributorCodes.includes(code)
+    ) {
+      return {
+        type: "contributor",
+        role: await this.getRole(guild, "contributor"),
+        allCodes,
+      };
+    } else if (allCodes.usedCodes && allCodes.usedCodes.includes(code)) {
+      return {
+        type: "used",
+        role: null,
+        allCodes,
+      };
+    } else {
+      return null;
     }
-
-    if (!allCodes) return null;
-    return {
-      type: allCodes.Type,
-      role: await this.getRole(guild, allCodes.Type),
-      allCodes,
-    };
   },
 
   async getRole(guild, type) {
