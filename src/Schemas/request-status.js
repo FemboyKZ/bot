@@ -1,4 +1,3 @@
-const { Message } = require("discord.js");
 const { model, Schema } = require("mongoose");
 
 let requestStatus = new Schema({
