@@ -8,7 +8,7 @@
       "port": "27015"
     },
     "csgo-server-2": {
-      "type": "api",
+      "type": "remote",
       "name": "CSGO Server 2",
       "user": "remote-user-1",
       "ip": "127.0.0.1",

@@ -8,7 +8,7 @@
       "port": "27015"
     },
     "cs2-server-2": {
-      "type": "api",
+      "type": "remote",
       "name": "CS2 Server 2",
       "user": "remote-user-1",
       "ip": "127.0.0.1",

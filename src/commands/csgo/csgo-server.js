@@ -13,8 +13,9 @@ require("dotenv").config();
 
 const MANAGER_ROLE = process.env.CSGO_MANAGER_ROLE;
 const EMBED_COLOR = "#ff00b3";
-const API_URL = new URL(process.env.API_URL);
-const API_FULL_URL = `${API_URL.origin}:${process.env.API_PORT || 8080}${API_URL.pathname}`;
+const REMOTE_IP = process.env.CSGO_REMOTE_IP;
+const REMOTE_USER = process.env.CSGO_REMOTE_USER;
+const REMOTE_PASS = process.env.CSGO_REMOTE_PASSWORD;
 const STATUS_SCRIPT = path.join(
   __dirname,
   "..",
@@ -82,22 +83,16 @@ const queryServerStatus = async (ip, port) => {
 
 const commandHandlers = {
   local: async (action, { user }) => {
-    const command = `sudo -iu csgo-${user} /home/csgo-${user}/csgoserver ${action}`;
+    const command = `cd /home/cs2-fkz && docker ${action} cs2-${user}`;
     const { stderr } = await execAsync(command);
     if (stderr) throw new Error(`Local command failed: ${stderr}`);
   },
 
-  api: async (action, { user }) => {
-    const command = [
-      "curl -X POST",
-      `-H 'authorization: ${process.env.API_KEY}'`,
-      '-H "Content-Type: application/json"',
-      `-d '{"user": "${user}", "game": "csgo", "command": "${action}"}'`,
-      API_FULL_URL,
-    ].join(" ");
+  remote: async (action, { user }) => {
+    const command = `sshpass -p ${REMOTE_PASS} ssh ${REMOTE_USER}@${REMOTE_IP} 'docker ${action} csgo-${user}'`;
 
     const { stderr } = await execAsync(command);
-    if (stderr) throw new Error(`API command failed: ${stderr}`);
+    if (stderr) throw new Error(`Remote command failed: ${stderr}`);
   },
 
   dathost: async (action, { id }) => {
