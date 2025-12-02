@@ -48,9 +48,9 @@ module.exports = {
 
     const csgoWLeu = "eu.femboy.kz:27025";
     const csgoGLeu1 = "eu.femboy.kz:27030";
-    const csgoGLeu2 = "eu.femboy.kz:27040";
-    const csgo64eu = "eu.femboy.kz:27035";
-    const csgoNUeu = "eu.femboy.kz:27045";
+    const csgoGLeu2 = "eu.femboy.kz:27035";
+    const csgoGLeu3 = "eu.femboy.kz:27040";
+    const csgo64eu = "eu.femboy.kz:27045";
 
     const csgoWLna = "na.femboy.kz:27025";
     const csgoGLna = "na.femboy.kz:27030";
@@ -121,13 +121,18 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **128t GLOBAL**",
-          value: `[*${csgoGLna}*](<https://csgo.femboy.kz/connect?ip=${csgoGLna}>)`,
+          name: ":flag_eu:  **128t GLOBAL 3**",
+          value: `[*${csgoGLeu3}*](<https://csgo.femboy.kz/connect?ip=${csgoGLeu3}>)`,
           inline: true,
         },
         {
           name: "\u200B",
           value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **128t GLOBAL**",
+          value: `[*${csgoGLna}*](<https://csgo.femboy.kz/connect?ip=${csgoGLna}>)`,
           inline: true,
         },
         {
@@ -136,18 +141,13 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **64t AutoBH**",
-          value: `[*${csgo64na}*](<https://csgo.femboy.kz/connect?ip=${csgo64na}>)`,
-          inline: true,
-        },
-        {
           name: "\u200B",
           value: "\u200B",
           inline: true,
         },
         {
-          name: ":flag_eu:  **64t AutoBH\n- de_nuke only**",
-          value: `[*${csgoNUeu}*](<https://csgo.femboy.kz/connect?ip=${csgoNUeu}>)`,
+          name: ":flag_us:  **64t AutoBH**",
+          value: `[*${csgo64na}*](<https://csgo.femboy.kz/connect?ip=${csgo64na}>)`,
           inline: true,
         },
       ]);
