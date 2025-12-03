@@ -12,10 +12,10 @@ const config = require("./csgo-server-config.json")[0];
 require("dotenv").config();
 
 const MANAGER_ROLE = process.env.CSGO_MANAGER_ROLE;
+const MANAGER_USERS = process.env.CSGO_MANAGER_USERS
+  ? process.env.CSGO_MANAGER_USERS.split(",")
+  : [];
 const EMBED_COLOR = "#ff00b3";
-const REMOTE_IP = process.env.CSGO_REMOTE_IP;
-const REMOTE_USER = process.env.CSGO_REMOTE_USER;
-const REMOTE_PASS = process.env.CSGO_REMOTE_PASSWORD;
 const STATUS_SCRIPT = path.join(
   __dirname,
   "..",
@@ -28,8 +28,7 @@ function createEmbed(description, color = EMBED_COLOR) {
   return new EmbedBuilder()
     .setColor(color)
     .setTimestamp()
-    .setTitle("FKZ CSGO Server Commands")
-    .setFooter({ text: "FKZ" })
+    .setTitle("CSGO Server Commands")
     .setDescription(description);
 }
 
@@ -83,28 +82,9 @@ const queryServerStatus = async (ip, port) => {
 
 const commandHandlers = {
   local: async (action, { user }) => {
-    const command = `cd /home/cs2-fkz && docker ${action} cs2-${user}`;
+    const command = `sudo -iu ${user} /home/${user}/csgoserver ${action}`;
     const { stderr } = await execAsync(command);
     if (stderr) throw new Error(`Local command failed: ${stderr}`);
-  },
-
-  remote: async (action, { user }) => {
-    const command = `sshpass -p ${REMOTE_PASS} ssh ${REMOTE_USER}@${REMOTE_IP} 'docker ${action} csgo-${user}'`;
-
-    const { stderr } = await execAsync(command);
-    if (stderr) throw new Error(`Remote command failed: ${stderr}`);
-  },
-
-  dathost: async (action, { id }) => {
-    const url = `https://dathost.net/api/0.1/game-servers/${id}`;
-    const auth = `-u "${process.env.DATHOST_USERNAME}:${process.env.DATHOST_PASSWORD}"`;
-
-    if (action === "restart") {
-      await execAsync(`curl ${auth} -X POST "${url}/stop"`);
-      await execAsync(`curl ${auth} -X POST "${url}/start"`);
-    } else {
-      await execAsync(`curl ${auth} -X POST "${url}/${action}"`);
-    }
   },
 };
 
@@ -152,7 +132,8 @@ module.exports = {
         !interaction.member.permissions.has(
           PermissionFlagsBits.Administrator,
         ) &&
-        !interaction.member.roles.cache.has(MANAGER_ROLE)
+        !interaction.member.roles.cache.has(MANAGER_ROLE) &&
+        !MANAGER_USERS.includes(interaction.user.id)
       ) {
         return await interaction.reply({
           content: "You don't have perms to use this command.",
