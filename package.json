@@ -10,9 +10,7 @@
   },
   "dependencies": {
     "discord.js": "^14.21.0",
-    "dotenv": "^16.6.1",
-    "mongoose": "^8.17.1",
-    "xml2js": "^0.6.2"
+    "dotenv": "^16.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
