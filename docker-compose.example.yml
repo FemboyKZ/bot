@@ -1,0 +1,19 @@
+services:
+  bot:
+    image: node:25-alpine
+    container_name: bot-fkz
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 5
+    tty: true
+    stdin_open: true

@@ -129,6 +129,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# docker
+docker-compose.yml
+
 # dev
 disabled_cmd/
 .vscode/
