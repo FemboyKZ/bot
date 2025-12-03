@@ -86,6 +86,20 @@ const commandHandlers = {
     const { stderr } = await execAsync(command);
     if (stderr) throw new Error(`Local command failed: ${stderr}`);
   },
+
+  dathost: async (action, { id }) => {
+    const url = `https://dathost.net/api/0.1/game-servers/${id}`;
+    const auth = `-u "${process.env.DATHOST_USERNAME}:${process.env.DATHOST_PASSWORD}"`;
+
+    console.log(`Executing ${action} on server ID ${id}`);
+
+    if (action === "restart") {
+      await execAsync(`curl ${auth} -X POST "${url}/stop"`);
+      await execAsync(`curl ${auth} -X POST "${url}/start"`);
+    } else {
+      await execAsync(`curl ${auth} -X POST "${url}/${action}"`);
+    }
+  },
 };
 
 const serverChoices = Object.entries(config).map(([id, { name }]) => ({
