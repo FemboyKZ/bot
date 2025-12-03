@@ -1,13 +1,35 @@
 services:
-  bot:
-    container_name: bot-fkz
+  bot1:
+    container_name: bot-fkz-1
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ./:/app
+      - ./configs/bot1/csgo-server-config.json:/app/src/commands/csgo/csgo-server-config.json:ro
     env_file:
-      - .env
+      - .env.1
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 5
+    network_mode: bridge
+    user: 1000:1000
+    tty: true
+    stdin_open: true
+
+  bot2:
+    container_name: bot-fkz-2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+      - ./configs/bot2/csgo-server-config.json:/app/src/commands/csgo/csgo-server-config.json:ro
+    env_file:
+      - .env.2
     restart: unless-stopped
     logging:
       driver: json-file
