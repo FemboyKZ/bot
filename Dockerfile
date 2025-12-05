@@ -8,7 +8,7 @@ COPY . .
 
 FROM node:25-alpine
 
-RUN apk add --no-cache dumb-init python3 py3-pip
+RUN apk add --no-cache dumb-init python3 py3-pip curl
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
