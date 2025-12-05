@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  MessageFlags,
+} = require("discord.js");
 const schema = require("../../schemas/reactionRoles.js");
 
 module.exports = {
@@ -19,7 +23,7 @@ module.exports = {
       ) {
         return await interaction.reply({
           content: `You don't have perms to use this command.`,
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -85,13 +89,13 @@ module.exports = {
 
       await interaction.reply({
         content: "Added missing roles to members and removed extra roles.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       console.error(error);
       await interaction.reply({
         content: "An error occurred while executing this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

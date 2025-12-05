@@ -3,6 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
   ChannelType,
+  MessageFlags,
 } = require("discord.js");
 
 module.exports = {
@@ -22,7 +23,7 @@ module.exports = {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const channel = interaction.options.getChannel("channel");
@@ -111,7 +112,7 @@ module.exports = {
     });
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   },
 };

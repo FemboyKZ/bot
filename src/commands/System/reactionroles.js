@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/reactionRoles.js");
 
@@ -64,12 +65,12 @@ module.exports = {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     if (e)
       return await interaction.reply({
         content: `Be sure to get a message from ${channel}`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const data = await schema.findOne({
@@ -83,7 +84,7 @@ module.exports = {
         if (data) {
           return await interaction.reply({
             content: `You already have this reaction setup, using ${emoji}, on this message.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } else {
           const role = options.getRole("role");
@@ -109,7 +110,7 @@ module.exports = {
         if (!data) {
           return await interaction.reply({
             content: `That reaction role doesn't exist`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } else {
           await schema.deleteMany({

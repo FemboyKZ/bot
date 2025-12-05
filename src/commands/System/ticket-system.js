@@ -5,6 +5,7 @@ const {
   ChannelType,
   ActionRowBuilder,
   StringSelectMenuBuilder,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 
@@ -67,7 +68,7 @@ module.exports = {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have the permissions to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const { guild, options } = interaction;
@@ -195,7 +196,7 @@ module.exports = {
             embedReply.setDescription("Tickets have already been setup");
             return await interaction.reply({
               embeds: [embedReply],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           } else {
             embedReply.setDescription(
@@ -212,7 +213,7 @@ module.exports = {
             });
             await interaction.reply({
               embeds: [embedReply],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
         } catch (err) {
@@ -222,7 +223,7 @@ module.exports = {
           console.error("Error executing command:", err);
           await interaction.reply({
             embeds: [embedReply],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
         break;
@@ -233,7 +234,7 @@ module.exports = {
             embedReply.setDescription("Tickets have not been setup yet.");
             return await interaction.reply({
               embeds: [embedReply],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
 
@@ -243,7 +244,7 @@ module.exports = {
             );
             return await interaction.reply({
               embeds: [embedReply],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
 
@@ -256,7 +257,7 @@ module.exports = {
               );
               return await interaction.reply({
                 embeds: [embedReply],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             }
 
@@ -271,7 +272,7 @@ module.exports = {
             });
             await interaction.reply({
               embeds: [embedReply],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
           if (category) {
@@ -292,13 +293,13 @@ module.exports = {
 
           await interaction.reply({
             embeds: [embedReply],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } catch (err) {
           console.error("Error executing command:", err);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
         break;
@@ -308,7 +309,7 @@ module.exports = {
           if (!data) {
             return await interaction.reply({
               content: "The tickets system is already disabled.",
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
           await schema.deleteMany({
@@ -317,13 +318,13 @@ module.exports = {
           });
           await interaction.reply({
             content: `The tickets system has been disabled.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } catch (err) {
           console.error("Error executing command:", err);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
         break;

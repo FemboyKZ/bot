@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlags,
+} = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
@@ -17,7 +21,7 @@ module.exports = {
       embed.setDescription("This command is restricted to the bot owner!");
       return interaction.reply({
         embeds: [embed],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -45,14 +49,14 @@ module.exports = {
 
       await interaction.reply({
         embeds: [embed],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       embed.setDescription(`Error reloading commands: ${error.message}`);
       console.error("Reload error:", error);
       await interaction.reply({
         embeds: [embed],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

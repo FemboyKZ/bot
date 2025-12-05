@@ -3,6 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
   ChannelType,
+  MessageFlags,
 } = require("discord.js");
 
 module.exports = {
@@ -32,7 +33,7 @@ module.exports = {
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
     const channel =
@@ -44,7 +45,7 @@ module.exports = {
     if (!channel && !message) {
       return await interaction.reply({
         content: "Please provide a channel or message.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -141,7 +142,7 @@ module.exports = {
       if (target.author.id !== interaction.client.user.id) {
         return await interaction.reply({
           content: "The specified message is not owned by FKZ bot.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -155,7 +156,7 @@ module.exports = {
     }
     await interaction.reply({
       content: `The embeds have been posted on ${channel}.`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   },
 };

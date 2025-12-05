@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 
 module.exports = {
@@ -39,7 +40,7 @@ module.exports = {
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -57,7 +58,7 @@ module.exports = {
       if (target.author.id !== interaction.client.user.id) {
         return await interaction.reply({
           content: "The specified message is not owned by FKZ bot.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -79,7 +80,7 @@ module.exports = {
         } catch (error) {
           return await interaction.reply({
             content: `Embed error: ${error.message}`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -87,14 +88,14 @@ module.exports = {
       if (!Object.keys(payload).length) {
         return await interaction.reply({
           content: "No changes specified!",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
       await target.edit(payload);
       return await interaction.reply({
         content: `Message updated successfully! [Jump to Message](${target.url})`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       console.error(error);

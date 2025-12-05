@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  MessageFlags,
+} = require("discord.js");
 const schema = require("../../schemas/vip/vipRoles.js");
 
 module.exports = {
@@ -31,7 +35,7 @@ module.exports = {
     ) {
       return interaction.reply({
         content: "You don't have permissions to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -46,7 +50,7 @@ module.exports = {
       if (!Object.values(roles).some((role) => role)) {
         return interaction.reply({
           content: "Please provide at least one role to set.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -73,13 +77,13 @@ module.exports = {
 
       return interaction.reply({
         content: "Roles have been successfully updated!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       console.error("Error in set-vip-roles:", error);
       return interaction.reply({
         content: "There was an error while executing this command!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

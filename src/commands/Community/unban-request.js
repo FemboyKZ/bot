@@ -4,6 +4,7 @@ const {
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 const status = require("../../schemas/requestStatus.js");
@@ -22,7 +23,7 @@ module.exports = {
     if (timeout.includes(interaction.user.id))
       return await interaction.reply({
         content: `You are on a cooldown! Try again in a few seconds.`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const statusData = await status.findOne({
@@ -76,21 +77,21 @@ module.exports = {
           return await interaction.reply({
             content:
               "Unfortunately your unban request has been denied, you can request again later.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
         if (statusData.Status === true) {
           return await interaction.reply({
             content: "You have already been unbanned.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
         if (statusData.Status === null) {
           return await interaction.reply({
             content: "You have already requested, please check again later.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -98,7 +99,7 @@ module.exports = {
       if (!data) {
         return await interaction.reply({
           content: "The unban requests are currently disabled.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -107,7 +108,7 @@ module.exports = {
       console.error(error);
       return await interaction.reply({
         content: "An error occurred while processing your request.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } finally {
       timeout.push(interaction.user.id);

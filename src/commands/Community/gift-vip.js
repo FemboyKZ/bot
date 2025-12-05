@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlags,
+} = require("discord.js");
 const vip = require("../../schemas/baseSystem.js");
 const uses = require("../../schemas/vip/vipCodes.js");
 const roles = require("../../schemas/vip/vipRoles.js");
@@ -93,7 +97,7 @@ module.exports = {
   replyError(interaction, message) {
     return interaction.reply({
       content: `${message}`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   },
 

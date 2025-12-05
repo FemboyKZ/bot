@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   PermissionFlagsBits,
   EmbedBuilder,
+  MessageFlags,
 } = require("discord.js");
 const { spawn } = require("child_process");
 const { promisify } = require("util");
@@ -156,14 +157,14 @@ module.exports = {
       ) {
         return await interaction.reply({
           content: "You don't have perms to use this command.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
     } catch (e) {
       console.error(e);
       return await interaction.reply({
         content: "Error checking permissions.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -173,7 +174,7 @@ module.exports = {
       if (!config || Object.keys(config).length === 0) {
         return interaction.editReply({
           embeds: [createEmbed("No servers configured", EMBED_COLOR)],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -237,12 +238,12 @@ module.exports = {
 
       await interaction.editReply({
         embeds: [createEmbed(description, EMBED_COLOR)],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       await interaction.editReply({
         embeds: [createEmbed(`Command failed: ${error.message}`, EMBED_COLOR)],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       console.error("CS2 Server Command Error:", error);
     }

@@ -4,6 +4,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
+  MessageFlags,
 } = require("discord.js");
 
 module.exports = {
@@ -43,7 +44,7 @@ module.exports = {
       console.error(error);
       await interaction.reply({
         content: "An error occurred while processing your request.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 const mutes = require("../../schemas/moderation/mutes.js");
@@ -37,7 +38,7 @@ module.exports = {
     ) {
       return await interaction.reply({
         content: `You don't have perms to use this command.`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -76,7 +77,7 @@ module.exports = {
         try {
           await interaction.reply({
             content: `User <@${user.id}> is already muted.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           if (!member.roles.cache.has(role)) {
             await member.roles.add(role);
@@ -95,7 +96,7 @@ module.exports = {
           });
           await interaction.reply({
             content: `User <@${user.id}> has been muted.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           if (!member.roles.cache.has(role)) {
             await member.roles.add(role);
@@ -112,7 +113,7 @@ module.exports = {
       console.error("Failed to mute user:", error);
       await interaction.reply({
         content: "Failed to mute user.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

@@ -3,6 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
   ChannelType,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 
@@ -32,7 +33,7 @@ module.exports = {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const { guild, options } = interaction;
@@ -64,13 +65,13 @@ module.exports = {
           }
           return await interaction.reply({
             embeds: [embed],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } catch (err) {
           console.error("Error executing command:", err);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
         break;
@@ -90,7 +91,7 @@ module.exports = {
           console.error("Error executing command:", err);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
     }

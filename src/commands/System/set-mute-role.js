@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  MessageFlags,
+} = require("discord.js");
 const schema = require("../../schemas/moderation/muteRoles.js");
 
 module.exports = {
@@ -19,7 +23,7 @@ module.exports = {
     ) {
       return interaction.reply({
         content: "You don't have permissions to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -30,7 +34,7 @@ module.exports = {
       if (!role) {
         return interaction.reply({
           content: "Please provide a role to set.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -49,13 +53,13 @@ module.exports = {
 
       return interaction.reply({
         content: "Roles have been successfully updated!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       console.error("Error in set-mute-role:", error);
       return interaction.reply({
         content: "There was an error while executing this command!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

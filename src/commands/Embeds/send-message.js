@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 
 module.exports = {
@@ -33,7 +34,7 @@ module.exports = {
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -46,7 +47,7 @@ module.exports = {
       if (!channel) {
         return await interaction.reply({
           content: "Please provide a channel.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
       const payload = {};
@@ -67,7 +68,7 @@ module.exports = {
         } catch (error) {
           return await interaction.reply({
             content: `Embed error: ${error.message}`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -75,20 +76,20 @@ module.exports = {
       if (!Object.keys(payload).length) {
         return await interaction.reply({
           content: "Cannot send an empty message.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
       await channel.send(payload);
       return await interaction.reply({
         content: `Message sent successfully! [View message in channel](${channel.url})`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       console.error("Error sending message:", error);
       return await interaction.reply({
         content: `Error: ${error.message}`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },

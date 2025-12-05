@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 
 module.exports = {
@@ -36,7 +37,7 @@ module.exports = {
 
       return await interaction.reply({
         embeds: [noPermissionEmbed],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 

@@ -4,6 +4,7 @@ const {
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 
@@ -21,7 +22,7 @@ module.exports = {
     if (timeout.includes(interaction.user.id))
       return await interaction.reply({
         content: `You are on a cooldown! Try again in a few seconds.`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const data = await schema.findOne({
@@ -68,7 +69,7 @@ module.exports = {
       if (!data) {
         return await interaction.reply({
           content: "The reports/suggestions are currently disabled.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -77,7 +78,7 @@ module.exports = {
       console.error(error);
       return await interaction.reply({
         content: "An error occurred while processing your request.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } finally {
       timeout.push(interaction.user.id);

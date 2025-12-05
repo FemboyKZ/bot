@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 
 module.exports = {
@@ -22,7 +23,7 @@ module.exports = {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: `You don't have perms to use this command.`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     await interaction.deferReply({ ephemeral: false });

@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/autoRoles.js");
 
@@ -25,7 +26,7 @@ module.exports = {
     if (roles.length === 0) {
       return await interaction.reply({
         content: "No valid roles provided.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -34,7 +35,7 @@ module.exports = {
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 

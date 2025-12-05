@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 const count = require("../../schemas/moderation/actionCounts.js");
@@ -37,7 +38,7 @@ module.exports = {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const { options } = interaction;
@@ -51,7 +52,7 @@ module.exports = {
         if (Data)
           return await interaction.reply({
             content: "The anti-ghostping system is already set up.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         else {
           await schema.create({
@@ -72,7 +73,7 @@ module.exports = {
         if (!Data)
           return await interaction.reply({
             content: "The anti-ghostping system has not yet been set up.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         else {
           await schema.deleteMany({
@@ -100,7 +101,7 @@ module.exports = {
         if (!Data)
           return await interaction.reply({
             content: "This member does not have any past ghostpings",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         else {
           await data.deleteOne({

@@ -2,6 +2,7 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
+  MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 
@@ -69,7 +70,7 @@ module.exports = {
     if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
     const sub = options.getSubcommand();
@@ -86,7 +87,7 @@ module.exports = {
         if (Data)
           return await interaction.reply({
             content: "The link system is already setup.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
 
         if (!Data) {
@@ -129,19 +130,19 @@ module.exports = {
         if (!Data)
           return await interaction.reply({
             content: "The anti-link system has not been setup.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
 
         const permissions = Data.ByPass;
         if (!permissions)
           return await interaction.reply({
             content: "The anti-link system has not been setup.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         else
           await interaction.reply({
             content: `The anti-link system is set up. Members with **${permissions}** can bypass it.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         break;
       }
@@ -156,7 +157,7 @@ module.exports = {
         if (!Data)
           return await interaction.reply({
             content: "The anti-link system has not been setup.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         else {
           await schema.deleteMany({

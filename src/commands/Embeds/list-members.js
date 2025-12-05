@@ -3,6 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
   ChannelType,
+  MessageFlags,
 } = require("discord.js");
 const { exec } = require("child_process");
 const { parseStringPromise } = require("xml2js");
@@ -43,7 +44,7 @@ module.exports = {
     ) {
       return await interaction.reply({
         content: "You don't have perms to use this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -85,7 +86,7 @@ module.exports = {
         await channel.send({ embeds: [embed], files: [`${fileName}.txt`] });
         await interaction.reply({
           content: `The list has been posted on ${channel}.`,
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -97,7 +98,7 @@ module.exports = {
       console.error(error);
       await interaction.reply({
         content: "There was an error while executing this command.",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   },
