@@ -25,4 +25,4 @@ USER nodejs
 
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD ["node", "src/index.js"]
+CMD ["node", "/app/src/index.js"]
