@@ -110,5 +110,11 @@ module.exports = {
     await connectToDatabase(client);
     await syncGuildData(client);
     await initializeInvites(client);
+
+    try {
+      await client.registerCommands();
+    } catch (error) {
+      console.error("Failed to register commands:", error);
+    }
   },
 };

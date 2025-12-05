@@ -6,7 +6,7 @@ const { Routes } = require("discord-api-types/v9");
 require("dotenv").config();
 
 module.exports = (client) => {
-  client.handleCommands = async (commandsPath) => {
+  client.loadCommands = async (commandsPath) => {
     client.commandArray = [];
     client.commands = new Map();
 
@@ -33,33 +33,37 @@ module.exports = (client) => {
       }
     };
 
-    const clientId = client.user.id || process.env.CLIENT_ID;
-    if (!process.env.TOKEN || !clientId) {
-      console.error(
-        "Bot token or client ID is not set in the environment variables.",
-      );
-      client.gracefulShutdown().catch(console.error);
-    }
-
     console.log(`Starting to load commands from: ${commandsPath}`);
     loadCommands(commandsPath);
     console.log(
       `Finished loading commands. Total commands: ${client.commandArray.length}`,
     );
+  };
+
+  client.registerCommands = async () => {
+    if (!process.env.TOKEN) {
+      throw new Error("Bot token is not set.");
+    }
+
+    if (!client.user?.id) {
+      throw new Error("Client user ID not available. Client not ready?");
+    }
+
     const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 
-    (async () => {
-      try {
-        console.log("Started refreshing application (/) commands.");
+    try {
+      console.log(
+        `Refreshing application (/) commands for client ${client.user.id}...`,
+      );
 
-        await rest.put(Routes.applicationCommands(clientId), {
-          body: client.commandArray,
-        });
+      await rest.put(Routes.applicationCommands(client.user.id), {
+        body: client.commandArray,
+      });
 
-        console.log("Successfully reloaded application (/) commands.");
-      } catch (error) {
-        console.error("Error refreshing commands:", error);
-      }
-    })();
+      console.log("Successfully registered application commands.");
+    } catch (error) {
+      console.error("Error registering commands:", error);
+      throw error;
+    }
   };
 };
