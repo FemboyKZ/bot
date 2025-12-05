@@ -18,50 +18,51 @@ module.exports = {
       return;
     }
 
-    if (timeout.includes(interaction.user.id)) {
+    if (timeout.includes(interaction.user.id))
       return await interaction.reply({
         content: `You are on a cooldown! Try again in a few seconds.`,
         ephemeral: true,
       });
-    }
 
     const data = await schema.findOne({
       Guild: interaction.guild.id,
       ID: "report",
     });
 
-    const modalReport = new ModalBuilder()
-      .setTitle("Report/Suggestion form")
-      .setCustomId("modalReport");
+    const issueReport = new TextInputBuilder({
+      customId: "issueReport",
+      required: true,
+      label: "What do you want to report/suggest",
+      placeholder: "A cheater? New server? Etc.",
+      style: TextInputStyle.Short,
+    });
 
-    const issueReport = new TextInputBuilder()
-      .setCustomId("issueReport")
-      .setRequired(true)
-      .setLabel("What do you want to report/suggest")
-      .setPlaceholder("A cheater? New server? Etc.")
-      .setStyle(TextInputStyle.Short);
-
-    const infoReport = new TextInputBuilder()
-      .setCustomId("infoReport")
-      .setRequired(true)
-      .setLabel("Explain what/who you're suggesting/reporting.")
-      .setPlaceholder(
+    const infoReport = new TextInputBuilder({
+      customId: " infoReport",
+      required: true,
+      label: "Explain what/who you're suggesting/reporting.",
+      placeholder:
         "What happened? Where? / What makes your suggestion worth adding.",
-      )
-      .setStyle(TextInputStyle.Paragraph);
+      style: TextInputStyle.Paragraph,
+    });
 
-    const moreReport = new TextInputBuilder()
-      .setCustomId("moreReport")
-      .setRequired(true)
-      .setLabel("Anything to add?")
-      .setPlaceholder("Links to images/videos for proof/concepts? Etc.")
-      .setStyle(TextInputStyle.Paragraph);
+    const moreReport = new TextInputBuilder({
+      customId: "moreReport",
+      required: true,
+      label: "Anything to add?",
+      placeholder: "Links to images/videos for proof/concepts? Etc.",
+      style: TextInputStyle.Short,
+    });
 
-    const firstActionRow = new ActionRowBuilder().addComponents(issueReport);
-    const secondActionRow = new ActionRowBuilder().addComponents(infoReport);
-    const thirdActionRow = new ActionRowBuilder().addComponents(moreReport);
-
-    modalReport.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+    const modalReport = new ModalBuilder({
+      customId: "modalReport",
+      title: "Report/Suggestion form",
+      components: [
+        new ActionRowBuilder({ components: [issueReport] }),
+        new ActionRowBuilder({ components: [infoReport] }),
+        new ActionRowBuilder({ components: [moreReport] }),
+      ],
+    });
 
     try {
       if (!data) {
@@ -72,16 +73,17 @@ module.exports = {
       }
 
       await interaction.showModal(modalReport);
+    } catch (error) {
+      console.error(error);
+      return await interaction.reply({
+        content: "An error occurred while processing your request.",
+        ephemeral: true,
+      });
+    } finally {
       timeout.push(interaction.user.id);
       setTimeout(() => {
         timeout.shift();
       }, 10000);
-    } catch (error) {
-      console.error(`Failed to execute report-or-suggest command: ${error}`);
-      await interaction.reply({
-        content: `An error occurred while executing the command. Please try again later.`,
-        ephemeral: true,
-      });
     }
   },
 };

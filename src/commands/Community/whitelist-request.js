@@ -37,46 +37,40 @@ module.exports = {
       ID: "whitelist",
     });
 
-    const modalWhitelist = new ModalBuilder()
-      .setTitle("Whitelist Request form")
-      .setCustomId("modalWhitelist");
+    const steamWhitelist = new TextInputBuilder({
+      customId: "steamWhitelist",
+      required: true,
+      label: "What is your SteamID, or Steam Profile URL",
+      placeholder: "STEAM_1:0:XXX, replace X with your ID",
+      style: TextInputStyle.Short,
+    });
 
-    const steamWhitelist = new TextInputBuilder()
-      .setCustomId("steamWhitelist")
-      .setRequired(true)
-      .setLabel("What is your SteamID, or Steam Profile URL")
-      .setPlaceholder("STEAM_1:0:XXX, replace X with your ID")
-      .setStyle(TextInputStyle.Short);
-
-    const reasonWhitelist = new TextInputBuilder()
-      .setCustomId("reasonWhitelist")
-      .setRequired(true)
-      .setLabel("Why should you get whitelisted")
-      .setPlaceholder(
+    const reasonWhitelist = new TextInputBuilder({
+      customId: "reasonWhitelist",
+      required: true,
+      label: "Why should you get whitelisted",
+      placeholder:
         "Do the owners know you? Were you whitelisted before? Are you a femboy? Etc.",
-      )
-      .setStyle(TextInputStyle.Paragraph);
+      style: TextInputStyle.Paragraph,
+    });
 
-    const requestWhitelist = new TextInputBuilder()
-      .setCustomId("requestWhitelist")
-      .setRequired(true)
-      .setLabel("Have you requested to join the WL SteamGroup?")
-      .setPlaceholder("Yes/No")
-      .setStyle(TextInputStyle.Short);
+    const requestWhitelist = new TextInputBuilder({
+      customId: "requestWhitelist",
+      required: true,
+      label: "Have you requested to join the WL SteamGroup?",
+      placeholder: "Yes/No",
+      style: TextInputStyle.Short,
+    });
 
-    const firstActionRow = new ActionRowBuilder().addComponents(steamWhitelist);
-    const secondActionRow = new ActionRowBuilder().addComponents(
-      reasonWhitelist,
-    );
-    const thirdActionRow = new ActionRowBuilder().addComponents(
-      requestWhitelist,
-    );
-
-    modalWhitelist.addComponents(
-      firstActionRow,
-      secondActionRow,
-      thirdActionRow,
-    );
+    const modalWhitelist = new ModalBuilder({
+      customId: "modalWhitelist",
+      title: "Whitelist Request form",
+      components: [
+        new ActionRowBuilder({ components: [steamWhitelist] }),
+        new ActionRowBuilder({ components: [reasonWhitelist] }),
+        new ActionRowBuilder({ components: [requestWhitelist] }),
+      ],
+    });
 
     try {
       if (interaction.member.roles.cache.has(whitelistRole)) {

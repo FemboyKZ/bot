@@ -19,12 +19,11 @@ module.exports = {
       return;
     }
 
-    if (timeout.includes(interaction.user.id)) {
+    if (timeout.includes(interaction.user.id))
       return await interaction.reply({
         content: `You are on a cooldown! Try again in a few seconds.`,
         ephemeral: true,
       });
-    }
 
     const statusData = await status.findOne({
       User: interaction.user.id,
@@ -36,38 +35,40 @@ module.exports = {
       ID: "unban",
     });
 
-    const modalUnban = new ModalBuilder()
-      .setTitle("Unban Request form")
-      .setCustomId("modalUnban");
+    const steamUnban = new TextInputBuilder({
+      customId: "steamUnban",
+      required: true,
+      label: "What is your SteamID, or Steam Profile URL",
+      placeholder: "STEAM_1:0:XXX, replace X with your ID",
+      style: TextInputStyle.Short,
+    });
 
-    const steamUnban = new TextInputBuilder()
-      .setCustomId("steamUnban")
-      .setRequired(true)
-      .setLabel("What is your SteamID, or Steam Profile URL")
-      .setPlaceholder("STEAM_1:0:XXX, replace X with your ID")
-      .setStyle(TextInputStyle.Short);
-
-    const reasonUnban = new TextInputBuilder()
-      .setCustomId("reasonUnban")
-      .setRequired(true)
-      .setLabel("Why should you get unbanned?")
-      .setPlaceholder(
+    const reasonUnban = new TextInputBuilder({
+      customId: "reasonUnban",
+      required: true,
+      label: "Why should you get unbanned?",
+      placeholder:
         "Why were you banned? Why would we trust that you won't do it again? Etc.",
-      )
-      .setStyle(TextInputStyle.Paragraph);
+      style: TextInputStyle.Paragraph,
+    });
 
-    const serverUnban = new TextInputBuilder()
-      .setCustomId("serverUnban")
-      .setRequired(true)
-      .setLabel("Which server were you banned from?")
-      .setPlaceholder("IP or name of the server")
-      .setStyle(TextInputStyle.Short);
+    const serverUnban = new TextInputBuilder({
+      customId: "serverUnban",
+      required: true,
+      label: "Which server were you banned from?",
+      placeholder: "Server name or ID",
+      style: TextInputStyle.Short,
+    });
 
-    const firstActionRow = new ActionRowBuilder().addComponents(steamUnban);
-    const secondActionRow = new ActionRowBuilder().addComponents(reasonUnban);
-    const thirdActionRow = new ActionRowBuilder().addComponents(serverUnban);
-
-    modalUnban.addComponents(firstActionRow, secondActionRow, thirdActionRow);
+    const modalUnban = new ModalBuilder({
+      customId: "modalUnban",
+      title: "Unban Request form",
+      components: [
+        new ActionRowBuilder({ components: [steamUnban] }),
+        new ActionRowBuilder({ components: [reasonUnban] }),
+        new ActionRowBuilder({ components: [serverUnban] }),
+      ],
+    });
 
     try {
       if (statusData) {
@@ -102,17 +103,17 @@ module.exports = {
       }
 
       await interaction.showModal(modalUnban);
-
+    } catch (error) {
+      console.error(error);
+      return await interaction.reply({
+        content: "An error occurred while processing your request.",
+        ephemeral: true,
+      });
+    } finally {
       timeout.push(interaction.user.id);
       setTimeout(() => {
         timeout.shift();
       }, 10000);
-    } catch (error) {
-      console.error("Error executing command:", error);
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
     }
   },
 };
