@@ -12,85 +12,11 @@ const {
 } = require("discord.js");
 const schema = require("../../../schemas/baseSystem.js");
 const status = require("../../../schemas/requestStatus.js");
-
-function isValidMinecraftUUID(uuid) {
-  const uuidRegex =
-    /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i;
-  return uuidRegex.test(uuid);
-}
-
-function isValidSteamID(steamId) {
-  if (typeof steamId !== "string") return false;
-
-  steamId = steamId.trim();
-
-  if (steamId.includes("steamcommunity.com")) {
-    const urlResult = extractSteamIdFromUrl(steamId);
-    if (urlResult === "custom_id") {
-      return "custom_id";
-    }
-    if (urlResult) {
-      steamId = urlResult;
-    }
-  }
-
-  const steamId64Regex = /^7656119\d{10}$/;
-  if (steamId64Regex.test(steamId)) {
-    return true;
-  }
-
-  const steamId2Regex = /^STEAM_[0-5]:[01]:\d+$/;
-  if (steamId2Regex.test(steamId.toUpperCase())) {
-    return true;
-  }
-
-  const steamId3Regex = /^\[U:1:\d+\]$/;
-  if (steamId3Regex.test(steamId)) {
-    return true;
-  }
-
-  return false;
-}
-
-function steamIDTo64(steamId) {
-  if (!isValidSteamID(steamId)) return null;
-  steamId = steamId.trim();
-
-  if (/^7656119\d{10}$/.test(steamId)) {
-    return steamId;
-  }
-  if (/^STEAM_[0-5]:[01]:\d+$/i.test(steamId)) {
-    const parts = steamId.split(":");
-    const y = parseInt(parts[1]);
-    const z = parseInt(parts[2]);
-    return (76561197960265728n + BigInt(z) * 2n + BigInt(y)).toString();
-  }
-  if (/^\[U:1:\d+\]$/i.test(steamId)) {
-    const accountId = parseInt(steamId.match(/\d+/)[0]);
-    return (76561197960265728n + BigInt(accountId)).toString();
-  }
-
-  return null;
-}
-
-function extractSteamIdFromUrl(url) {
-  try {
-    const profileRegex = /steamcommunity\.com\/profiles\/(7656119\d{10})/;
-    const profileMatch = url.match(profileRegex);
-    if (profileMatch) {
-      return profileMatch[1];
-    }
-
-    const customRegex = /steamcommunity\.com\/id\/([a-zA-Z0-9_-]+)/;
-    const customMatch = url.match(customRegex);
-    if (customMatch) {
-      return "custom_id";
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
+const {
+  isValidMinecraftUUID,
+  isValidSteamID,
+  ConvertSteamIDTo64,
+} = require("../../utils/validators.js");
 
 module.exports = {
   name: Events.InteractionCreate,
@@ -442,7 +368,7 @@ module.exports = {
           .addFields(
             {
               name: "SteamID / Profile URL",
-              value: `${await steamIDTo64(steam)}`,
+              value: `${await ConvertSteamIDTo64(steam)}`,
               inline: false,
             },
             {
