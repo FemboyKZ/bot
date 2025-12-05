@@ -6,7 +6,11 @@
   "license": "GPL-3.0-only",
   "description": "Discord Bot for managing FKZ Discord Server, FKZ Dedicated Server and more.",
   "scripts": {
-    "start": "node --no-warnings src/index.js"
+    "start": "node --no-warnings src/index.js",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "discord.js": "^14.25.1",
