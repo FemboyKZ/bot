@@ -1,9 +1,7 @@
 services:
   bot1:
     container_name: bot-fkz-1
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: bot-csgo
     volumes:
       - ./:/app
       - ./configs/bot1/csgo-server-config.json:/app/src/commands/csgo/csgo-server-config.json:ro
@@ -22,9 +20,7 @@ services:
 
   bot2:
     container_name: bot-fkz-2
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: bot-csgo
     volumes:
       - ./:/app
       - ./configs/bot2/csgo-server-config.json:/app/src/commands/csgo/csgo-server-config.json:ro
