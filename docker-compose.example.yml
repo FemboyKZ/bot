@@ -1,9 +1,7 @@
 services:
   bot:
     container_name: bot-fkz
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: bot-fkz
     volumes:
       - ./:/app
     env_file:

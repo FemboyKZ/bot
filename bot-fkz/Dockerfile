@@ -8,7 +8,7 @@ COPY . .
 
 FROM node:25-alpine
 
-RUN apk add --no-cache dumb-init python3 py3-pip
+RUN apk add --no-cache dumb-init python3 py3-pip curl ssh sshpass
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
@@ -25,4 +25,4 @@ USER nodejs
 
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD ["node", "src/index.js"]
+CMD ["node", "/app/src/index.js"]
