@@ -42,6 +42,8 @@ const resolveServerConfig = (serverId) => {
       type: server.type,
       user: server.user,
       id: server.id,
+      ssh_user: server.ssh_user,
+      ssh_pass: server.ssh_pass,
     }));
   }
 
@@ -56,6 +58,8 @@ const resolveServerConfig = (serverId) => {
         type: server.type,
         user: server.user,
         id: server.id,
+        ssh_user: server.ssh_user,
+        ssh_pass: server.ssh_pass,
       },
     ];
   }
@@ -82,10 +86,17 @@ const queryServerStatus = async (ip, port) => {
 };
 
 const commandHandlers = {
-  local: async (action, { user }) => {
-    const command = `sudo -iu ${user} /home/${user}/csgoserver ${action}`;
+  remote_lgsm: async (action, { ip, ssh_user, ssh_pass }) => {
+    const command = `sshpass -p ${ssh_pass} ssh ${ssh_user}@${ip} './csgoserver ${action}'`;
     const { stderr } = await execAsync(command);
     if (stderr) throw new Error(`Local command failed: ${stderr}`);
+  },
+
+  remote_docker: async (action, { user, ip, ssh_user, ssh_pass }) => {
+    const command = `sshpass -p ${ssh_pass} ssh ${ssh_user}@${ip} 'docker ${action} csgo-${user}'`;
+
+    const { stderr } = await execAsync(command);
+    if (stderr) throw new Error(`Remote command failed: ${stderr}`);
   },
 
   dathost: async (action, { id }) => {
