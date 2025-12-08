@@ -22,7 +22,7 @@ If you wish to help with this feel free to open prs.
 ## Usage (Docker)
 
 - run `git clone -b misc/csgo-bot https://github.com/FemboyKZ/bot` to download the files
-- run `docker build -t csgo-bot ./csgo-bot` to build the image.
+- run `docker build -t csgo-bot .` to build the image.
 - create and fill out a `.env` file with details shown on the `.example`
 - create and fill out a `csgo-server-config.json` file with details shown on the `.example`. This can be found in `src/commands/csgo/`
 - create and fill out a `docker-compose.yml` file with details shown on the `.example`.
