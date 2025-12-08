@@ -87,16 +87,18 @@ const queryServerStatus = async (ip, port) => {
 
 const commandHandlers = {
   remote_lgsm: async (action, { ip, ssh_user, ssh_pass }) => {
-    const command = `sshpass -p ${ssh_pass} ssh ${ssh_user}@${ip} './csgoserver ${action}'`;
+    const command = `sshpass -p '${ssh_pass}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ssh_user}@${ip} './csgoserver ${action}'`;
     const { stderr } = await execAsync(command);
-    if (stderr) throw new Error(`Local command failed: ${stderr}`);
+    if (stderr && !stderr.includes("Warning: Permanently added"))
+      throw new Error(`Command failed: ${stderr}`);
   },
 
   remote_docker: async (action, { user, ip, ssh_user, ssh_pass }) => {
-    const command = `sshpass -p ${ssh_pass} ssh ${ssh_user}@${ip} 'docker ${action} csgo-${user}'`;
+    const command = `sshpass -p '${ssh_pass}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ssh_user}@${ip} 'docker ${action} csgo-${user}'`;
 
     const { stderr } = await execAsync(command);
-    if (stderr) throw new Error(`Remote command failed: ${stderr}`);
+    if (stderr && !stderr.includes("Warning: Permanently added"))
+      throw new Error(`Command failed: ${stderr}`);
   },
 
   dathost: async (action, { id }) => {
@@ -247,7 +249,8 @@ module.exports = {
       if (failed.length > 0) {
         description += `\n\nFailed:`;
         failed.forEach((f) => {
-          description += `\n\`${f.server.name}: ${f.error}\``;
+          description += `\n\`${f.server.name}\``;
+          console.log(`Failed on server ${f.server.name}: ${f.error}`);
         });
       }
 
