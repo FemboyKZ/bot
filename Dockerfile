@@ -7,7 +7,7 @@ COPY . .
 
 FROM node:25-alpine
 
-RUN apk add --no-cache dumb-init python3 py3-pip curl sudo
+RUN apk add --no-cache dumb-init python3 py3-pip curl sshpass openssh sudo
 
 RUN addgroup -g 1019 -S nodejs && \
     adduser -S nodejs -u 1019 -G nodejs
