@@ -2,42 +2,42 @@
   {
     // Local Docker Server Example
     "cs2-server-1": {
-       // Requires bot user to be in docker group
+      // Requires bot user to be in docker group
       "type": "local_docker",
 
-       // Name is just for display on the command
+      // Name is just for display on the command
       "name": "CS2 Server 1",
 
-       // User doesn't matter with local docker
+      // User doesn't matter with local docker
       "user": "local-user-1",
 
       // IP/Port is just for display with local commands
       "ip": "127.0.0.1",
-      "port": "27015"
-      
+      "port": "27015",
+
       // Only command that requires folder to be set
       "folder": "/home/cs2-servers"
     },
 
     // Local LGSM Server Example
     "cs2-server-2": {
-       // Requires bot user to be in sudo group
+      // Requires bot user to be in sudo group
       "type": "local_lgsm",
 
-       // Name is just for display on the command
+      // Name is just for display on the command
       "name": "CS2 Server 2",
 
-       // Requires user to be owner of the server files
+      // Requires user to be owner of the server files
       "user": "local-user-2",
 
-       // IP/Port is just for display with local commands
+      // IP/Port is just for display with local commands
       "ip": "127.0.0.1",
       "port": "27016"
     },
 
     // Remote Docker Server Example
     "cs2-server-3": {
-       // Requires remote user to be in docker group
+      // Requires remote user to be in docker group
       "type": "remote_docker",
 
       // Name is just for display on the command
@@ -46,22 +46,22 @@
       // Requires user to be in docker group
       "user": "remote-user-3",
 
-       // IP must be remote host's IP address
+      // IP must be remote host's IP address
       "ip": "0.0.0.0",
 
-       // Port is just for display with commands
+      // Port is just for display with commands
       "port": "27017"
     },
 
     // Remote LSGM Server Example
     "cs2-server-4": {
-       // requires server to be installed in remote user's home folder and owned by remote user
+      // requires server to be installed in remote user's home folder and owned by remote user
       "type": "remote_lgsm",
 
-       // Name is just for display on the command
+      // Name is just for display on the command
       "name": "CS2 Server 4",
 
-       // requires user to be owner of the server files
+      // requires user to be owner of the server files
       "user": "remote-user-4",
 
       // IP must be remote host's IP address
@@ -73,14 +73,14 @@
 
     // Remote Dathost Server Example
     "cs2-server-5": {
-       // Requires you to auth using dathost login details, set in .env
+      // Requires you to auth using dathost login details, set in .env
       "type": "dathost",
 
-       // Name is just for display on the command
+      // Name is just for display on the command
       "name": "CS2 Server 5",
 
-       // ID must be server's dathost id, get it from the panel url:
-       // https://dathost.net/control-panel/cs2-server/console/serverid
+      // ID must be server's dathost id, get it from the panel url:
+      // https://dathost.net/control-panel/cs2-server/console/serverid
       "id": "serverid",
 
       // IP/Port is just for display with dathost commands
