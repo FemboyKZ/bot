@@ -16,7 +16,7 @@ const {
   isValidMinecraftUUID,
   isValidSteamID,
   ConvertSteamIDTo64,
-} = require("../../utils/validators.js");
+} = require("../../../utils/validators.js");
 
 module.exports = {
   name: Events.InteractionCreate,

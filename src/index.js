@@ -90,7 +90,7 @@ const eventsPath = path.join(__dirname, "events");
     await client.handleProcessEvents(path.join(eventsPath, "process"));
     await client.handleRestEvents(path.join(eventsPath, "rest"));
     await client.handleMongoEvents(path.join(eventsPath, "mongo"));
-    await client.handleCommands(path.join(__dirname, "commands"));
+    await client.loadCommands(path.join(__dirname, "commands"));
   } catch (error) {
     console.error("Error starting the bot:", error);
   }

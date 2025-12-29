@@ -13,10 +13,10 @@ const config = require("./csgo-server-config.json")[0];
 require("dotenv").config();
 
 const MANAGER_ROLE = process.env.CSGO_MANAGER_ROLE;
+const MANAGER_USERS = process.env.CSGO_MANAGER_USERS
+  ? process.env.CSGO_MANAGER_USERS.split(",")
+  : [];
 const EMBED_COLOR = "#ff00b3";
-const REMOTE_IP = process.env.CSGO_REMOTE_IP;
-const REMOTE_USER = process.env.CSGO_REMOTE_USER;
-const REMOTE_PASS = process.env.CSGO_REMOTE_PASSWORD;
 const STATUS_SCRIPT = path.join(
   __dirname,
   "..",
@@ -43,6 +43,8 @@ const resolveServerConfig = (serverId) => {
       type: server.type,
       user: server.user,
       id: server.id,
+      ssh_user: server.ssh_user,
+      ssh_pass: server.ssh_pass,
     }));
   }
 
@@ -57,6 +59,8 @@ const resolveServerConfig = (serverId) => {
         type: server.type,
         user: server.user,
         id: server.id,
+        ssh_user: server.ssh_user,
+        ssh_pass: server.ssh_pass,
       },
     ];
   }
@@ -83,22 +87,26 @@ const queryServerStatus = async (ip, port) => {
 };
 
 const commandHandlers = {
-  local: async (action, { user }) => {
-    const command = `cd /home/cs2-fkz && docker ${action} cs2-${user}`;
+  remote_lgsm: async (action, { ip, ssh_user, ssh_pass }) => {
+    const command = `sshpass -p '${ssh_pass}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ssh_user}@${ip} './csgoserver ${action}'`;
     const { stderr } = await execAsync(command);
-    if (stderr) throw new Error(`Local command failed: ${stderr}`);
+    if (stderr && !stderr.includes("Warning: Permanently added"))
+      throw new Error(`Command failed: ${stderr}`);
   },
 
-  remote: async (action, { user }) => {
-    const command = `sshpass -p ${REMOTE_PASS} ssh ${REMOTE_USER}@${REMOTE_IP} 'docker ${action} csgo-${user}'`;
+  remote_docker: async (action, { user, ip, ssh_user, ssh_pass }) => {
+    const command = `sshpass -p '${ssh_pass}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ssh_user}@${ip} 'docker ${action} csgo-${user}'`;
 
     const { stderr } = await execAsync(command);
-    if (stderr) throw new Error(`Remote command failed: ${stderr}`);
+    if (stderr && !stderr.includes("Warning: Permanently added"))
+      throw new Error(`Command failed: ${stderr}`);
   },
 
   dathost: async (action, { id }) => {
     const url = `https://dathost.net/api/0.1/game-servers/${id}`;
     const auth = `-u "${process.env.DATHOST_USERNAME}:${process.env.DATHOST_PASSWORD}"`;
+
+    console.log(`Executing ${action} on server ID ${id}`);
 
     if (action === "restart") {
       await execAsync(`curl ${auth} -X POST "${url}/stop"`);
@@ -145,20 +153,30 @@ module.exports = {
 
   async execute(interaction) {
     try {
-      const role = await interaction.guild.roles.fetch(MANAGER_ROLE);
-      if (!role) {
-        console.log("Manager role not found in guild", MANAGER_ROLE);
-      }
-      if (
-        !interaction.member.permissions.has(
-          PermissionFlagsBits.Administrator,
-        ) &&
-        !interaction.member.roles.cache.has(MANAGER_ROLE)
-      ) {
-        return await interaction.reply({
-          content: "You don't have perms to use this command.",
-          flags: MessageFlags.Ephemeral,
-        });
+      if (interaction.guild) {
+        const role = await interaction.guild.roles.fetch(MANAGER_ROLE);
+        if (!role) {
+          console.log("Manager role not found in guild", MANAGER_ROLE);
+        }
+        if (
+          !MANAGER_USERS.includes(interaction.user.id) &&
+          !interaction.member.permissions.has(
+            PermissionFlagsBits.Administrator,
+          ) &&
+          !interaction.member.roles.cache.has(MANAGER_ROLE)
+        ) {
+          return await interaction.reply({
+            content: "You don't have perms to use this command.",
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+      } else {
+        if (!MANAGER_USERS.includes(interaction.user.id)) {
+          return await interaction.reply({
+            content: "You don't have perms to use this command.",
+            flags: MessageFlags.Ephemeral,
+          });
+        }
       }
     } catch (e) {
       console.error(e);
@@ -168,7 +186,7 @@ module.exports = {
       });
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {
       if (!config || Object.keys(config).length === 0) {
@@ -232,7 +250,8 @@ module.exports = {
       if (failed.length > 0) {
         description += `\n\nFailed:`;
         failed.forEach((f) => {
-          description += `\n\`${f.server.name}: ${f.error}\``;
+          description += `\n\`${f.server.name}\``;
+          console.log(`Failed on server ${f.server.name}: ${f.error}`);
         });
       }
 

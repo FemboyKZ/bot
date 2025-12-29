@@ -28,8 +28,6 @@ async function connectToDatabase(client) {
   try {
     console.log("Attempting MongoDB connection...");
     await mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 3000,
     });
     console.log("MongoDB connection established");
