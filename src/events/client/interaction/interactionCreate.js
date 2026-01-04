@@ -15,7 +15,7 @@ const status = require("../../../schemas/requestStatus.js");
 const {
   isValidMinecraftUUID,
   isValidSteamID,
-  ConvertSteamIDTo64,
+  convertToSteamID64,
 } = require("../../../utils/validators.js");
 
 module.exports = {
@@ -368,7 +368,7 @@ module.exports = {
           .addFields(
             {
               name: "SteamID / Profile URL",
-              value: `${await ConvertSteamIDTo64(steam)}`,
+              value: `${await convertToSteamID64(steam)}`,
               inline: false,
             },
             {
