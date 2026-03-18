@@ -3,7 +3,6 @@ const path = require("path");
 const process = require("node:process");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-require("dotenv").config();
 
 module.exports = (client) => {
   client.loadCommands = async (commandsPath) => {
