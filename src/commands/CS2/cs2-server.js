@@ -5,9 +5,7 @@ const {
   MessageFlags,
 } = require("discord.js");
 const { spawn } = require("child_process");
-const { promisify } = require("util");
 const path = require("path");
-const execAsync = promisify(require("child_process").exec);
 
 const config = require("./cs2-server-config.json")[0];
 require("dotenv").config();
@@ -86,31 +84,76 @@ const queryServerStatus = async (ip, port) => {
   });
 };
 
+function spawnAsync(command, args) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(command, args, { stdio: ["pipe", "pipe", "pipe"] });
+    let stderr = "";
+    proc.stderr.on("data", (data) => (stderr += data));
+    proc.on("close", (code) => {
+      if (
+        code !== 0 &&
+        stderr &&
+        !stderr.includes("Warning: Permanently added")
+      ) {
+        reject(new Error(`Command failed: ${stderr}`));
+      } else {
+        resolve({ stderr });
+      }
+    });
+    proc.on("error", reject);
+  });
+}
+
+function dathostRequest(url, method = "POST") {
+  const username = process.env.DATHOST_USERNAME || "";
+  const password = process.env.DATHOST_PASSWORD || "";
+  return spawnAsync("curl", [
+    "-s",
+    "-u",
+    `${username}:${password}`,
+    "-X",
+    method,
+    url,
+  ]);
+}
+
 const commandHandlers = {
   remote_lgsm: async (action, { ip, ssh_user, ssh_pass }) => {
-    const command = `sshpass -p '${ssh_pass}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ssh_user}@${ip} './cs2server ${action}'`;
-    const { stderr } = await execAsync(command);
-    if (stderr && !stderr.includes("Warning: Permanently added"))
-      throw new Error(`Command failed: ${stderr}`);
+    await spawnAsync("sshpass", [
+      "-p",
+      ssh_pass,
+      "ssh",
+      "-o",
+      "StrictHostKeyChecking=no",
+      "-o",
+      "UserKnownHostsFile=/dev/null",
+      `${ssh_user}@${ip}`,
+      `./cs2server ${action}`,
+    ]);
   },
 
   remote_docker: async (action, { user, ip, ssh_user, ssh_pass }) => {
-    const command = `sshpass -p '${ssh_pass}' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${ssh_user}@${ip} 'docker ${action} cs2-${user}'`;
-
-    const { stderr } = await execAsync(command);
-    if (stderr && !stderr.includes("Warning: Permanently added"))
-      throw new Error(`Command failed: ${stderr}`);
+    await spawnAsync("sshpass", [
+      "-p",
+      ssh_pass,
+      "ssh",
+      "-o",
+      "StrictHostKeyChecking=no",
+      "-o",
+      "UserKnownHostsFile=/dev/null",
+      `${ssh_user}@${ip}`,
+      `docker ${action} cs2-${user}`,
+    ]);
   },
 
   dathost: async (action, { id }) => {
-    const url = `https://dathost.net/api/0.1/game-servers/${id}`;
-    const auth = `-u "${process.env.DATHOST_USERNAME}:${process.env.DATHOST_PASSWORD}"`;
+    const url = `https://dathost.net/api/0.1/game-servers/${encodeURIComponent(id)}`;
 
     if (action === "restart") {
-      await execAsync(`curl ${auth} -X POST "${url}/stop"`);
-      await execAsync(`curl ${auth} -X POST "${url}/start"`);
+      await dathostRequest(`${url}/stop`);
+      await dathostRequest(`${url}/start`);
     } else {
-      await execAsync(`curl ${auth} -X POST "${url}/${action}"`);
+      await dathostRequest(`${url}/${encodeURIComponent(action)}`);
     }
   },
 };
