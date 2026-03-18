@@ -1,0 +1,10 @@
+.github/
+.git/
+.gitignore
+.vscode/
+node_modules/
+*.example*
+LICENSE
+README.md
+eslint.config.js
+.prettier*
