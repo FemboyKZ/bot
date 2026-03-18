@@ -7,4 +7,6 @@ let reactionRoles = new Schema({
   Role: { type: String, required: true },
 });
 
+reactionRoles.index({ Guild: 1, Message: 1, Emoji: 1 }, { unique: true });
+
 module.exports = model("reactionRoles", reactionRoles);
