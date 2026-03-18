@@ -21,15 +21,7 @@ module.exports = (client) => {
               continue;
             }
 
-            if (event.execute) {
-              process.on(event.name, (...args) =>
-                event.execute(client, ...args),
-              );
-            } else {
-              console.warn(
-                `Event file ${file} is missing an execute function.`,
-              );
-            }
+            process.on(event.name, (...args) => event.execute(client, ...args));
           } catch (error) {
             console.error(`Error loading process event file:`, error);
           }

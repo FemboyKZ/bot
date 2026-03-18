@@ -21,15 +21,9 @@ module.exports = (client) => {
               continue;
             }
 
-            if (event.execute) {
-              mongoose.connection.on(event.name, (...args) =>
-                event.execute(client, ...args),
-              );
-            } else {
-              console.warn(
-                `Event file ${file} is missing an execute function.`,
-              );
-            }
+            mongoose.connection.on(event.name, (...args) =>
+              event.execute(client, ...args),
+            );
           } catch (error) {
             console.error(`Error loading mongo event file:`, error);
           }
