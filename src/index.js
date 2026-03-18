@@ -49,7 +49,6 @@ const client = new Client({
 exports.client = client;
 
 client.commands = new Collection();
-//client.cooldowns = new Collection();
 client.invites = new Collection();
 
 const utilsPath = path.join(__dirname, "utils");

@@ -8,7 +8,7 @@ const {
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 
-var timeout = [];
+const cooldowns = new Set();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,7 +19,7 @@ module.exports = {
       return;
     }
 
-    if (timeout.includes(interaction.user.id))
+    if (cooldowns.has(interaction.user.id))
       return await interaction.reply({
         content: `You are on a cooldown! Try again in a few seconds.`,
         flags: MessageFlags.Ephemeral,
@@ -39,7 +39,7 @@ module.exports = {
     });
 
     const infoReport = new TextInputBuilder({
-      customId: " infoReport",
+      customId: "infoReport",
       required: true,
       label: "Explain what/who you're suggesting/reporting.",
       placeholder:
@@ -81,9 +81,9 @@ module.exports = {
         flags: MessageFlags.Ephemeral,
       });
     } finally {
-      timeout.push(interaction.user.id);
+      cooldowns.add(interaction.user.id);
       setTimeout(() => {
-        timeout.shift();
+        cooldowns.delete(interaction.user.id);
       }, 10000);
     }
   },
