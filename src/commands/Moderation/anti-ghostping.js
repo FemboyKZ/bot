@@ -98,7 +98,7 @@ module.exports = {
           Type: "ghostping",
         });
 
-        if (!Data)
+        if (!data)
           return await interaction.reply({
             content: "This member does not have any past ghostpings",
             flags: MessageFlags.Ephemeral,
