@@ -102,7 +102,7 @@ function extractSteamIdFromUrl(url) {
       return "custom_id";
     }
     return null;
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

@@ -2,7 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.VoiceChannelEffectSend,
-  async execute(voiceChannelEffect, client) {
+  async execute(_voiceChannelEffect, _client) {
     // TODO: Implement
   },
 };

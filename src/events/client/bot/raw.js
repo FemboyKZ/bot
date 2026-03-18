@@ -2,7 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.Raw,
-  async execute(packet, client) {
+  async execute(_packet, _client) {
     /*
     if (packet.t) {
       if (client.ws && typeof client.ws.sequence !== "undefined") {

@@ -2,7 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.StageInstanceUpdate,
-  async execute(oldStageInstance, newStageInstance, client) {
+  async execute(_oldStageInstance, _newStageInstance, _client) {
     // TODO: Implement
   },
 };

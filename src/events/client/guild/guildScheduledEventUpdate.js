@@ -2,7 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.GuildScheduledEventUpdate,
-  async execute(oldGuildScheduledEvent, newGuildScheduledEvent, client) {
+  async execute(_oldGuildScheduledEvent, _newGuildScheduledEvent, _client) {
     // TODO: Implement
   },
 };

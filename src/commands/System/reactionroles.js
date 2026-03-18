@@ -101,7 +101,7 @@ module.exports = {
               `A Reaction role has been added to ${message.url} with ${emoji} and the role ${role}`,
             );
 
-          await message.react(emoji).catch((err) => {});
+          await message.react(emoji).catch((_err) => {});
           await interaction.reply({
             embeds: [embed],
             flags: MessageFlags.Ephemeral,

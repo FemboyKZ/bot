@@ -1,6 +1,6 @@
 module.exports = {
   name: "close",
-  async execute(client) {
+  async execute(_client) {
     console.warn("MongoDB connection closed.");
   },
 };

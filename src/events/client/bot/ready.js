@@ -2,7 +2,7 @@ const { Events, PermissionsBitField, Collection } = require("discord.js");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-const { MONGODB_URI, SESSION_ID } = process.env;
+const { MONGODB_URI } = process.env;
 
 // mongoose global cfg
 mongoose.set("strictQuery", false);

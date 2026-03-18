@@ -2,7 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.GuildAuditLogEntryCreate,
-  async execute(auditLogEntry, guild, client) {
+  async execute(_auditLogEntry, _guild, _client) {
     // TODO: Implement
     // wtf does this do?
   },

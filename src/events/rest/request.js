@@ -1,6 +1,6 @@
 module.exports = {
   name: "request",
-  async execute(request, client) {
+  async execute(_request, _client) {
     //console.log("Request sent:", request.route);
   },
 };

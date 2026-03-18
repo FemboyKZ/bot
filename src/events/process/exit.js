@@ -1,6 +1,6 @@
 module.exports = {
   name: "exit",
-  async execute(code, client) {
+  async execute(_code, _client) {
     // console.debug("Process exit event with code: ", code);
   },
 };

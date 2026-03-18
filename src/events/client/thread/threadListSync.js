@@ -2,7 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.ThreadListSync,
-  async execute(threads, guild, client) {
+  async execute(_threads, _guild, _client) {
     // TODO: Implement
   },
 };

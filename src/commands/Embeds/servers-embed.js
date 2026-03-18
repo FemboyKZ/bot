@@ -71,7 +71,7 @@ module.exports = {
     const cs2KZsa = "sa.femboy.kz:25126";
     const cs2KZza = "za.femboy.kz:26518";
 
-    const embedHeader = new EmbedBuilder()
+    const _embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
       .setColor("#ff00b3")
       .setImage("https://files.femboy.kz/web/images/servers-banner.png");

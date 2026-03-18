@@ -1,6 +1,6 @@
 module.exports = {
   name: "disconnected",
-  async execute(client) {
+  async execute(_client) {
     console.warn("Disconnected from MongoDB.");
   },
 };

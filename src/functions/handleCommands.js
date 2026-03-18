@@ -7,7 +7,7 @@ const { Routes } = require("discord-api-types/v9");
 module.exports = (client) => {
   client.loadCommands = async (commandsPath) => {
     client.commandArray = [];
-    client.commands = new Map();
+    client.commands.clear();
 
     const loadCommands = (dir) => {
       const files = fs.readdirSync(dir);

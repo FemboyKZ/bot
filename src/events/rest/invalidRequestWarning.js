@@ -1,6 +1,6 @@
 module.exports = {
   name: "invalidRequestWarning",
-  async execute(info, client) {
+  async execute(info, _client) {
     console.warn("Invalid request warning: ", info);
   },
 };

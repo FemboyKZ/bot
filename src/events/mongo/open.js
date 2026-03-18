@@ -1,6 +1,6 @@
 module.exports = {
   name: "open",
-  async execute(client) {
+  async execute(_client) {
     console.log("MongoDB connection is open.");
   },
 };

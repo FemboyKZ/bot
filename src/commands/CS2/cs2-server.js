@@ -77,7 +77,7 @@ const queryServerStatus = async (ip, port) => {
       if (code !== 0) reject(`Python script exited with code ${code}`);
       try {
         resolve(JSON.parse(dataBuffer).status);
-      } catch (e) {
+      } catch (_err) {
         reject("Invalid JSON response");
       }
     });
