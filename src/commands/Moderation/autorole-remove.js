@@ -54,6 +54,9 @@ module.exports = {
         `The role ${roleNames} has been removed from the autoroles`,
       );
 
-    await interaction.reply({ embeds: [removed], ephemeral: true });
+    await interaction.reply({
+      embeds: [removed],
+      flags: MessageFlags.Ephemeral,
+    });
   },
 };

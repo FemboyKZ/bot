@@ -102,7 +102,10 @@ module.exports = {
             );
 
           await message.react(emoji).catch((err) => {});
-          await interaction.reply({ embeds: [embed], ephemeral: true });
+          await interaction.reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          });
         }
         break;
 
@@ -125,7 +128,10 @@ module.exports = {
               `A Reaction role has been removed from ${message.url} with ${emoji}`,
             );
 
-          await interaction.reply({ embeds: [embed], ephemeral: true });
+          await interaction.reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          });
         }
     }
   },

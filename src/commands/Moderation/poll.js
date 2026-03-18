@@ -41,7 +41,10 @@ module.exports = {
       const m = await channel.send({ embeds: [embed] });
       await m.react("✅");
       await m.react("❌");
-      await interaction.reply({ content: "poll was created", ephemeral: true });
+      await interaction.reply({
+        content: "poll was created",
+        flags: MessageFlags.Ephemeral,
+      });
     } catch (err) {
       console.log(err);
       return;

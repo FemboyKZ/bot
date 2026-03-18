@@ -86,7 +86,10 @@ module.exports = {
             embed.setDescription("The invite-logger has been disabled.");
             await schema.deleteMany({ Guild: guild.id, ID: "invite-logs" });
           }
-          return await interaction.reply({ embeds: [embed], ephemeral: true });
+          return await interaction.reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          });
         } catch (err) {
           console.error("Error executing command:", err);
           await interaction.reply({

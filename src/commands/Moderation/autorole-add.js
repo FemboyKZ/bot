@@ -54,6 +54,6 @@ module.exports = {
         `You have added the roles: ${roleNames}, to the autoroles.`,
       );
 
-    await interaction.reply({ embeds: [set], ephemeral: true });
+    await interaction.reply({ embeds: [set], flags: MessageFlags.Ephemeral });
   },
 };

@@ -26,7 +26,7 @@ module.exports = {
         flags: MessageFlags.Ephemeral,
       });
 
-    await interaction.deferReply({ ephemeral: false });
+    await interaction.deferReply();
 
     const members = await guild.members.fetch();
     if (!members)

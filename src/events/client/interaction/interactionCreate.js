@@ -6,6 +6,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ChannelType,
+  MessageFlags,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -44,7 +45,7 @@ module.exports = {
         const expiredTimestamp = Math.round(expirationTime / 1000);
         return interaction.reply({
           content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
     }
@@ -71,12 +72,12 @@ module.exports = {
           ) {
             return await interaction.reply({
               content: `You don't have perms to use this command.`,
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
           await interaction.reply({
             content: `Ticket closed.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await interaction.message.delete();
           await interaction.channel.delete();
@@ -84,7 +85,7 @@ module.exports = {
           console.error("Error closing ticket:", error);
           await interaction.reply({
             content: "There was an error while closing the ticket.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -97,7 +98,7 @@ module.exports = {
           ) {
             return await interaction.reply({
               content: `You don't have perms to use this command.`,
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
           const data = await status.findOne({
@@ -106,7 +107,7 @@ module.exports = {
           if (!data) {
             return await interaction.reply({
               content: `No pending request found for this user.`,
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
           await status.findOneAndUpdate(
@@ -115,7 +116,7 @@ module.exports = {
           );
           await interaction.reply({
             content: `Request accepted.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await interaction.message.edit({
             content: `**REQUEST ACCEPTED**`,
@@ -125,7 +126,7 @@ module.exports = {
           console.error("Error accepting request:", error);
           await interaction.reply({
             content: "There was an error while accepting the request.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -138,7 +139,7 @@ module.exports = {
           ) {
             return await interaction.reply({
               content: `You don't have perms to use this command.`,
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
           const data = await status.findOne({
@@ -147,7 +148,7 @@ module.exports = {
           if (!data) {
             return await interaction.reply({
               content: `No pending request found for this user.`,
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
           await status.findOneAndUpdate(
@@ -156,7 +157,7 @@ module.exports = {
           );
           await interaction.reply({
             content: `Request denied.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await interaction.message.edit({
             content: `**REQUEST DENIED**`,
@@ -166,7 +167,7 @@ module.exports = {
           console.error("Error denying request:", error);
           await interaction.reply({
             content: "There was an error while denying the request.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -193,12 +194,12 @@ module.exports = {
         if (interaction.replied || interaction.deferred) {
           await interaction.followUp({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } else {
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -230,14 +231,14 @@ module.exports = {
         if (!isValidMinecraftUUID(uuid)) {
           return await interaction.reply({
             content: `The provided UUID is not valid. Please provide a valid Minecraft UUID.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
         if (reason.length > 500 || request.length > 500) {
           return await interaction.reply({
             content: `You have entered too much text, please shorten it and try again.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -298,7 +299,7 @@ module.exports = {
           });
           await interaction.reply({
             content: "Your request has been submitted.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await status.create({
             User: interaction.user.id,
@@ -310,7 +311,7 @@ module.exports = {
           console.error("Error submitting modal:", error);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -324,20 +325,20 @@ module.exports = {
         if (isValidSteamID(steam) === false) {
           return await interaction.reply({
             content: `Please enter a valid SteamID or Profile URL`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
         if (isValidSteamID(steam) === "custom_id") {
           return await interaction.reply({
             content: `Please enter a valid SteamID or Profile URL, not a custom URL.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
         if (reason.length > 500 || request.length > 500) {
           return await interaction.reply({
             content: `You have entered too much text, please shorten it and try again.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -347,14 +348,14 @@ module.exports = {
         ) {
           return await interaction.reply({
             content: `Please specify if you have requested to join the group with a simple "yes" or "no".`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
         if (request.toLowerCase().includes("no")) {
           return await interaction.reply({
             content: `Not requesting to the group will get you automatically denied.\nIf you want to request without joining the group, please create a ticket instead.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -415,7 +416,7 @@ module.exports = {
           });
           await interaction.reply({
             content: "Your request has been submitted.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await status.create({
             User: interaction.user.id,
@@ -427,7 +428,7 @@ module.exports = {
           console.error("Error submitting modal:", error);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -440,20 +441,20 @@ module.exports = {
         if (isValidSteamID(steam) === false) {
           return await interaction.reply({
             content: `Please enter a valid SteamID or Profile URL`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
         if (isValidSteamID(steam) === "custom_id") {
           return await interaction.reply({
             content: `Please enter a valid SteamID or Profile URL, not a custom URL.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
         if (reason.length > 500) {
           return await interaction.reply({
             content: `You have entered too much text, please shorten it and try again.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -514,7 +515,7 @@ module.exports = {
           });
           await interaction.reply({
             content: "Your request has been submitted.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await status.create({
             User: interaction.user.id,
@@ -526,7 +527,7 @@ module.exports = {
           console.error("Error submitting modal:", error);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -539,7 +540,7 @@ module.exports = {
         if (info.length > 500 || more.length > 500) {
           return await interaction.reply({
             content: `You have entered too much text, please shorten it and try again.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -583,7 +584,7 @@ module.exports = {
           await channel.send({ embeds: [embed] });
           await interaction.reply({
             content: "Your request has been submitted.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await status.create({
             User: interaction.user.id,
@@ -594,7 +595,7 @@ module.exports = {
           console.error("Error submitting modal:", error);
           await interaction.reply({
             content: "There was an error while executing this command!",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }
@@ -614,7 +615,7 @@ module.exports = {
         if (infoInput.length > 500 || additionalInput.length > 500) {
           return await interaction.reply({
             content: `You have entered too much text, please shorten it and try again.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -624,7 +625,7 @@ module.exports = {
         if (posChannel)
           return await interaction.reply({
             content: `You already have an open ticket - ${posChannel}`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
 
         const category = data.Channel;
@@ -632,7 +633,7 @@ module.exports = {
         if (!category) {
           return await interaction.reply({
             content: `Tickets are currently disabled, please try again later.`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -683,7 +684,7 @@ module.exports = {
           });
           await interaction.reply({
             content: `You have opened a ticket: ${channel}`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
 
           const member = interaction.user.id;

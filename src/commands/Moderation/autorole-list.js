@@ -33,6 +33,6 @@ module.exports = {
         autoroles.map((role) => `<@&${role}>`).join("\n") || "None",
       );
 
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   },
 };

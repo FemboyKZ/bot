@@ -65,7 +65,10 @@ module.exports = {
             );
           }
 
-          return await interaction.reply({ embeds: [embed], ephemeral: true });
+          return await interaction.reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          });
         } catch (err) {
           console.error("Error executing command:", err);
           await interaction.reply({
@@ -87,7 +90,10 @@ module.exports = {
             });
           }
 
-          return await interaction.reply({ embeds: [embed], ephemeral: true });
+          return await interaction.reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          });
         } catch (err) {
           console.error("Error executing command:", err);
           await interaction.reply({
