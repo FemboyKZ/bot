@@ -66,7 +66,9 @@ class ConsoleHandler extends EventEmitter {
         .join(" ");
 
       const logMessage = `[${formattedLogTimestamp}] [${eventData.type.toUpperCase()}]: ${messages}\n`;
-      fs.appendFileSync(logFilePath, logMessage);
+      fs.appendFile(logFilePath, logMessage, (err) => {
+        if (err) this.originalConsoleError("Logging error:", err);
+      });
     } catch (error) {
       this.originalConsoleError("Logging error:", error);
     }
