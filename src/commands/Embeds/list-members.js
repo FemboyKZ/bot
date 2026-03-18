@@ -5,11 +5,12 @@ const {
   ChannelType,
   MessageFlags,
 } = require("discord.js");
-const { exec } = require("child_process");
+const https = require("https");
 const { parseStringPromise } = require("xml2js");
 const fs = require("fs");
+const path = require("path");
+const os = require("os");
 const wait = require("timers/promises").setTimeout;
-require("dotenv").config();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -50,18 +51,24 @@ module.exports = {
 
     const channel = interaction.options.getChannel("channel");
     const groupUrl = interaction.options.getString("group-url");
-    const fileName = interaction.options.getString("file-name") || "members";
+    const rawFileName = interaction.options.getString("file-name") || "members";
+    const sanitizedName = rawFileName.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const tmpFile = path.join(
+      os.tmpdir(),
+      `${sanitizedName}-${Date.now()}.txt`,
+    );
 
     try {
-      const { stdout, stderr } = await new Promise((resolve, reject) => {
-        exec(
-          `curl https://steamcommunity.com/groups/${groupUrl}/memberslistxml/?xml=1`,
-          (error, stdout, stderr) => {
-            if (error) reject(error);
-            if (stderr) reject(stderr);
-            resolve({ stdout, stderr });
-          },
-        );
+      const encodedGroup = encodeURIComponent(groupUrl);
+      const stdout = await new Promise((resolve, reject) => {
+        const url = `https://steamcommunity.com/groups/${encodedGroup}/memberslistxml/?xml=1`;
+        https
+          .get(url, (res) => {
+            let data = "";
+            res.on("data", (chunk) => (data += chunk));
+            res.on("end", () => resolve(data));
+          })
+          .on("error", reject);
       });
 
       const data = await parseStringPromise(stdout);
@@ -69,7 +76,7 @@ module.exports = {
         (member) => member.steamID64,
       );
 
-      await fs.promises.writeFile(`${fileName}.txt`, memberIds.join("\n"));
+      await fs.promises.writeFile(tmpFile, memberIds.join("\n"));
 
       const embed = new EmbedBuilder()
         .setTitle(`Members of ${groupUrl}`)
@@ -80,10 +87,10 @@ module.exports = {
       if (!channel) {
         await interaction.reply({
           embeds: [embed],
-          files: [`${fileName}.txt`],
+          files: [tmpFile],
         });
       } else {
-        await channel.send({ embeds: [embed], files: [`${fileName}.txt`] });
+        await channel.send({ embeds: [embed], files: [tmpFile] });
         await interaction.reply({
           content: `The list has been posted on ${channel}.`,
           flags: MessageFlags.Ephemeral,
@@ -91,9 +98,7 @@ module.exports = {
       }
 
       await wait(3000);
-      fs.unlink(`${fileName}.txt`, (err) => {
-        if (err) console.error(err);
-      });
+      await fs.promises.unlink(tmpFile).catch((err) => console.error(err));
     } catch (error) {
       console.error(error);
       await interaction.reply({
