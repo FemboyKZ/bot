@@ -3,6 +3,7 @@
 .gitignore
 .vscode/
 node_modules/
+__pycache__/
 *.example*
 LICENSE
 README.md
