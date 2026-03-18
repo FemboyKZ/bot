@@ -2,10 +2,12 @@ import sys
 import a2s
 import json
 
+QUERY_TIMEOUT = 5
+
 def query_server(address, port):
     try:
-        info = a2s.info((address, int(port)))
-        players = a2s.players((address, int(port)))
+        info = a2s.info((address, int(port)), timeout=QUERY_TIMEOUT)
+        players = a2s.players((address, int(port)), timeout=QUERY_TIMEOUT)
         result = {
             "server": f"{address}:{port}",
             "status": "EMPTY" if len(players) == 0 else "ACTIVE",
