@@ -43,11 +43,14 @@ module.exports = {
     });
 
     let num = 0;
-    for (const [_, member] of members) {
-      member.roles.add(role.id).catch(() => {
-        num--;
-      });
-      num++;
+    const BATCH_SIZE = 10;
+    const memberArray = Array.from(members.values());
+    for (let i = 0; i < memberArray.length; i += BATCH_SIZE) {
+      const batch = memberArray.slice(i, i + BATCH_SIZE);
+      const results = await Promise.allSettled(
+        batch.map((member) => member.roles.add(role.id)),
+      );
+      num += results.filter((r) => r.status === "fulfilled").length;
 
       const embed = new EmbedBuilder()
         .setColor("#ff00b3")
@@ -57,7 +60,7 @@ module.exports = {
     }
 
     await interaction.editReply({
-      conent: "done giving roles :3",
+      content: "done giving roles :3",
     });
   },
 };
