@@ -45,7 +45,9 @@ module.exports = {
     const reason =
       interaction.options.getString("reason") || "No reason provided";
 
-    const member = interaction.guild.members.cache.get(user.id);
+    const member = await interaction.guild.members
+      .fetch(user.id)
+      .catch(() => null);
     if (!member) {
       const notInServerEmbed = new EmbedBuilder()
         .setColor("#ff00b3")
