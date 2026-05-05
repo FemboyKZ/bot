@@ -30,7 +30,7 @@ module.exports = {
 
     const embedInfo = new EmbedBuilder()
       .setTitle("**FKZ Minecraft Server Info**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> The Server is running Fabric version 1.20.1, you will need a Java version client to connect.",
@@ -44,7 +44,7 @@ module.exports = {
 
     const embedRules = new EmbedBuilder()
       .setTitle("**FKZ Minecraft Server Rules**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> The rules are just here as reminders, just use common sense. Excessively breaking them could get you kicked off the whitelist.\n\nThe rules of the Discord Server also apply on the Minecraft Server. See them here: <#858419058172887073>",

@@ -30,19 +30,19 @@ module.exports = {
 
     const embedBanner = new EmbedBuilder()
       .setTitle("**FKZ Self-Roles**")
-      .setImage("https://femboy.kz/images/selfrols.png")
+      .setImage("https://femboykz.com/images/selfrols.png")
       .setColor("#ff00b3");
 
     const embedInfo = new EmbedBuilder()
       .setDescription(
         "> FemboyKZ has a lot of roles to choose from to customize your experience on the server.\n> **Choose your own by reacting to the messages below**:",
       )
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png")
       .setColor("#ff00b3");
 
     const embedPing = new EmbedBuilder()
       .setTitle("**Ping Roles**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> These Roles are for if you want to get pinged for events, news or more. <#858419058172887074>",
@@ -56,7 +56,7 @@ module.exports = {
       ]);
     const embedRegion = new EmbedBuilder()
       .setTitle("**Region Roles**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> Roles for showing off your current region.\n> The amounts on these will help us choose server locations!",
@@ -70,7 +70,7 @@ module.exports = {
       ]);
     const embedGame = new EmbedBuilder()
       .setTitle("**Game Roles**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "> Roles for showing off what games you play, and to get pinged for anything related to them.",
@@ -84,7 +84,7 @@ module.exports = {
       ]);
     const embedInterest = new EmbedBuilder()
       .setTitle("**Interest Roles**")
-      .setImage("https://femboy.kz/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png")
       .setColor("#ff00b3")
       .setDescription("> Roles for showing off your interests.")
       .addFields([

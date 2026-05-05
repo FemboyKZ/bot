@@ -13,7 +13,7 @@ module.exports = {
     const guild = interaction.guild;
     const { name, ownerId, createdTimestamp, memberCount } = guild;
     const icon =
-      guild.iconURL() || "https://femboy.kz/images/discord-logo-7-11.png";
+      guild.iconURL() || "https://femboykz.com/images/discord-logo-7-11.png";
     const roles = guild.roles.cache.size;
     const emojis = guild.emojis.cache.size;
     const id = guild.id;

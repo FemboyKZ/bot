@@ -51,12 +51,12 @@ module.exports = {
 
     const embedBanner = new EmbedBuilder()
       .setTitle("**Welcome to FemboyKZ! <3**")
-      .setImage("https://files.femboy.kz/web/images/welcome-banner.png")
+      .setImage("https://files.femboykz.com/web/images/welcome-banner.png")
       .setColor("#ff00b3");
 
     const embedInfo = new EmbedBuilder()
       .setTitle("**FemboyKZ Info**")
-      .setImage("https://files.femboy.kz/web/images/wide.png")
+      .setImage("https://files.femboykz.com/web/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "This is a Discord server for the Femboy KZ CS:GO and CS2 servers. Here you can chat about the game with other members of the server, get <#860283188646248510> for server related issues, and get <#858419058172887074> relating the servers.",
@@ -70,13 +70,13 @@ module.exports = {
         {
           name: "** **",
           value:
-            "Check out our **Website**:\n<https://Femboy.KZ>\nJoin our **Steam Group**:\n<https://steamcommunity.com/groups/FemboyKZ>\nCheck out our **Youtube Channel**:\n<https://www.youtube.com/@FemboyKZ>\nFollow our **Twitter**:\n<https://twitter.com/FemboyKZ>\nCheck out our **Twitch Channel**:\n<https://www.twitch.tv/FemboyKZ>",
+            "Check out our **Website**:\n<https://femboykz.com>\nJoin our **Steam Group**:\n<https://steamcommunity.com/groups/FemboyKZ>\nCheck out our **Youtube Channel**:\n<https://www.youtube.com/@FemboyKZ>\nFollow our **Twitter**:\n<https://twitter.com/FemboyKZ>\nCheck out our **Twitch Channel**:\n<https://www.twitch.tv/FemboyKZ>",
         },
       ]);
 
     const embedRules = new EmbedBuilder()
       .setTitle("**FemboyKZ Rules**")
-      .setImage("https://files.femboy.kz/web/images/wide.png")
+      .setImage("https://files.femboykz.com/web/images/wide.png")
       .setColor("#ff00b3")
       .setDescription(
         "Not following these rules can result in certain punishments.",
