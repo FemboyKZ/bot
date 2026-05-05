@@ -84,7 +84,7 @@ module.exports = {
       ID: "tickets",
     });
 
-    const embedImage = "https://files.femboy.kz/web/images/wide.png";
+    const embedImage = "https://files.femboykz.com/web/images/wide.png";
     const embedColor = "#ff00b3";
 
     const embedWhitelist = new EmbedBuilder()
@@ -133,7 +133,7 @@ module.exports = {
         {
           name: "**How to buy VIP & VIP+**",
           value:
-            "If you wish to purchase VIP or VIP+, you can do so here:\n\n**<https://femboy.kz/shop>**\n\nAll the needed info can be found there.",
+            "If you wish to purchase VIP or VIP+, you can do so here:\n\n**<https://femboykz.com/shop>**\n\nAll the needed info can be found there.",
         },
         {
           name: "**How to Claim VIP/VIP+**",
@@ -149,7 +149,7 @@ module.exports = {
       .addFields([
         {
           name: "Docs / Guides",
-          value: `Check out our **[Docs](https://docs.femboy.kz/)** for more info on how to use the servers.`,
+          value: `Check out our **[Docs](https://docs.femboykz.com/)** for more info on how to use the servers.`,
         },
         {
           name: "Reports / Suggestions",

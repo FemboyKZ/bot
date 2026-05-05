@@ -38,7 +38,7 @@ module.exports = {
       await newMember.user.fetch({ force: true });
       const newAvatar = newMember.user.displayAvatarURL();
       const backupAvatar =
-        "https://files.femboy.kz/web/images/avatars/unknown.png";
+        "https://files.femboykz.com/web/images/avatars/unknown.png";
       const newBanner = newMember.user.bannerURL();
 
       const newValues = {
