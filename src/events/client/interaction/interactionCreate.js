@@ -245,7 +245,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setColor("#ff00b3")
           .setTitle("New Whitelist Request")
-          .setImage("https://femboykz.com/images/wide.png")
+          .setImage("https://femboykz.com/images/wide.png?raw=1")
           .setDescription(
             `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
@@ -362,7 +362,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setColor("#ff00b3")
           .setTitle("New Whitelist Request")
-          .setImage("https://femboykz.com/images/wide.png")
+          .setImage("https://femboykz.com/images/wide.png?raw=1")
           .setDescription(
             `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
@@ -461,7 +461,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setColor("#ff00b3")
           .setTitle("New Unban Request")
-          .setImage("https://femboykz.com/images/wide.png")
+          .setImage("https://femboykz.com/images/wide.png?raw=1")
           .setDescription(
             `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
@@ -547,7 +547,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setColor("Red")
           .setTitle("New Report/Suggestion Request")
-          .setImage("https://femboykz.com/images/wide.png")
+          .setImage("https://femboykz.com/images/wide.png?raw=1")
           .setDescription(
             `Requesting member: ${interaction.user.tag} (${interaction.user.id})\nIn Server: ${interaction.guild.name} (${interaction.guild.id})`,
           )
@@ -662,7 +662,7 @@ module.exports = {
           ])
           .setFooter({ text: `${interaction.guild.name} Tickets` })
           .setTimestamp()
-          .setImage("https://femboykz.com/images/wide.png");
+          .setImage("https://femboykz.com/images/wide.png?raw=1");
 
         const buttonClose = new ActionRowBuilder().addComponents(
           new ButtonBuilder()

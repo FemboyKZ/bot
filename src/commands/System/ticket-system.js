@@ -84,7 +84,7 @@ module.exports = {
       ID: "tickets",
     });
 
-    const embedImage = "https://files.femboykz.com/web/images/wide.png";
+    const embedImage = "https://files.femboykz.com/web/images/wide.png?raw=1";
     const embedColor = "#ff00b3";
 
     const embedWhitelist = new EmbedBuilder()

@@ -74,12 +74,14 @@ module.exports = {
     const _embedHeader = new EmbedBuilder()
       .setTitle("**FemboyKZ Servers**")
       .setColor("#ff00b3")
-      .setImage("https://files.femboykz.com/web/images/servers-banner.png");
+      .setImage(
+        "https://files.femboykz.com/web/images/servers-banner.png?raw=1",
+      );
 
     const embedCSGO = new EmbedBuilder()
       .setTitle("**CS:GO Servers**")
       .setColor("#ff00b3")
-      .setImage("https://files.femboykz.com/web/images/wide.png")
+      .setImage("https://files.femboykz.com/web/images/wide.png?raw=1")
       .addFields([
         {
           name: "Whitelist Servers",
@@ -156,7 +158,7 @@ module.exports = {
     const embedCS2 = new EmbedBuilder()
       .setTitle("**CS2 Servers**")
       .setColor("#ff00b3")
-      .setImage("https://femboykz.com/images/wide.png")
+      .setImage("https://femboykz.com/images/wide.png?raw=1")
       .addFields([
         {
           name: "Whitelist Servers",

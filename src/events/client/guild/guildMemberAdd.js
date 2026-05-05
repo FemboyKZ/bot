@@ -85,14 +85,14 @@ module.exports = {
         name: `Member Joined`,
         iconURL: member.user.avatarURL({ size: 256 })
           ? logData.Avatar
-          : "https://files.femboykz.com/web/images/avatars/unknown.png",
+          : "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1",
       });
     } else {
       embed.setAuthor({
         name: `Member Joined`,
         iconURL:
           member.user.avatarURL({ size: 256 }) ||
-          "https://files.femboykz.com/web/images/avatars/unknown.png",
+          "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1",
       });
     }
 
