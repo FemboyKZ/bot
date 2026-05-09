@@ -58,13 +58,17 @@ module.exports = {
     const csgo64na = "na.femboykz.com:27035";
 
     const cs2WLeu = "eu.femboykz.com";
-    const cs2KZeu = "eu.femboykz.com:27016";
-    const cs2KZ2eu = "eu.femboykz.com:27017";
-    const cs2MVeu = "eu.femboykz.com:27019";
+    const cs2WLeu2 = "eu.femboykz.com:27016";
+    const cs2KZeu = "eu.femboykz.com:27017";
+    const cs2KZeu2 = "eu.femboykz.com:27019";
+    const cs2KZeu3 = "eu.femboykz.com:27020";
+    const cs2KZeu4 = "eu.femboykz.com:27021";
 
     const cs2KZna = "na.femboykz.com";
-    const cs2KZ2na = "na.femboykz.com:27016";
-    const cs2MVna = "na.femboykz.com:27017";
+    const cs2KZna2 = "na.femboykz.com:27016";
+    const cs2KZna3 = "na.femboykz.com:27017";
+    const cs2KZna4 = "na.femboykz.com:27018";
+    const cs2KZna5 = "na.femboykz.com:27019";
 
     const cs2KZas = "as.femboykz.com:26532";
     const cs2KZau = "au.femboykz.com:25064";
@@ -166,8 +170,18 @@ module.exports = {
           inline: false,
         },
         {
-          name: ":flag_eu:  **KZ**",
+          name: ":flag_eu:  **KZ 1**",
           value: `[*${cs2WLeu}*](<https://cs2.femboykz.com/connect?ip=${cs2WLeu}:27015>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **KZ 2**",
+          value: `[*${cs2WLeu2}*](<https://cs2.femboykz.com/connect?ip=${cs2WLeu2}>)`,
           inline: true,
         },
         {
@@ -176,7 +190,7 @@ module.exports = {
           inline: false,
         },
         {
-          name: ":flag_eu:  **KZ**",
+          name: ":flag_eu:  **KZ 1**",
           value: `[*${cs2KZeu}*](<https://cs2.femboykz.com/connect?ip=${cs2KZeu}>)`,
           inline: true,
         },
@@ -186,13 +200,43 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **KZ**",
+          name: ":flag_eu:  **KZ 2**",
+          value: `[*${cs2KZeu2}*](<https://cs2.femboykz.com/connect?ip=${cs2KZeu2}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **KZ 3**",
+          value: `[*${cs2KZeu3}*](<https://cs2.femboykz.com/connect?ip=${cs2KZeu3}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **KZ 4**",
+          value: `[*${cs2KZeu4}*](<https://cs2.femboykz.com/connect?ip=${cs2KZeu4}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **KZ 1**",
           value: `[*${cs2KZna}*](<https://cs2.femboykz.com/connect?ip=${cs2KZna}:27015>)`,
           inline: true,
         },
         {
-          name: ":flag_eu:  **KZ**",
-          value: `[*${cs2KZ2eu}*](<https://cs2.femboykz.com/connect?ip=${cs2KZ2eu}>)`,
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **KZ 2**",
+          value: `[*${cs2KZna2}*](<https://cs2.femboykz.com/connect?ip=${cs2KZna2}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **KZ 3**",
+          value: `[*${cs2KZna3}*](<https://cs2.femboykz.com/connect?ip=${cs2KZna3}>)`,
           inline: true,
         },
         {
@@ -201,13 +245,13 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **KZ**",
-          value: `[*${cs2KZ2na}*](<https://cs2.femboykz.com/connect?ip=${cs2KZ2na}>)`,
+          name: ":flag_us:  **KZ 4**",
+          value: `[*${cs2KZna4}*](<https://cs2.femboykz.com/connect?ip=${cs2KZna4}>)`,
           inline: true,
         },
         {
-          name: ":flag_eu:  **Movement**",
-          value: `[*${cs2MVeu}*](<https://cs2.femboykz.com/connect?ip=${cs2MVeu}>)`,
+          name: ":flag_us:  **KZ 5**",
+          value: `[*${cs2KZna5}*](<https://cs2.femboykz.com/connect?ip=${cs2KZna5}>)`,
           inline: true,
         },
         {
@@ -216,37 +260,27 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **Movement**",
-          value: `[*${cs2MVna}*](<https://cs2.femboykz.com/connect?ip=${cs2MVna}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_hk:  **KZ**",
+          name: ":flag_hk:  **KZ 1**",
           value: `[*${cs2KZas}*](<https://cs2.femboykz.com/connect?ip=${cs2KZas}>)`,
           inline: true,
         },
         {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_au:  **KZ**",
+          name: ":flag_au:  **KZ 1**",
           value: `[*${cs2KZau}*](<https://cs2.femboykz.com/connect?ip=${cs2KZau}>)`,
           inline: true,
         },
         {
-          name: ":flag_br:  **KZ**",
-          value: `[*${cs2KZsa}*](<https://cs2.femboykz.com/connect?ip=${cs2KZsa}>)`,
-          inline: true,
-        },
-        {
           name: "\u200B",
           value: "\u200B",
           inline: true,
         },
         {
-          name: ":flag_za:  **KZ**",
+          name: ":flag_br:  **KZ 1**",
+          value: `[*${cs2KZsa}*](<https://cs2.femboykz.com/connect?ip=${cs2KZsa}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_za:  **KZ 1**",
           value: `[*${cs2KZza}*](<https://cs2.femboykz.com/connect?ip=${cs2KZza}>)`,
           inline: true,
         },
