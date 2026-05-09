@@ -215,12 +215,12 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **KZ 4**",
+          name: ":flag_eu:  **KZ 4**",
           value: `[*${cs2KZeu4}*](<https://cs2.femboykz.com/connect?ip=${cs2KZeu4}>)`,
           inline: true,
         },
         {
-          name: ":flag_eu:  **KZ 1**",
+          name: ":flag_us:  **KZ 1**",
           value: `[*${cs2KZna}*](<https://cs2.femboykz.com/connect?ip=${cs2KZna}:27015>)`,
           inline: true,
         },
