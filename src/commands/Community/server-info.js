@@ -19,27 +19,11 @@ module.exports = {
     const id = guild.id;
     const channels = guild.channels.cache.size;
 
-    let baseVerification = guild.verificationLevel;
-
-    switch (baseVerification) {
-      case "NONE":
-        baseVerification = "None";
-        break;
-      case "LOW":
-        baseVerification = "Low";
-        break;
-      case "MEDIUM":
-        baseVerification = "Medium";
-        break;
-      case "HIGH":
-        baseVerification = "High";
-        break;
-      case "VERY_HIGH":
-        baseVerification = "Very High";
-        break;
-      default:
-        baseVerification = "Unknown";
-    }
+    // verificationLevel is a numeric enum in discord.js v14
+    // (0 None .. 4 Very High), not a string.
+    const verificationLevels = ["None", "Low", "Medium", "High", "Very High"];
+    const baseVerification =
+      verificationLevels[guild.verificationLevel] ?? "Unknown";
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
@@ -85,7 +69,7 @@ module.exports = {
         },
         {
           name: "Server Boost Count",
-          value: String(guild.premiumSubscriptionCount),
+          value: String(guild.premiumSubscriptionCount ?? 0),
           inline: true,
         },
         {
