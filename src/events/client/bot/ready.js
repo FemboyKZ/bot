@@ -33,7 +33,7 @@ async function connectToDatabase(client) {
     console.log("MongoDB connection established");
   } catch (error) {
     console.error("MongoDB connection failed:", error);
-    client.gracefulShutdown();
+    return client.gracefulShutdown();
   }
 }
 
@@ -69,10 +69,14 @@ module.exports = {
     await connectToDatabase(client);
     await syncGuildData(client);
 
-    try {
-      await client.registerCommands();
-    } catch (error) {
-      console.error("Failed to register commands:", error);
+    // ClientReady can fire again after a full gateway reconnect;
+    if (!client.commandsRegistered) {
+      try {
+        await client.registerCommands();
+        client.commandsRegistered = true;
+      } catch (error) {
+        console.error("Failed to register commands:", error);
+      }
     }
   },
 };
