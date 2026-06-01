@@ -2,7 +2,9 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.GuildUnavailable,
-  async execute(_guild, _client) {
-    // TODO: Implement the GuildUnavailable event
+  async execute(guild, _client) {
+    console.warn(
+      `Guild unavailable (outage?): ${guild?.name ?? "unknown"} (${guild?.id})`,
+    );
   },
 };

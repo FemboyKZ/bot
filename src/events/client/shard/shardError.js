@@ -2,8 +2,7 @@ const { Events } = require("discord.js");
 
 module.exports = {
   name: Events.ShardError,
-  async execute(_error, _shardId, _client) {
-    // TODO: Implement
-    // wtf does this do?
+  async execute(error, shardId, _client) {
+    console.error(`[shard ${shardId}] connection error:`, error);
   },
 };
