@@ -1,11 +1,11 @@
 
-FROM node:25-alpine AS builder
+FROM node:26-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 
-FROM node:25-alpine
+FROM node:26-alpine
 
 RUN apk add --no-cache dumb-init python3 py3-pip curl sshpass openssh sudo
 RUN addgroup -g 1010 -S nodejs && \
