@@ -1,19 +1,12 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/roles.js");
 
 module.exports = {
   name: Events.GuildRoleUpdate,
   async execute(oldRole, newRole, client) {
     try {
-      const auditlogData = await schema.findOne({
-        Guild: oldRole.guild.id,
-        ID: "audit-logs",
-      });
-
-      if (!auditlogData?.Channel) return;
-
-      const channel = client.channels.cache.get(auditlogData.Channel);
+      const channel = await getAuditChannel(oldRole.guild, client);
       if (!channel) return;
 
       let logData = await logs.findOne({

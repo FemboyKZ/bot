@@ -1,5 +1,5 @@
 const { EmbedBuilder, Events, DMChannel } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/channels.js");
 
 module.exports = {
@@ -11,14 +11,7 @@ module.exports = {
     if (!oldChannel.guild || !newChannel.guild) return;
 
     try {
-      const auditlogData = await schema.findOne({
-        Guild: oldChannel.guild.id,
-        ID: "audit-logs",
-      });
-
-      if (!auditlogData?.Channel) return;
-
-      const auditChannel = client.channels.cache.get(auditlogData.Channel);
+      const auditChannel = await getAuditChannel(oldChannel.guild, client);
       if (!auditChannel) return;
 
       const logData = await logs.findOne({

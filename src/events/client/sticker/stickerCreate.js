@@ -1,16 +1,11 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/stickers.js");
 
 module.exports = {
   name: Events.GuildStickerCreate,
   async execute(sticker, client) {
-    const auditlogData = await schema.findOne({
-      Guild: sticker.guild.id,
-      ID: "audit-logs",
-    });
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = await client.channels.cache.get(auditlogData.Channel);
+    const channel = await getAuditChannel(sticker.guild, client);
     if (!channel) return;
 
     const logData = await logs.findOne({

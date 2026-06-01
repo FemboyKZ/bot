@@ -18,6 +18,7 @@ const {
   isValidSteamID,
   convertToSteamID64,
 } = require("../../../utils/validators.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 
 // Reply without risking InteractionAlreadyReplied:
 // follow up if we've already responded, otherwise reply.
@@ -784,13 +785,7 @@ module.exports = {
     // Audit logging below is guild-scoped; DM interactions have no guild.
     if (!interaction.guild) return;
 
-    const auditlogData = await schema.findOne({
-      Guild: interaction.guild.id,
-      ID: "audit-logs",
-    });
-
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = await client.channels.cache.get(auditlogData.Channel);
+    const channel = await getAuditChannel(interaction.guild, client);
     if (!channel) return;
 
     const embed = new EmbedBuilder()

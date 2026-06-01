@@ -1,5 +1,5 @@
 const { EmbedBuilder, Events, AuditLogEvent } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 
 // Only actions that have NO dedicated event handler of their own.
 // This handler exists to add the "who did it" for ban/kick/prune/etc.
@@ -44,12 +44,7 @@ module.exports = {
     // Skip actions already covered by a dedicated handler.
     if (!REPORTED_ACTIONS.has(auditLogEntry.action)) return;
 
-    const auditlogData = await schema.findOne({
-      Guild: guild.id,
-      ID: "audit-logs",
-    });
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = client.channels.cache.get(auditlogData.Channel);
+    const channel = await getAuditChannel(guild, client);
     if (!channel) return;
 
     const { action, executorId, targetId, reason, changes, extra } =

@@ -1,5 +1,5 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
 
 const UNKNOWN_AVATAR =
@@ -47,12 +47,7 @@ module.exports = {
           await logs.updateOne({ Guild: guild.id, User: newUser.id }, update);
         }
 
-        const auditlogData = await schema.findOne({
-          Guild: guild.id,
-          ID: "audit-logs",
-        });
-        if (!auditlogData || !auditlogData.Channel) continue;
-        const channel = client.channels.cache.get(auditlogData.Channel);
+        const channel = await getAuditChannel(guild, client);
         if (!channel) continue;
 
         const embed = new EmbedBuilder()

@@ -3,7 +3,7 @@ require("dotenv").config();
 const autoroles = require("../../../schemas/autoRoles.js");
 const mutes = require("../../../schemas/moderation/mutes.js");
 const muteRoles = require("../../../schemas/moderation/muteRoles.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
 
 const UNKNOWN_AVATAR =
@@ -47,12 +47,7 @@ module.exports = {
       }
     }
 
-    const auditlogData = await schema.findOne({
-      Guild: member.guild.id,
-      ID: "audit-logs",
-    });
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = client.channels.cache.get(auditlogData.Channel);
+    const channel = await getAuditChannel(member.guild, client);
     if (!channel) return;
 
     const logData = await logs.findOne({

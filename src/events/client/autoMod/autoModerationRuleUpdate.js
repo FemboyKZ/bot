@@ -1,5 +1,5 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/automodRules.js");
 
 // TODO: make this not shit
@@ -7,12 +7,7 @@ const logs = require("../../../schemas/events/automodRules.js");
 module.exports = {
   name: Events.AutoModerationRuleUpdate,
   async execute(oldAutoModerationRule, newAutoModerationRule, client) {
-    const auditlogData = await schema.findOne({
-      Guild: newAutoModerationRule.guild.id,
-      ID: "audit-logs",
-    });
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = await client.channels.cache.get(auditlogData.Channel);
+    const channel = await getAuditChannel(newAutoModerationRule.guild, client);
     if (!channel) return;
 
     const embed = new EmbedBuilder()

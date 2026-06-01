@@ -1,6 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
 require("dotenv").config();
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
 
 module.exports = {
@@ -136,12 +136,7 @@ module.exports = {
         }
       });
 
-      const auditlogData = await schema.findOne({
-        Guild: newMember.guild.id,
-        ID: "audit-logs",
-      });
-      if (!auditlogData || !auditlogData.Channel) return;
-      const channel = client.channels.cache.get(auditlogData.Channel);
+      const channel = await getAuditChannel(newMember.guild, client);
       if (!channel) return;
 
       await channel.send({ embeds: [embed] });

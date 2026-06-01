@@ -1,16 +1,11 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/guilds.js");
 
 module.exports = {
   name: Events.GuildDelete,
   async execute(guild, client) {
-    const auditlogData = await schema.findOne({
-      Guild: guild.id,
-      ID: "audit-logs",
-    });
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = await client.channels.cache.get(auditlogData.Channel);
+    const channel = await getAuditChannel(guild, client);
     if (!channel) return;
 
     const owner = await client.users.fetch(guild.ownerId).catch(() => null);

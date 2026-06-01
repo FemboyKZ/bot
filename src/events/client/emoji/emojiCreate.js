@@ -1,16 +1,11 @@
 const { EmbedBuilder, Events } = require("discord.js");
-const schema = require("../../../schemas/baseSystem.js");
+const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/emojis.js");
 
 module.exports = {
   name: Events.GuildEmojiCreate,
   async execute(emoji, client) {
-    const auditlogData = await schema.findOne({
-      Guild: emoji.guild.id,
-      ID: "audit-logs",
-    });
-    if (!auditlogData || !auditlogData.Channel) return;
-    const channel = await client.channels.cache.get(auditlogData.Channel);
+    const channel = await getAuditChannel(emoji.guild, client);
     if (!channel) return;
 
     const logData = await logs.findOne({
