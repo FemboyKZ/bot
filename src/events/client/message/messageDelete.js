@@ -21,7 +21,10 @@ module.exports = {
     }
 
     if (!message.guild) return;
-    if (message.webhookId !== null || message.author === client.user) return;
+    // author can be null when a partial/uncached message fails to fetch.
+    if (!message.author) return;
+    if (message.webhookId !== null || message.author.id === client.user.id)
+      return;
 
     const hasContent = message.content && message.content.length > 0;
     const hasMedia = message.attachments.size > 0 || message.stickers.size > 0;

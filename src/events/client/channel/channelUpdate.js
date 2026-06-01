@@ -60,8 +60,11 @@ module.exports = {
       }
 
       if (oldChannel.topic !== newChannel.topic) {
-        const oldTopic = logData?.Topic || oldChannel.topic || "none";
-        const newTopic = newChannel.topic || "none";
+        const oldTopic = (logData?.Topic || oldChannel.topic || "none").slice(
+          0,
+          480,
+        );
+        const newTopic = (newChannel.topic || "none").slice(0, 480);
 
         changes.push({
           name: "Topic",

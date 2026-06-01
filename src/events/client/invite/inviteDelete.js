@@ -30,12 +30,18 @@ module.exports = {
       });
 
     try {
-      const invites = await invite.guild.invites.fetch();
-      if (client.invites?.has(invite.guild.id)) {
-        client.invites.set(
-          invite.guild.id,
-          new Collection(invites.map((i) => [i.code, i.uses])),
-        );
+      // Refreshing the cached invite list needs ManageGuild;
+      // isolate it so a missing perm doesn't abort the whole log below.
+      try {
+        const invites = await invite.guild.invites.fetch();
+        if (client.invites?.has(invite.guild.id)) {
+          client.invites.set(
+            invite.guild.id,
+            new Collection(invites.map((i) => [i.code, i.uses])),
+          );
+        }
+      } catch (fetchError) {
+        console.error("InviteDelete: failed to refresh invites:", fetchError);
       }
       const member = invite.inviter
         ? invite.guild.members.cache.get(invite.inviter.id)

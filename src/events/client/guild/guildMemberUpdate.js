@@ -108,14 +108,20 @@ module.exports = {
           if (change.added.length > 0) {
             embed.addFields({
               name: "Roles Added",
-              value: change.added.map((id) => `<@&${id}>`).join(", "),
+              value: change.added
+                .map((id) => `<@&${id}>`)
+                .join(", ")
+                .slice(0, 1024),
               inline: true,
             });
           }
           if (change.removed.length > 0) {
             embed.addFields({
               name: "Roles Removed",
-              value: change.removed.map((id) => `<@&${id}>`).join(", "),
+              value: change.removed
+                .map((id) => `<@&${id}>`)
+                .join(", ")
+                .slice(0, 1024),
               inline: true,
             });
           }

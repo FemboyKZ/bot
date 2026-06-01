@@ -5,7 +5,7 @@ const logs = require("../../../schemas/events/channels.js");
 module.exports = {
   name: Events.ChannelCreate,
   async execute(channel, client) {
-    if (channel === DMChannel) return;
+    if (channel instanceof DMChannel || !channel.guild) return;
     const auditlogData = await schema.findOne({
       Guild: channel.guild.id,
       ID: "audit-logs",
@@ -37,12 +37,12 @@ module.exports = {
         },
         {
           name: "Topic",
-          value: `${channel.topic ? logData.Topic : "None"}`,
+          value: channel.topic ? channel.topic.slice(0, 1024) : "None",
           inline: false,
         },
         {
           name: "Category",
-          value: `${channel.parentId ? logData.Parent : "Unknown"}`,
+          value: channel.parent ? `${channel.parent.name}` : "None",
           inline: false,
         },
       );
