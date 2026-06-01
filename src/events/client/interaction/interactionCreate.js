@@ -19,6 +19,20 @@ const {
   convertToSteamID64,
 } = require("../../../utils/validators.js");
 
+// Reply without risking InteractionAlreadyReplied:
+// follow up if we've already responded, otherwise reply.
+async function safeReply(interaction, content) {
+  try {
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({ content, flags: MessageFlags.Ephemeral });
+    } else {
+      await interaction.reply({ content, flags: MessageFlags.Ephemeral });
+    }
+  } catch (error) {
+    console.error("Failed to send interaction response:", error);
+  }
+}
+
 module.exports = {
   name: Events.InteractionCreate,
   async execute(interaction, client) {
@@ -83,10 +97,10 @@ module.exports = {
           await interaction.channel.delete();
         } catch (error) {
           console.error("Error closing ticket:", error);
-          await interaction.reply({
-            content: "There was an error while closing the ticket.",
-            flags: MessageFlags.Ephemeral,
-          });
+          await safeReply(
+            interaction,
+            "There was an error while closing the ticket.",
+          );
         }
       }
       if (interaction.customId === "accept-request") {
@@ -124,10 +138,10 @@ module.exports = {
           });
         } catch (error) {
           console.error("Error accepting request:", error);
-          await interaction.reply({
-            content: "There was an error while accepting the request.",
-            flags: MessageFlags.Ephemeral,
-          });
+          await safeReply(
+            interaction,
+            "There was an error while accepting the request.",
+          );
         }
       }
       if (interaction.customId === "deny-request") {
@@ -165,10 +179,10 @@ module.exports = {
           });
         } catch (error) {
           console.error("Error denying request:", error);
-          await interaction.reply({
-            content: "There was an error while denying the request.",
-            flags: MessageFlags.Ephemeral,
-          });
+          await safeReply(
+            interaction,
+            "There was an error while denying the request.",
+          );
         }
       }
     }
@@ -309,10 +323,10 @@ module.exports = {
           });
         } catch (error) {
           console.error("Error submitting modal:", error);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
+          await safeReply(
+            interaction,
+            "There was an error while executing this command!",
+          );
         }
       }
 
@@ -426,10 +440,10 @@ module.exports = {
           });
         } catch (error) {
           console.error("Error submitting modal:", error);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
+          await safeReply(
+            interaction,
+            "There was an error while executing this command!",
+          );
         }
       }
 
@@ -525,10 +539,10 @@ module.exports = {
           });
         } catch (error) {
           console.error("Error submitting modal:", error);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
+          await safeReply(
+            interaction,
+            "There was an error while executing this command!",
+          );
         }
       }
 
@@ -593,10 +607,10 @@ module.exports = {
           });
         } catch (error) {
           console.error("Error submitting modal:", error);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
+          await safeReply(
+            interaction,
+            "There was an error while executing this command!",
+          );
         }
       }
 
@@ -767,6 +781,9 @@ module.exports = {
     }
     */
 
+    // Audit logging below is guild-scoped; DM interactions have no guild.
+    if (!interaction.guild) return;
+
     const auditlogData = await schema.findOne({
       Guild: interaction.guild.id,
       ID: "audit-logs",
@@ -811,13 +828,24 @@ module.exports = {
     }
 
     if (interaction.options && interaction.options.data.length > 0) {
-      embed.addFields({
-        name: "Options/Arguments",
-        value: `${await interaction.options.data
-          .map((x) => x.value)
-          .join(", ")}`,
-        inline: false,
-      });
+      // Flatten subcommand/group options so we log leaf name=value pairs
+      // instead of "undefined" for the subcommand wrappers.
+      const flatten = (opts) =>
+        opts.flatMap((o) =>
+          o.options?.length
+            ? flatten(o.options)
+            : o.value !== undefined
+              ? [`${o.name}: ${o.value}`]
+              : [],
+        );
+      const summary = flatten(interaction.options.data);
+      if (summary.length) {
+        embed.addFields({
+          name: "Options/Arguments",
+          value: summary.join(", ").slice(0, 1024),
+          inline: false,
+        });
+      }
     }
 
     try {
