@@ -1,3 +1,4 @@
+const { Collection, PermissionsBitField } = require("discord.js");
 const automodData = require("../schemas/events/automodRules.js");
 const banData = require("../schemas/events/bans.js");
 const channelData = require("../schemas/events/channels.js");
@@ -9,6 +10,48 @@ const roleData = require("../schemas/events/roles.js");
 const stickerData = require("../schemas/events/stickers.js");
 const threadData = require("../schemas/events/threads.js");
 require("dotenv").config();
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function withRetry(label, fn, { retries = 3, baseDelay = 1000 } = {}) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await fn();
+    } catch (error) {
+      const status = error?.status ?? error?.httpStatus;
+      const isRateLimit = status === 429 || error?.name === "RateLimitError";
+      const retryAfterMs =
+        (error?.retryAfter && error.retryAfter * 1000) ||
+        Number(error?.headers?.get?.("retry-after")) * 1000 ||
+        0;
+      const isTransient =
+        isRateLimit ||
+        (typeof status === "number" && status >= 500) ||
+        ["ECONNRESET", "ETIMEDOUT", "EAI_AGAIN", "ENOTFOUND"].includes(
+          error?.code,
+        );
+
+      if (!isTransient || attempt >= retries) throw error;
+
+      const wait =
+        isRateLimit && retryAfterMs
+          ? retryAfterMs + 250
+          : baseDelay * 2 ** attempt;
+      console.warn(
+        `${label}: ${
+          isRateLimit ? "rate limited" : "transient error"
+        } (attempt ${attempt + 1}/${retries}), retrying in ${wait}ms`,
+      );
+      await sleep(wait);
+    }
+  }
+}
+
+/** Whether the bot has every listed permission at the guild level. */
+function botCan(guild, ...flags) {
+  const me = guild.members.me;
+  return me ? me.permissions.has(flags) : false;
+}
 
 async function syncData({
   dbCollection,
@@ -115,7 +158,7 @@ module.exports = (client) => {
     try {
       if (!guild?.id) throw new Error("Invalid guild object");
 
-      await guild.fetch();
+      await withRetry("guild.fetch", () => guild.fetch());
       const dbGuild = await guildData.findOne({ Guild: guild.id });
 
       const guildNewData = {
@@ -148,7 +191,13 @@ module.exports = (client) => {
 
   client.syncGuildAutomodRules = async (guild) => {
     try {
-      const automodRules = await guild.autoModerationRules.fetch();
+      if (!botCan(guild, PermissionsBitField.Flags.ManageGuild)) {
+        console.log(`Skipping automod for ${guild.name} (missing ManageGuild)`);
+        return;
+      }
+      const automodRules = await withRetry("automod.fetch", () =>
+        guild.autoModerationRules.fetch(),
+      );
       await syncData({
         dbCollection: automodData,
         guildId: guild.id,
@@ -177,7 +226,11 @@ module.exports = (client) => {
 
   client.syncGuildBans = async (guild) => {
     try {
-      const bans = await guild.bans.fetch();
+      if (!botCan(guild, PermissionsBitField.Flags.BanMembers)) {
+        console.log(`Skipping bans for ${guild.name} (missing BanMembers)`);
+        return;
+      }
+      const bans = await withRetry("bans.fetch", () => guild.bans.fetch());
       await syncData({
         dbCollection: banData,
         guildId: guild.id,
@@ -199,7 +252,9 @@ module.exports = (client) => {
 
   client.syncGuildChannels = async (guild) => {
     try {
-      const channels = await guild.channels.fetch();
+      const channels = await withRetry("channels.fetch", () =>
+        guild.channels.fetch(),
+      );
       await syncData({
         dbCollection: channelData,
         guildId: guild.id,
@@ -224,7 +279,9 @@ module.exports = (client) => {
 
   client.syncGuildEmojis = async (guild) => {
     try {
-      const emojis = await guild.emojis.fetch();
+      const emojis = await withRetry("emojis.fetch", () =>
+        guild.emojis.fetch(),
+      );
       await syncData({
         dbCollection: emojiData,
         guildId: guild.id,
@@ -248,7 +305,22 @@ module.exports = (client) => {
 
   client.syncGuildInvites = async (guild) => {
     try {
-      const invites = await guild.invites.fetch();
+      if (!botCan(guild, PermissionsBitField.Flags.ManageGuild)) {
+        console.log(`Skipping invites for ${guild.name} (missing ManageGuild)`);
+        return;
+      }
+      const invites = await withRetry("invites.fetch", () =>
+        guild.invites.fetch(),
+      );
+
+      // Reuse this fetch to seed the in-memory invite-use cache that
+      // guildMemberAdd reads to attribute joins.
+      client.invites ??= new Collection();
+      client.invites.set(
+        guild.id,
+        new Collection(invites.map((invite) => [invite.code, invite.uses])),
+      );
+
       await syncData({
         dbCollection: inviteData,
         guildId: guild.id,
@@ -274,7 +346,9 @@ module.exports = (client) => {
 
   client.syncGuildMembers = async (guild) => {
     try {
-      const members = await guild.members.fetch();
+      const members = await withRetry("members.fetch", () =>
+        guild.members.fetch(),
+      );
       await syncData({
         dbCollection: memberData,
         guildId: guild.id,
@@ -309,7 +383,7 @@ module.exports = (client) => {
 
   client.syncGuildRoles = async (guild) => {
     try {
-      const roles = await guild.roles.fetch();
+      const roles = await withRetry("roles.fetch", () => guild.roles.fetch());
       await syncData({
         dbCollection: roleData,
         guildId: guild.id,
@@ -336,7 +410,9 @@ module.exports = (client) => {
 
   client.syncGuildStickers = async (guild) => {
     try {
-      const stickers = await guild.stickers.fetch();
+      const stickers = await withRetry("stickers.fetch", () =>
+        guild.stickers.fetch(),
+      );
       await syncData({
         dbCollection: stickerData,
         guildId: guild.id,
@@ -364,7 +440,9 @@ module.exports = (client) => {
       const threadMap = new Map();
 
       // Active threads, one guild-wide call.
-      const active = await guild.channels.fetchActiveThreads();
+      const active = await withRetry("threads.fetchActive", () =>
+        guild.channels.fetchActiveThreads(),
+      );
       for (const [id, thread] of active.threads) {
         threadMap.set(id, thread);
       }
@@ -377,11 +455,9 @@ module.exports = (client) => {
         for (let page = 0; page < 20; page += 1) {
           let fetched;
           try {
-            fetched = await parent.threads.fetchArchived({
-              type,
-              before,
-              limit: 100,
-            });
+            fetched = await withRetry(`threads.fetchArchived(${type})`, () =>
+              parent.threads.fetchArchived({ type, before, limit: 100 }),
+            );
           } catch {
             return; // missing perms / unsupported channel type
           }
@@ -394,12 +470,24 @@ module.exports = (client) => {
         }
       };
 
+      // Pre-check perms per channel so we don't fire calls that 403,
+      // those count toward Discord's invalid-request limit.
+      const me = guild.members.me;
       const parents = guild.channels.cache.filter(
         (channel) => typeof channel.threads?.fetchArchived === "function",
       );
       for (const [, parent] of parents) {
+        const perms = me ? parent.permissionsFor(me) : null;
+        if (
+          !perms?.has(PermissionsBitField.Flags.ViewChannel) ||
+          !perms.has(PermissionsBitField.Flags.ReadMessageHistory)
+        ) {
+          continue;
+        }
         await fetchArchived(parent, "public");
-        await fetchArchived(parent, "private");
+        if (perms.has(PermissionsBitField.Flags.ManageThreads)) {
+          await fetchArchived(parent, "private");
+        }
       }
 
       await syncData({
