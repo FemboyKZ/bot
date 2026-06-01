@@ -1,4 +1,4 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Collection, EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/baseSystem.js");
 const logs = require("../../../schemas/events/invites.js");
 
@@ -30,24 +30,38 @@ module.exports = {
       });
 
     try {
-      await invite.guild.invites.fetch();
-      const member = await invite.guild.members.cache.get(invite.inviter.id);
+      const invites = await invite.guild.invites.fetch();
+      if (client.invites?.has(invite.guild.id)) {
+        client.invites.set(
+          invite.guild.id,
+          new Collection(invites.map((i) => [i.code, i.uses])),
+        );
+      }
+      const member = invite.inviter
+        ? invite.guild.members.cache.get(invite.inviter.id)
+        : null;
       if (member) {
         embed.addFields({
           name: "Creator",
-          value: `${member}` || `unknown`,
+          value: `${member}`,
           inline: false,
         });
       } else if (logData && logData.User) {
         embed.addFields({
           name: "Creator",
-          value: `<@${logData?.User}>`,
+          value: `<@${logData.User}>`,
+          inline: false,
+        });
+      } else if (invite.inviter) {
+        embed.addFields({
+          name: "Creator",
+          value: `<@${invite.inviter.id}>`,
           inline: false,
         });
       } else {
         embed.addFields({
           name: "Creator",
-          value: `<@${invite.inviter.id}>`,
+          value: "Unknown",
           inline: false,
         });
       }
