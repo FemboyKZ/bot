@@ -8,95 +8,95 @@ const schema = require("../../schemas/reactionRoles.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("role-missing")
-    .setDescription("[Admin] Add missing reaction roles to members")
+    .setDescription("[Admin] Backfill reaction roles for members who reacted")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction) {
+    const guild = interaction.guild;
+    if (!guild) {
+      return await interaction.reply({
+        content: "This command can only be used in a server.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    if (
+      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+    ) {
+      return await interaction.reply({
+        content: `You don't have perms to use this command.`,
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     try {
-      const guild = interaction.guild;
-      if (!guild) {
-        throw new Error("Interaction is not in a guild");
-      }
-
-      if (
-        !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
-      ) {
-        return await interaction.reply({
-          content: `You don't have perms to use this command.`,
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-
       const reactionsData = await schema.find({ Guild: guild.id });
-      if (!reactionsData) {
-        throw new Error("No reaction data found");
-      }
-
-      for (const reactionData of reactionsData) {
-        const channel = guild.channels.cache.get(reactionData.Channel);
-        if (!channel) {
-          console.log(`Channel not found for reaction: ${reactionData.Emoji}`);
-          continue;
-        }
-
-        const message = await channel.messages.fetch(reactionData.Message);
-        if (!message) {
-          console.log(`Message not found for reaction: ${reactionData.Emoji}`);
-          continue;
-        }
-
-        const reaction = message.reactions.cache.get(reactionData.Emoji);
-        if (!reaction) {
-          console.log(`Reaction not found: ${reactionData.Emoji}`);
-          continue;
-        }
-
-        const role = guild.roles.cache.get(reactionData.Role);
-        if (!role) {
-          console.log(`Role not found: ${reactionData.Role}`);
-          continue;
-        }
-
-        const membersWithRole = await reaction.users.fetch();
-        const membersToAddRole = membersWithRole.filter(
-          (member) => !member.roles.cache.has(role.id),
+      if (!reactionsData.length) {
+        return await interaction.editReply(
+          "No reaction roles are configured for this server.",
         );
-
-        for (const member of membersToAddRole.values()) {
-          await member.roles.add(role);
-        }
       }
 
-      const membersWithExtraRoles = guild.members.cache.filter(
-        (member) =>
-          !member.user.bot &&
-          !member.roles.cache.has(guild.id) &&
-          !reactionsData.some((data) => member.roles.cache.has(data.Role)),
+      // The schema doesn't store a channel, so locate each referenced message
+      // by scanning the guild's text channels (cached per message id).
+      const textChannels = guild.channels.cache.filter(
+        (c) => typeof c.messages?.fetch === "function" && !c.isThread?.(),
       );
+      const messageCache = new Map();
+      const findMessage = async (messageId) => {
+        if (messageCache.has(messageId)) return messageCache.get(messageId);
+        for (const ch of textChannels.values()) {
+          const msg = await ch.messages.fetch(messageId).catch(() => null);
+          if (msg) {
+            messageCache.set(messageId, msg);
+            return msg;
+          }
+        }
+        messageCache.set(messageId, null);
+        return null;
+      };
 
-      for (const member of membersWithExtraRoles.values()) {
-        const rolesToRemove = member.roles.cache.filter(
-          (role) =>
-            !role.managed &&
-            role.id !== guild.id &&
-            !reactionsData.some((data) => role.id === data.Role),
-        );
+      let added = 0;
+      for (const data of reactionsData) {
+        const role = guild.roles.cache.get(data.Role);
+        if (!role) continue;
 
-        for (const role of rolesToRemove.values()) {
-          await member.roles.remove(role);
+        const message = await findMessage(data.Message);
+        if (!message) continue;
+
+        // Match the stored emoji key against the message's reactions.
+        const reaction = message.reactions.cache.find((r) => {
+          const e = r.emoji;
+          const key = e.id
+            ? `<${e.animated ? "a" : ""}:${e.name}:${e.id}>`
+            : e.name;
+          return key === data.Emoji;
+        });
+        if (!reaction) continue;
+
+        const users = await reaction.users.fetch().catch(() => null);
+        if (!users) continue;
+
+        for (const user of users.values()) {
+          if (user.bot) continue;
+          const member = await guild.members.fetch(user.id).catch(() => null);
+          if (member && !member.roles.cache.has(role.id)) {
+            await member.roles.add(role).catch(() => {});
+            added++;
+          }
         }
       }
 
-      await interaction.reply({
-        content: "Added missing roles to members and removed extra roles.",
-        flags: MessageFlags.Ephemeral,
-      });
+      await interaction.editReply(
+        `Backfill complete. Added ${added} missing reaction role(s).`,
+      );
     } catch (error) {
-      console.error(error);
-      await interaction.reply({
-        content: "An error occurred while executing this command.",
-        flags: MessageFlags.Ephemeral,
-      });
+      console.error("Error in role-missing:", error);
+      await interaction.editReply(
+        "An error occurred while executing this command.",
+      );
     }
   },
 };
