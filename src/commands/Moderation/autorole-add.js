@@ -43,7 +43,7 @@ module.exports = {
 
     await schema.updateOne(
       { Guild: interaction.guild.id },
-      { $push: { Roles: { $each: roleIds } } },
+      { $addToSet: { Roles: { $each: roleIds } } },
       { upsert: true },
     );
 

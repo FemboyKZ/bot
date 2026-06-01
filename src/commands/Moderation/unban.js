@@ -58,9 +58,10 @@ module.exports = {
         return await interaction.reply({ embeds: [notBannedEmbed] });
       }
 
-      await interaction.guild.bans.remove(user, {
-        reason: `Requested by moderator: ${reason}`,
-      });
+      await interaction.guild.bans.remove(
+        user,
+        `Requested by moderator: ${reason}`,
+      );
 
       const successEmbed = new EmbedBuilder()
         .setColor("#ff00b3")

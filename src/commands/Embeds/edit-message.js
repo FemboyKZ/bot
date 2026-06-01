@@ -46,9 +46,7 @@ module.exports = {
 
     const message = interaction.options.getString("message");
     const channel =
-      interaction.options.getChannel("channel") ||
-      message?.channel ||
-      interaction.channel;
+      interaction.options.getChannel("channel") || interaction.channel;
     const content = interaction.options.getString("content");
     const embeds = interaction.options.getString("embeds");
 
@@ -99,7 +97,12 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      return await interaction.reply(`Error: ${error.message}`);
+      if (!interaction.replied && !interaction.deferred) {
+        return await interaction.reply({
+          content: `Error: ${error.message}`,
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     }
   },
 };

@@ -26,6 +26,8 @@ module.exports = {
     }
 
     const client = interaction.client;
+    // This file lives in commands/system, so the commands root is two up.
+    const commandsPath = path.join(__dirname, "..");
 
     try {
       const clearCache = (dir) => {
@@ -41,9 +43,10 @@ module.exports = {
         }
       };
 
-      clearCache(client.commandsPath);
+      clearCache(commandsPath);
 
-      await client.handleCommands(client.commandsPath);
+      await client.loadCommands(commandsPath);
+      await client.registerCommands();
 
       embed.setDescription("Commands reloaded successfully!").setColor("Green");
 

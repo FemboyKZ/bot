@@ -34,11 +34,9 @@ module.exports = {
         flags: MessageFlags.Ephemeral,
       });
     }
-    const channel =
-      interaction.options.getChannel("channel") ||
-      message?.channel ||
-      interaction.channel;
     const message = interaction.options.getString("message");
+    const channel =
+      interaction.options.getChannel("channel") || interaction.channel;
 
     if (!channel && !message) {
       return await interaction.reply({

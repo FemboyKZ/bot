@@ -72,9 +72,17 @@ module.exports = {
       });
 
       const data = await parseStringPromise(stdout);
-      const memberIds = data.memberList.members.map(
-        (member) => member.steamID64,
-      );
+      // xml2js wraps repeated tags in arrays:
+      // memberList.members[0].steamID64 is the array of ids.
+      const memberIds = data?.memberList?.members?.[0]?.steamID64 || [];
+
+      if (!memberIds.length) {
+        return await interaction.reply({
+          content:
+            "No members found. Check the group name (use the group's custom URL, not the full link).",
+          flags: MessageFlags.Ephemeral,
+        });
+      }
 
       await fs.promises.writeFile(tmpFile, memberIds.join("\n"));
 

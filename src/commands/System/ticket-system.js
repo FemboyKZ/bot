@@ -72,12 +72,10 @@ module.exports = {
       });
 
     const { guild, options } = interaction;
-    const channel =
-      interaction.options.getChannel("channel") ||
-      message?.channel ||
-      interaction.channel;
-    const category = interaction.options.getChannel("category");
     const message = interaction.options.getString("message");
+    const channel =
+      interaction.options.getChannel("channel") || interaction.channel;
+    const category = interaction.options.getChannel("category");
     const sub = options.getSubcommand();
     const data = await schema.findOne({
       Guild: guild.id,
@@ -264,10 +262,6 @@ module.exports = {
             await target.edit({
               embeds: [embedWhitelist, embedBans, embedVip, embedSupport],
               components: [menu],
-            });
-            await interaction.reply({
-              embeds: [embedReply],
-              flags: MessageFlags.Ephemeral,
             });
           }
           if (category) {

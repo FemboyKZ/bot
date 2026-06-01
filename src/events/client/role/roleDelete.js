@@ -3,7 +3,7 @@ const schema = require("../../../schemas/baseSystem.js");
 const logs = require("../../../schemas/events/roles.js");
 
 module.exports = {
-  name: Events.GuildRoleCreate,
+  name: Events.GuildRoleDelete,
   async execute(role, client) {
     const auditlogData = await schema.findOne({
       Guild: role.guild?.id,

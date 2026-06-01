@@ -80,9 +80,9 @@ module.exports = {
         });
       }
 
-      await channel.send(payload);
+      const sent = await channel.send(payload);
       return await interaction.reply({
-        content: `Message sent successfully! [View message in channel](${channel.url})`,
+        content: `Message sent successfully in ${channel}! [Jump to message](${sent.url})`,
         flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
