@@ -1,6 +1,15 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/baseSystem.js");
 const logs = require("../../../schemas/events/messages.js");
+const {
+  collectMedia,
+  mediaUrls,
+  previewImageUrl,
+  attachmentsField,
+  resolveReply,
+  replyField,
+  prepareMediaUpload,
+} = require("../../../utils/messageLog.js");
 
 module.exports = {
   name: Events.MessageUpdate,
@@ -33,6 +42,9 @@ module.exports = {
         Message: newMessage.id,
       });
 
+      const media = collectMedia(newMessage);
+      const reply = await resolveReply(newMessage);
+
       const isContentValid =
         !oldMessage.content ||
         !newMessage.content ||
@@ -49,31 +61,12 @@ module.exports = {
         ? "`Message Too Long or null.`"
         : `\`\`\`${oldMessage.content || "Unknown."}\`\`\` → \`\`\`${newMessage.content || "Unknown."}\`\`\``;
 
-      const updateData = {
-        $push: { Content: contentToLog },
-        Edited: newMessage.editedAt || date,
-        Edits: (logData?.Edits || 0) + 1,
-      };
-
-      if (!logData) {
-        await logs.create({
-          Guild: newMessage.guild.id,
-          User: newMessage.author.id,
-          Channel: newMessage.channel.id,
-          Message: newMessage.id,
-          Content: [contentToLog],
-          Images: oldMessage.attachments.map((attachment) => attachment.url),
-          Created: oldMessage.createdAt,
-          Edited: newMessage.editedAt || date,
-          Deleted: null,
-          Edits: 1,
-        });
-      } else {
-        await logs.findOneAndUpdate(
-          { Guild: newMessage.guild.id, Message: newMessage.id },
-          updateData,
-        );
-      }
+      // Download + re-host media so the log keeps a permanent copy (tags `media`
+      // with rehosted/fileName, used by the field + preview below).
+      const { files, previewName } = await prepareMediaUpload(
+        media,
+        newMessage.guild,
+      );
 
       const embed = new EmbedBuilder()
         .setColor("#ff00b3")
@@ -91,14 +84,69 @@ module.exports = {
             value: `<#${newMessage.channel.id}>`,
             inline: true,
           },
-          {
-            name: "Edited Message",
-            value: displayContent,
-            inline: false,
-          },
         );
 
-      await channel.send({ embeds: [embed] });
+      const replyValue = replyField(reply);
+      if (replyValue)
+        embed.addFields({
+          name: "Reply To",
+          value: replyValue,
+          inline: false,
+        });
+
+      embed.addFields({
+        name: "Edited Message",
+        value: displayContent,
+        inline: false,
+      });
+
+      const mediaValue = attachmentsField(media);
+      if (mediaValue)
+        embed.addFields({
+          name: "Attachments",
+          value: mediaValue,
+          inline: false,
+        });
+
+      if (previewName) embed.setImage(`attachment://${previewName}`);
+      else {
+        const preview = previewImageUrl(media);
+        if (preview) embed.setImage(preview);
+      }
+
+      const sent = await channel.send({ embeds: [embed], files });
+      // Persist the re-hosted urls (live as long as the audit message) when the
+      // upload succeeded; otherwise fall back to the original CDN urls.
+      const storedImages = sent.attachments.size
+        ? [...sent.attachments.values()].map((a) => a.url)
+        : mediaUrls(newMessage);
+
+      if (!logData) {
+        await logs.create({
+          Guild: newMessage.guild.id,
+          User: newMessage.author.id,
+          Channel: newMessage.channel.id,
+          Message: newMessage.id,
+          Content: [contentToLog],
+          Images: storedImages,
+          ReplyTo: reply?.messageId ?? null,
+          ReplyToUser: reply?.userId ?? null,
+          Created: oldMessage.createdAt,
+          Edited: newMessage.editedAt || date,
+          Deleted: null,
+          Edits: 1,
+        });
+      } else {
+        await logs.findOneAndUpdate(
+          { Guild: newMessage.guild.id, Message: newMessage.id },
+          {
+            $push: { Content: contentToLog },
+            Images: storedImages,
+            Edited: newMessage.editedAt || date,
+            Edits: (logData.Edits || 0) + 1,
+          },
+        );
+      }
     } catch (error) {
       console.error("Error in MessageEdit event:", error);
     }
