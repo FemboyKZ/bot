@@ -52,49 +52,50 @@ module.exports = {
       );
 
     const roleId = await roles.findOne({ Guild: interaction.guild.id });
-    const role = await interaction.guild.roles.cache.get(roleId.Role);
+    if (!roleId) {
+      return await interaction.reply({
+        content:
+          "No mute role configured. Set one with `/set-mute-role` first.",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+    const role = interaction.guild.roles.cache.get(roleId.Role);
 
     try {
       if (!mute) {
-        try {
-          await interaction.reply({
-            content: `User <@${user.id}> is already unmuted.`,
-            flags: MessageFlags.Ephemeral,
-          });
-          if (member.roles.cache.has(role)) {
-            await member.roles.remove(role);
-          }
-          return;
-        } catch (error) {
-          console.error("Unmute event error:", error);
+        await interaction.reply({
+          content: `User <@${user.id}> is already unmuted.`,
+          flags: MessageFlags.Ephemeral,
+        });
+        if (role && member && member.roles.cache.has(role.id)) {
+          await member.roles.remove(role);
         }
-      } else {
-        try {
-          await mutes.findOneAndDelete({
-            Guild: interaction.guild.id,
-            User: user.id,
-          });
-          if (member.roles.cache.has(role)) {
-            await member.roles.remove(role);
-          }
-          await interaction.reply({
-            content: `User <@${user.id}> has been unmuted.`,
-            flags: MessageFlags.Ephemeral,
-          });
-          if (data && data.Channel) {
-            const channel = interaction.guild.channels.cache.get(data.Channel);
-            await channel.send({ embeds: [embed] });
-          }
-        } catch (error) {
-          console.error("Unmute event error:", error);
-        }
+        return;
+      }
+
+      await mutes.findOneAndDelete({
+        Guild: interaction.guild.id,
+        User: user.id,
+      });
+      if (role && member && member.roles.cache.has(role.id)) {
+        await member.roles.remove(role);
+      }
+      await interaction.reply({
+        content: `User <@${user.id}> has been unmuted.`,
+        flags: MessageFlags.Ephemeral,
+      });
+      if (data && data.Channel) {
+        const channel = interaction.guild.channels.cache.get(data.Channel);
+        if (channel) await channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.error("Failed to unmute user:", error);
-      await interaction.reply({
-        content: "Failed to unmute user.",
-        flags: MessageFlags.Ephemeral,
-      });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content: "Failed to unmute user.",
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     }
   },
 };
