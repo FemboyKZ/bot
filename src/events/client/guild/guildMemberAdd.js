@@ -121,6 +121,8 @@ module.exports = {
             Avatar: member.user.displayAvatarURL({ size: 128 }),
             Banner: member.user.bannerURL({ size: 128 }) || null,
             Joined: member.joinedAt || date,
+            Left: false,
+            LeftAt: null,
           },
         );
       }

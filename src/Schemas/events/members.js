@@ -11,6 +11,8 @@ let members = new Schema({
   Roles: { type: [String], default: [] },
   Joined: { type: Date, default: Date.now },
   Created: { type: Date, default: null },
+  Left: { type: Boolean, default: false },
+  LeftAt: { type: Date, default: null },
 });
 
 members.index({ Guild: 1, User: 1 }, { unique: true });

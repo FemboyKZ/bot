@@ -17,6 +17,7 @@ async function syncData({
   liveCache,
   createNewData,
   deleteConditions = {},
+  softDelete = null,
 }) {
   const baseFilter = {
     Guild: guildId,
@@ -51,14 +52,24 @@ async function syncData({
 
   const toDelete = dbData.filter((doc) => !seenIds.has(doc._id.toString()));
   for (const doc of toDelete) {
-    bulkOps.push({
-      deleteOne: {
-        filter: {
-          _id: doc._id,
-          ...baseFilter,
+    if (softDelete) {
+      // Keep the record, just flag it (e.g. members who have left).
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: doc._id },
+          update: { $set: softDelete },
         },
-      },
-    });
+      });
+    } else {
+      bulkOps.push({
+        deleteOne: {
+          filter: {
+            _id: doc._id,
+            ...baseFilter,
+          },
+        },
+      });
+    }
   }
 
   if (bulkOps.length > 0) {
@@ -269,6 +280,8 @@ module.exports = (client) => {
         guildId: guild.id,
         dbKey: "User",
         liveCache: members,
+        // Members who left are flagged, not deleted, to preserve history.
+        softDelete: { Left: true, LeftAt: new Date() },
         createNewData: (member) => ({
           Guild: guild.id,
           User: member.id,
@@ -280,6 +293,8 @@ module.exports = (client) => {
           Avatar: member.avatarURL({ size: 128 }) || null,
           Banner: member.bannerURL({ size: 128 }) || null,
           Roles: member.roles.cache.map((role) => role.id),
+          Left: false,
+          LeftAt: null,
         }),
       });
       console.log(`Synced members for guild: ${guild.name}`);

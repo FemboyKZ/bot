@@ -2,6 +2,9 @@ const { EmbedBuilder, Events } = require("discord.js");
 const schema = require("../../../schemas/baseSystem.js");
 const logs = require("../../../schemas/events/members.js");
 
+const UNKNOWN_AVATAR =
+  "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1";
+
 module.exports = {
   name: Events.GuildMemberRemove,
   async execute(member, client) {
@@ -14,7 +17,7 @@ module.exports = {
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
-    const channel = await client.channels.cache.get(auditlogData.Channel);
+    const channel = client.channels.cache.get(auditlogData.Channel);
     if (!channel) return;
 
     const logData = await logs.findOne({
@@ -29,28 +32,21 @@ module.exports = {
       .setTitle(`${member.user.username} has left the server`)
       .setDescription(`<@${member.user.id}> has left the Server`);
 
-    if (logData && logData.Avatar) {
-      embed.setAuthor({
-        name: `Member Left`,
-        iconURL: member.user.avatarURL({ size: 256 })
-          ? logData.Avatar
-          : "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1",
-      });
-    } else {
-      embed.setAuthor({
-        name: `Member Left`,
-        iconURL:
-          member.user.avatarURL({ size: 256 }) ||
-          "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1",
-      });
-    }
+    embed.setAuthor({
+      name: `Member Left`,
+      iconURL:
+        member.user.avatarURL({ size: 256 }) ||
+        logData?.Avatar ||
+        UNKNOWN_AVATAR,
+    });
 
     try {
       if (logData) {
-        await logs.deleteMany({
-          Guild: member.guild.id,
-          User: member.user.id,
-        });
+        // Flag as left instead of deleting the record.
+        await logs.updateOne(
+          { Guild: member.guild.id, User: member.user.id },
+          { Left: true, LeftAt: new Date() },
+        );
       }
       await channel.send({ embeds: [embed] });
     } catch (error) {

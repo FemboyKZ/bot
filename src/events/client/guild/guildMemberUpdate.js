@@ -19,46 +19,30 @@ module.exports = {
           Name: newMember.user.username,
           Nickname: newMember.nickname || "",
           Displayname: newMember.displayName || "",
-          Avatar: newMember.user.displayAvatarURL() || "",
-          Banner: newMember.user.bannerURL() || "",
+          Avatar: newMember.user.displayAvatarURL({ size: 128 }) || "",
+          Banner: newMember.user.bannerURL({ size: 128 }) || "",
           Roles: newMember.roles.cache.map((r) => r.id) || [],
           Joined: newMember.joinedAt || null,
           Created: newMember.user.createdAt,
         });
       }
 
+      // Guild-level changes only. User-level fields (username, avatar, banner)
+      // are handled by the UserUpdate event. Prefer the actual pre-update
+      // snapshot (oldMember) over the DB, which can lag behind reality.
       const oldValues = {
-        Name: data?.Name || oldMember.user.username,
-        Nickname: data?.Nickname || oldMember.nickname || "",
-        Displayname: data?.Displayname || oldMember.displayName || "",
-        Avatar: data?.Avatar || oldMember.user.displayAvatarURL() || "",
-        Roles: data?.Roles || oldMember.roles.cache.map((r) => r.id),
+        Nickname: oldMember.nickname ?? data?.Nickname ?? "",
+        Displayname: oldMember.displayName || data?.Displayname || "",
+        Roles: oldMember.roles?.cache?.map((r) => r.id) || data?.Roles || [],
       };
 
-      await newMember.user.fetch({ force: true });
-      const newAvatar = newMember.user.displayAvatarURL();
-      const backupAvatar =
-        "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1";
-      const newBanner = newMember.user.bannerURL();
-
       const newValues = {
-        Name: newMember.user.username,
-        Nickname: newMember.nickname || oldValues.Nickname,
+        Nickname: newMember.nickname ?? "",
         Displayname: newMember.displayName || oldValues.Displayname,
-        Avatar: newAvatar || backupAvatar,
-        Banner: newBanner || "",
         Roles: newMember.roles.cache.map((r) => r.id),
       };
 
       const changes = [];
-
-      if (oldValues.Name !== newValues.Name) {
-        changes.push({
-          field: "Username",
-          old: oldValues.Name,
-          new: newValues.Name,
-        });
-      }
 
       if (oldValues.Nickname !== newValues.Nickname) {
         changes.push({
@@ -76,22 +60,6 @@ module.exports = {
         });
       }
 
-      if (oldValues.Avatar !== newValues.Avatar) {
-        changes.push({
-          field: "Avatar",
-          old: oldValues.Avatar,
-          new: newValues.Avatar,
-        });
-      }
-
-      if ((data?.Banner || null) !== newBanner) {
-        changes.push({
-          field: "Banner",
-          old: data?.Banner || null,
-          new: newBanner,
-        });
-      }
-
       const addedRoles = newValues.Roles.filter(
         (id) => !oldValues.Roles.includes(id),
       );
@@ -106,43 +74,24 @@ module.exports = {
         });
       }
 
-      if (changes.length === 0) {
-        console.log(
-          "Member profile updated, no changes detected. Member: ",
-          newMember.id,
-        );
-        return;
-      }
+      if (changes.length === 0) return;
 
       const update = {};
-      const existingData = data || {};
-
-      const hasChanged = (field) =>
-        newValues[field] !== existingData[field] &&
-        newValues[field] !== null &&
-        newValues[field] !== undefined;
-
-      if (hasChanged("Name")) update.Name = newValues.Name;
-      if (hasChanged("Nickname")) update.Nickname = newValues.Nickname;
-      if (hasChanged("Displayname")) update.Displayname = newValues.Displayname;
-      if (hasChanged("Avatar")) update.Avatar = newValues.Avatar;
-      if (hasChanged("Banner")) update.Banner = newValues.Banner;
-      if (
-        JSON.stringify(newValues.Roles) !== JSON.stringify(existingData.Roles)
-      ) {
+      if (oldValues.Nickname !== newValues.Nickname) {
+        update.Nickname = newValues.Nickname;
+      }
+      if (oldValues.Displayname !== newValues.Displayname) {
+        update.Displayname = newValues.Displayname;
+      }
+      if (JSON.stringify(newValues.Roles) !== JSON.stringify(data?.Roles)) {
         update.Roles = newValues.Roles;
       }
 
-      update.Joined = newMember.joinedAt;
-      update.Created = newMember.user.createdAt;
-
-      const minUpdates = 2;
-
-      if (Object.keys(update).length > minUpdates) {
-        await logs.findOneAndUpdate(
+      if (Object.keys(update).length > 0) {
+        await logs.updateOne(
           { Guild: newMember.guild.id, User: newMember.id },
           update,
-          { upsert: true, new: true },
+          { upsert: true },
         );
       }
 
@@ -156,33 +105,20 @@ module.exports = {
 
       changes.forEach((change) => {
         if (change.field === "Roles") {
-          const added =
-            change.added.map((id) => `<@&${id}>`).join(", ") || "None";
-          const removed =
-            change.removed.map((id) => `<@&${id}>`).join(", ") || "None";
-
-          if (added.length > 0) {
+          if (change.added.length > 0) {
             embed.addFields({
               name: "Roles Added",
-              value: added,
+              value: change.added.map((id) => `<@&${id}>`).join(", "),
               inline: true,
             });
           }
-          if (removed.length > 0) {
+          if (change.removed.length > 0) {
             embed.addFields({
               name: "Roles Removed",
-              value: removed,
+              value: change.removed.map((id) => `<@&${id}>`).join(", "),
               inline: true,
             });
           }
-        } else if (change.field === "Avatar") {
-          embed
-            .addFields({
-              name: "Avatar",
-              value: `[Old](<${oldValues.Avatar}>)\n[New](<${newValues.Avatar}>)`,
-              inline: true,
-            })
-            .setThumbnail(newValues.Avatar);
         } else {
           const oldValue = change.old?.toString().slice(0, 1024) || "None";
           const newValue = change.new?.toString().slice(0, 1024) || "None";
@@ -199,7 +135,7 @@ module.exports = {
         ID: "audit-logs",
       });
       if (!auditlogData || !auditlogData.Channel) return;
-      const channel = await client.channels.cache.get(auditlogData.Channel);
+      const channel = client.channels.cache.get(auditlogData.Channel);
       if (!channel) return;
 
       await channel.send({ embeds: [embed] });
@@ -207,7 +143,6 @@ module.exports = {
       console.error(
         "Error handling GuildMemberUpdate for user",
         newMember.id,
-        "Changes detected:",
         error.stack,
       );
     }
