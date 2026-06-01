@@ -4,7 +4,7 @@ const {
   PermissionFlagsBits,
   MessageFlags,
 } = require("discord.js");
-const schema = require("../../schemas/baseSystem.js");
+const antiLink = require("../../schemas/moderation/antiLink.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -79,9 +79,8 @@ module.exports = {
       case "setup": {
         const permissions = options.getString("permissions");
 
-        const Data = await schema.findOne({
+        const Data = await antiLink.findOne({
           Guild: interaction.guild.id,
-          ID: "anti-link",
         });
 
         if (Data)
@@ -90,13 +89,10 @@ module.exports = {
             flags: MessageFlags.Ephemeral,
           });
 
-        if (!Data) {
-          schema.create({
-            Guild: interaction.guild.id,
-            ID: "anti-link",
-            ByPass: permissions,
-          });
-        }
+        await antiLink.create({
+          Guild: interaction.guild.id,
+          Perms: permissions,
+        });
 
         const embed = new EmbedBuilder()
           .setColor("#ff00b3")
@@ -109,9 +105,8 @@ module.exports = {
       }
 
       case "disable": {
-        await schema.deleteMany({
+        await antiLink.deleteMany({
           Guild: interaction.guild.id,
-          ID: "anti-link",
         });
 
         const embed2 = new EmbedBuilder()
@@ -123,9 +118,8 @@ module.exports = {
       }
 
       case "check": {
-        const Data = await schema.findOne({
+        const Data = await antiLink.findOne({
           Guild: interaction.guild.id,
-          ID: "anti-link",
         });
         if (!Data)
           return await interaction.reply({
@@ -133,7 +127,7 @@ module.exports = {
             flags: MessageFlags.Ephemeral,
           });
 
-        const permissions = Data.ByPass;
+        const permissions = Data.Perms;
         if (!permissions)
           return await interaction.reply({
             content: "The anti-link system has not been setup.",
@@ -148,9 +142,8 @@ module.exports = {
       }
 
       case "edit": {
-        const Data = await schema.findOne({
+        const Data = await antiLink.findOne({
           Guild: interaction.guild.id,
-          ID: "anti-link",
         });
         const permissions = options.getString("permissions");
 
@@ -160,16 +153,10 @@ module.exports = {
             flags: MessageFlags.Ephemeral,
           });
         else {
-          await schema.deleteMany({
-            Guild: interaction.guild.id,
-            ID: "anti-link",
-          });
-
-          await schema.create({
-            Guild: interaction.guild.id,
-            ID: "anti-link",
-            ByPass: permissions,
-          });
+          await antiLink.updateOne(
+            { Guild: interaction.guild.id },
+            { Perms: permissions },
+          );
 
           const embed3 = new EmbedBuilder()
             .setColor("#ff00b3")
