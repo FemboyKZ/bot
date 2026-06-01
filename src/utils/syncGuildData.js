@@ -53,6 +53,8 @@ async function syncData({
   const toDelete = dbData.filter((doc) => !seenIds.has(doc._id.toString()));
   for (const doc of toDelete) {
     if (softDelete) {
+      // Already flagged. Keep the original timestamp, don't rewrite it.
+      if (doc.Left) continue;
       // Keep the record, just flag it (e.g. members who have left).
       bulkOps.push({
         updateOne: {
@@ -89,16 +91,15 @@ async function syncData({
 }
 
 async function handleDuplicateKeys(error, collection, bulkOps) {
-  const successOps = [];
-
   for (const op of bulkOps) {
     try {
       if (op.insertOne) {
         await collection.create(op.insertOne.document);
-      } else {
+      } else if (op.updateOne) {
         await collection.updateOne(op.updateOne.filter, op.updateOne.update);
+      } else if (op.deleteOne) {
+        await collection.deleteOne(op.deleteOne.filter);
       }
-      successOps.push(op);
     } catch (err) {
       if (err.code === 11000) {
         console.warn(`Skipping duplicate document: ${err.message}`);
@@ -263,7 +264,6 @@ module.exports = (client) => {
           Permanent: invite.maxAge === 0,
           Expires: invite.expiresAt || null,
         }),
-        deleteConditions: [["Guild", guild.id]],
       });
       console.log(`Synced invites for guild: ${guild.name}`);
     } catch (error) {
@@ -290,8 +290,11 @@ module.exports = (client) => {
           Created: member.user.createdAt,
           Nickname: member.nickname || null,
           Displayname: member.displayName || null,
-          Avatar: member.avatarURL({ size: 128 }) || null,
-          Banner: member.bannerURL({ size: 128 }) || null,
+          // displayAvatarURL never returns null; member.avatarURL() would be
+          // null for users without a guild-specific avatar and clobber the
+          // real avatar. Banner is omitted - member fetch can't retrieve the
+          // user banner, so the UserUpdate event owns that field.
+          Avatar: member.user.displayAvatarURL({ size: 128 }),
           Roles: member.roles.cache.map((role) => role.id),
           Left: false,
           LeftAt: null,
@@ -394,20 +397,33 @@ module.exports = (client) => {
     try {
       if (!guild?.id) throw new Error("Invalid guild object");
 
-      await Promise.all([
-        client.syncGuild(guild),
-        client.syncGuildAutomodRules(guild),
-        client.syncGuildBans(guild),
-        client.syncGuildChannels(guild),
-        client.syncGuildEmojis(guild),
-        client.syncGuildInvites(guild),
-        client.syncGuildMembers(guild),
-        client.syncGuildRoles(guild),
-        client.syncGuildStickers(guild),
-        client.syncGuildThreads(guild),
-      ]);
+      // allSettled so one perm-gated category (e.g. bans/automod) failing
+      // doesn't abort the categories that synced fine.
+      const tasks = {
+        guild: client.syncGuild(guild),
+        automod: client.syncGuildAutomodRules(guild),
+        bans: client.syncGuildBans(guild),
+        channels: client.syncGuildChannels(guild),
+        emojis: client.syncGuildEmojis(guild),
+        invites: client.syncGuildInvites(guild),
+        members: client.syncGuildMembers(guild),
+        roles: client.syncGuildRoles(guild),
+        stickers: client.syncGuildStickers(guild),
+        threads: client.syncGuildThreads(guild),
+      };
+      const labels = Object.keys(tasks);
+      const results = await Promise.allSettled(Object.values(tasks));
+      const failed = results
+        .map((r, i) => (r.status === "rejected" ? labels[i] : null))
+        .filter(Boolean);
 
-      console.log(`Completed full sync for guild: ${guild.name}`);
+      if (failed.length) {
+        console.warn(
+          `Partial sync for ${guild.name} - failed: ${failed.join(", ")}`,
+        );
+      } else {
+        console.log(`Completed full sync for guild: ${guild.name}`);
+      }
     } catch (error) {
       console.error(`Failed to sync guild ${guild.name}:`, error);
       throw error;
