@@ -68,17 +68,25 @@ const resolveServerConfig = (serverId) => {
 
 const queryServerStatus = async (ip, port) => {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python3", [STATUS_SCRIPT, ip, port]);
+    const pythonProcess = spawn("python3", [STATUS_SCRIPT, ip, String(port)]);
     let dataBuffer = "";
+    let errBuffer = "";
 
+    pythonProcess.on("error", reject);
     pythonProcess.stdout.on("data", (data) => (dataBuffer += data));
-    pythonProcess.stderr.on("data", reject);
+    pythonProcess.stderr.on("data", (data) => (errBuffer += data));
     pythonProcess.on("close", (code) => {
-      if (code !== 0) reject(`Python script exited with code ${code}`);
+      if (code !== 0) {
+        return reject(
+          new Error(
+            `Python script exited with code ${code}${errBuffer ? `: ${errBuffer.trim()}` : ""}`,
+          ),
+        );
+      }
       try {
         resolve(JSON.parse(dataBuffer).status);
       } catch (_err) {
-        reject("Invalid JSON response");
+        reject(new Error("Invalid JSON response from status script"));
       }
     });
   });
