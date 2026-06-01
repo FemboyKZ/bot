@@ -80,7 +80,6 @@ const eventsPath = path.join(__dirname, "events");
 
 (async () => {
   try {
-    await client.login(process.env.TOKEN);
     let file;
     for (file of functions) {
       require(`${functionsPath}/${file}`)(client);
@@ -90,6 +89,8 @@ const eventsPath = path.join(__dirname, "events");
     await client.handleRestEvents(path.join(eventsPath, "rest"));
     await client.handleMongoEvents(path.join(eventsPath, "mongo"));
     await client.loadCommands(path.join(__dirname, "commands"));
+
+    await client.login(process.env.TOKEN);
   } catch (error) {
     console.error("Error starting the bot:", error);
   }
