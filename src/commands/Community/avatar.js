@@ -19,12 +19,14 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    const { channel, options } = interaction;
+    const { options } = interaction;
     const requestedUser = options.getUser("user");
 
     try {
-      const userToShow = requestedUser || interaction.member.user;
-      const avatarUrl = userToShow.avatarURL({ size: 512 });
+      const userToShow = requestedUser || interaction.user;
+      // displayAvatarURL always returns a url (falls back to the default
+      // avatar); avatarURL() is null for users without a custom avatar.
+      const avatarUrl = userToShow.displayAvatarURL({ size: 512 });
 
       const embed = new EmbedBuilder()
         .setColor("#ff00b3")
@@ -39,13 +41,15 @@ module.exports = {
 
       const actionRow = new ActionRowBuilder().addComponents(button);
 
-      await channel.send({ embeds: [embed], components: [actionRow] });
+      await interaction.reply({ embeds: [embed], components: [actionRow] });
     } catch (error) {
       console.error(error);
-      await interaction.reply({
-        content: "An error occurred while processing your request.",
-        flags: MessageFlags.Ephemeral,
-      });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content: "An error occurred while processing your request.",
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     }
   },
 };
