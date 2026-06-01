@@ -361,31 +361,65 @@ module.exports = (client) => {
 
   client.syncGuildThreads = async (guild) => {
     try {
-      const threads = await guild.channels.cache.filter((channel) =>
-        channel.isThread(),
-      );
-      // const threads = await guild.threads.fetch();
-      // TODO: use thread.fetchActive() and thread.fetchArchived() instead?
-      if (threads) {
-        await syncData({
-          dbCollection: threadData,
-          guildId: guild.id,
-          dbKey: "Thread",
-          liveCache: threads,
-          createNewData: (thread) => ({
-            Guild: guild.id,
-            Thread: thread.id,
-            Name: thread.name,
-            Type: thread.type,
-            Created: thread.createdAt,
-            User: thread.ownerId || null,
-            Locked: thread.locked,
-            Archived: thread.archived,
-            Auto: thread.autoArchiveDuration || null,
-            Parent: thread.parentId || null,
-          }),
-        });
+      const threadMap = new Map();
+
+      // Active threads, one guild-wide call.
+      const active = await guild.channels.fetchActiveThreads();
+      for (const [id, thread] of active.threads) {
+        threadMap.set(id, thread);
       }
+
+      // Archived threads - per parent channel, paginated. fetchArchived
+      // returns at most 100 per call, so follow `hasMore` to avoid pruning
+      // valid older threads. Capped to stay clear of runaway loops.
+      const fetchArchived = async (parent, type) => {
+        let before;
+        for (let page = 0; page < 20; page += 1) {
+          let fetched;
+          try {
+            fetched = await parent.threads.fetchArchived({
+              type,
+              before,
+              limit: 100,
+            });
+          } catch {
+            return; // missing perms / unsupported channel type
+          }
+          if (!fetched?.threads?.size) return;
+          for (const [id, thread] of fetched.threads) {
+            threadMap.set(id, thread);
+          }
+          if (!fetched.hasMore) return;
+          before = fetched.threads.last();
+        }
+      };
+
+      const parents = guild.channels.cache.filter(
+        (channel) => typeof channel.threads?.fetchArchived === "function",
+      );
+      for (const [, parent] of parents) {
+        await fetchArchived(parent, "public");
+        await fetchArchived(parent, "private");
+      }
+
+      await syncData({
+        dbCollection: threadData,
+        guildId: guild.id,
+        dbKey: "Thread",
+        liveCache: threadMap,
+        createNewData: (thread) => ({
+          Guild: guild.id,
+          Thread: thread.id,
+          Name: thread.name,
+          Type: thread.type,
+          Created: thread.createdAt,
+          User: thread.ownerId || null,
+          Locked: thread.locked,
+          Archived: thread.archived,
+          Auto: thread.autoArchiveDuration || null,
+          Parent: thread.parentId || null,
+        }),
+      });
       console.log(`Synced threads for guild: ${guild.name}`);
     } catch (error) {
       console.error(`Error syncing threads for ${guild.name}:`, error);
