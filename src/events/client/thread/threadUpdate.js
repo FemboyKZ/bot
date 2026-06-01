@@ -31,7 +31,7 @@ module.exports = {
           Thread: newThread.id,
           Name: newThread.name,
           User: newThread.ownerId,
-          Parent: newThread.parent,
+          Parent: newThread.parentId,
           Auto: newThread.autoArchiveDuration,
           Locked: newThread.locked,
           Archived: newThread.archived,
@@ -59,18 +59,14 @@ module.exports = {
       }
 
       if (oldThread.archived !== newThread.archived) {
-        if (
-          oldThread.archived === null &&
-          newThread.archived === null &&
-          logData.Archived === null
-        ) {
+        if (oldThread.archived == null && newThread.archived == null) {
           return;
         }
 
         embed.addFields({
           name: "Archived",
-          value: `\`${oldThread.archived ? logData.Archived : "none"}\` → \`${
-            newThread.archived || "none"
+          value: `\`${oldThread.archived ?? "none"}\` → \`${
+            newThread.archived ?? "none"
           }\``,
           inline: false,
         });
@@ -89,18 +85,14 @@ module.exports = {
       }
 
       if (oldThread.locked !== newThread.locked) {
-        if (
-          oldThread.locked === null &&
-          newThread.locked === null &&
-          logData.Locked === null
-        ) {
+        if (oldThread.locked == null && newThread.locked == null) {
           return;
         }
 
         embed.addFields({
           name: "Locked",
-          value: `\`${oldThread.locked ? logData.Locked : "none"}\` → \`${
-            newThread.locked || "none"
+          value: `\`${oldThread.locked ?? "none"}\` → \`${
+            newThread.locked ?? "none"
           }\``,
           inline: false,
         });
@@ -120,9 +112,8 @@ module.exports = {
 
       if (oldThread.autoArchiveDuration !== newThread.autoArchiveDuration) {
         if (
-          oldThread.autoArchiveDuration === null &&
-          newThread.autoArchiveDuration === null &&
-          logData.Auto === null
+          oldThread.autoArchiveDuration == null &&
+          newThread.autoArchiveDuration == null
         ) {
           return;
         }

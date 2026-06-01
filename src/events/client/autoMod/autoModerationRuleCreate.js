@@ -33,17 +33,17 @@ module.exports = {
         },
         {
           name: "Name",
-          value: autoModerationRule.name ? logData.Name : "None",
+          value: autoModerationRule.name || "None",
           inline: false,
         },
         {
           name: "Trigger",
-          value: autoModerationRule.triggerType ? logData.Trigger : "None",
+          value: `${autoModerationRule.triggerType ?? "None"}`,
           inline: false,
         },
         {
           name: "Actions",
-          value: autoModerationRule.actions[0].type ? logData.Action : "None",
+          value: `${autoModerationRule.actions?.[0]?.type ?? "None"}`,
           inline: false,
         },
       );
@@ -56,7 +56,7 @@ module.exports = {
           Rule: autoModerationRule.id,
           User: autoModerationRule.creatorId,
           Trigger: autoModerationRule.triggerType,
-          Action: autoModerationRule.actions[0].type,
+          Action: autoModerationRule.actions?.[0]?.type ?? null,
           Enabled: autoModerationRule.enabled,
         });
       }

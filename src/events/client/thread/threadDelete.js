@@ -31,17 +31,25 @@ module.exports = {
         },
         {
           name: "Creator",
-          value: `${thread.ownerId ? logData.User : "unknown"}`,
+          value: thread.ownerId
+            ? `<@${thread.ownerId}>`
+            : logData?.User
+              ? `<@${logData.User}>`
+              : "unknown",
           inline: false,
         },
         {
           name: "Channel",
-          value: `${thread.parent ? logData.Parent : "none"}`,
+          value: thread.parentId
+            ? `<#${thread.parentId}>`
+            : logData?.Parent
+              ? `<#${logData.Parent}>`
+              : "none",
           inline: false,
         },
         {
           name: "Auto Archive Time",
-          value: `${thread.autoArchiveDuration ? logData.Auto : "unknown"}`,
+          value: `${thread.autoArchiveDuration || logData?.Auto || "unknown"}`,
           inline: false,
         },
         {

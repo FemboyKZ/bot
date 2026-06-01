@@ -6,7 +6,7 @@ module.exports = {
   name: Events.GuildStickerUpdate,
   async execute(oldSticker, newSticker, client) {
     const auditlogData = await schema.findOne({
-      //Guild: newSticker.guild.id,
+      Guild: newSticker.guild.id,
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
@@ -14,7 +14,7 @@ module.exports = {
     if (!channel) return;
 
     const logData = await logs.findOne({
-      //Guild: newSticker.guild.id,
+      Guild: newSticker.guild.id,
       Sticker: newSticker.id,
     });
 
@@ -59,9 +59,7 @@ module.exports = {
       if (oldSticker.description !== newSticker.description) {
         embed.addFields({
           name: "Description",
-          value: `\`${
-            oldSticker.description ? logData.Description : "none"
-          }\` → \`${newSticker.description || "none"}\``,
+          value: `\`${(oldSticker.description || "none").slice(0, 480)}\` → \`${(newSticker.description || "none").slice(0, 480)}\``,
           inline: false,
         });
         if (logData) {

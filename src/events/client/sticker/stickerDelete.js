@@ -6,7 +6,7 @@ module.exports = {
   name: Events.GuildStickerDelete,
   async execute(sticker, client) {
     const auditlogData = await schema.findOne({
-      //Guild: sticker.guild.id,
+      Guild: sticker.guild.id,
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;

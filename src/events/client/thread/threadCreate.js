@@ -31,17 +31,19 @@ module.exports = {
         },
         {
           name: "Creator",
-          value: `${thread.ownerId ? logData.User : "unknown"}`,
+          value: thread.ownerId ? `<@${thread.ownerId}>` : "unknown",
           inline: false,
         },
         {
           name: "Channel",
-          value: `${thread.parent ? logData.Parent : "none"}`,
+          value: thread.parentId ? `<#${thread.parentId}>` : "none",
           inline: false,
         },
         {
           name: "Auto Archive Time",
-          value: `${thread.autoArchiveDuration}` || "unknown",
+          value: thread.autoArchiveDuration
+            ? `${thread.autoArchiveDuration}`
+            : "unknown",
           inline: false,
         },
         {
@@ -58,7 +60,7 @@ module.exports = {
           Thread: thread.id,
           Name: thread.name,
           User: thread.ownerId,
-          Parent: thread.parent,
+          Parent: thread.parentId,
           Auto: thread.autoArchiveDuration,
           Locked: thread.locked,
           Archived: thread.archived,

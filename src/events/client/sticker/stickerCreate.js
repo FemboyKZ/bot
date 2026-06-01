@@ -6,7 +6,7 @@ module.exports = {
   name: Events.GuildStickerCreate,
   async execute(sticker, client) {
     const auditlogData = await schema.findOne({
-      //Guild: sticker.guild.id,
+      Guild: sticker.guild.id,
       ID: "audit-logs",
     });
     if (!auditlogData || !auditlogData.Channel) return;
@@ -14,7 +14,7 @@ module.exports = {
     if (!channel) return;
 
     const logData = await logs.findOne({
-      //Guild: sticker.guild.id,
+      Guild: sticker.guild.id,
       Sticker: sticker.id,
     });
 
@@ -31,7 +31,7 @@ module.exports = {
         },
         {
           name: "Description",
-          value: `${sticker.description ? logData.Description : "none"}`,
+          value: (sticker.description || "none").slice(0, 1024),
           inline: false,
         },
         {

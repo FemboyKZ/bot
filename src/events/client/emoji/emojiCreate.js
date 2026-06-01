@@ -18,50 +18,53 @@ module.exports = {
       Emoji: emoji.id,
     });
 
+    // author isn't populated on the create payload, fetch it.
+    const author = await emoji.fetchAuthor().catch(() => null);
+    const image = emoji.imageURL({ size: 128 });
+
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setImage(emoji.imageURL({ size: 128 }) || logData.Image)
       .setFooter({ text: `FKZ • ID: ${emoji.id}` })
       .setTitle("Emoji Added")
       .addFields(
         {
           name: "Name",
-          value: emoji.name ? logData.Name : "Unknown",
+          value: emoji.name || logData?.Name || "Unknown",
           inline: false,
         },
         {
           name: "Author",
-          value: emoji.author ? logData.User : "Unknown",
+          value: author ? `<@${author.id}>` : "Unknown",
           inline: false,
         },
         {
           name: "Animated?",
-          value: emoji.animated ? logData.Animated : "Unknown",
+          value: emoji.animated ? "Yes" : "No",
           inline: false,
         },
       );
+    if (image) embed.setImage(image);
     try {
       if (logData) {
         await logs.findOneAndUpdate(
           { Guild: emoji.guild.id, Emoji: emoji.id },
           {
             Name: emoji.name,
-            User: emoji.author.id,
+            User: author?.id || null,
             Animated: emoji.animated || null,
-            Image: emoji.imageURL({ size: 128 }),
+            Image: image,
           },
         );
-      }
-      if (!logData) {
+      } else {
         await logs.create({
           Guild: emoji.guild.id,
           Emoji: emoji.id,
           Name: emoji.name,
-          User: emoji.author.id,
+          User: author?.id || null,
           Created: emoji.createdAt,
           Animated: emoji.animated,
-          Image: emoji.imageURL({ size: 128 }),
+          Image: image,
         });
       }
       await channel.send({ embeds: [embed] });

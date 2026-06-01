@@ -18,29 +18,31 @@ module.exports = {
       Emoji: emoji.id,
     });
 
+    const image = emoji.imageURL({ size: 128 }) || logData?.Image;
+
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setImage(emoji.imageURL({ size: 128 }) || logData.Image)
       .setFooter({ text: `FKZ • ID: ${emoji.id}` })
       .setTitle("Emoji Deleted")
       .addFields(
         {
           name: "Name",
-          value: emoji.name ? logData.Name : "Unknown",
+          value: emoji.name || logData?.Name || "Unknown",
           inline: false,
         },
         {
           name: "Author",
-          value: emoji.author ? logData.User : "Unknown",
+          value: logData?.User ? `<@${logData.User}>` : "Unknown",
           inline: false,
         },
         {
           name: "Animated?",
-          value: emoji.animated ? logData.Animated : "Unknown",
+          value: emoji.animated ? "Yes" : "No",
           inline: false,
         },
       );
+    if (image) embed.setImage(image);
     try {
       if (logData) {
         await logs.deleteMany({ Guild: emoji.guild.id, Emoji: emoji.id });

@@ -33,17 +33,17 @@ module.exports = {
         },
         {
           name: "Name",
-          value: autoModerationRule.name ? logData.Name : "None",
+          value: autoModerationRule.name || logData?.Name || "None",
           inline: false,
         },
         {
           name: "Trigger",
-          value: autoModerationRule.triggerType ? logData.Trigger : "None",
+          value: `${autoModerationRule.triggerType ?? logData?.Trigger ?? "None"}`,
           inline: false,
         },
         {
           name: "Actions",
-          value: autoModerationRule.actions[0].type ? logData.Action : "None",
+          value: `${autoModerationRule.actions?.[0]?.type ?? logData?.Action ?? "None"}`,
           inline: false,
         },
       );

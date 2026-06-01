@@ -18,35 +18,37 @@ module.exports = {
       Emoji: oldEmoji.id,
     });
 
+    const image = newEmoji.imageURL({ size: 128 });
+
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")
       .setTimestamp()
-      .setImage(newEmoji.imageURL({ size: 128 }) || logData.Image)
       .setFooter({ text: `FKZ • ID: ${newEmoji.id}` })
       .setTitle("Emoji Edited")
       .addFields({
         name: "Author:",
-        value: newEmoji.author ? logData.User : "Unknown",
+        value: logData?.User ? `<@${logData.User}>` : "Unknown",
         inline: false,
       });
+    if (image) embed.setImage(image);
 
     try {
       if (!logData) {
         await logs.create({
           Guild: newEmoji.guild.id,
           Emoji: newEmoji.id,
-          Name: newEmoji.name ? oldEmoji.name : null,
-          User: newEmoji.author.id ? oldEmoji.author.id : null,
-          Animated: newEmoji.animated ? oldEmoji.animated : null,
+          Name: oldEmoji.name || null,
+          User: oldEmoji.author?.id || null,
+          Animated: oldEmoji.animated ?? null,
           Created: newEmoji.createdAt,
-          Image: newEmoji.imageURL({ size: 128 }),
+          Image: image,
         });
       }
 
       if (oldEmoji.name !== newEmoji.name) {
         embed.addFields({
           name: "Name:",
-          value: `\`${oldEmoji.name ? logData.Name : "none"}\` →\`${
+          value: `\`${oldEmoji.name || "none"}\` →\`${
             newEmoji.name || "Unknown"
           }\``,
           inline: false,
@@ -63,8 +65,8 @@ module.exports = {
       if (oldEmoji.animated !== newEmoji.animated) {
         embed.addFields({
           name: "Animated:",
-          value: `\`${oldEmoji.animated ? logData.Animated : "none"}\` →\`${
-            newEmoji.animated || "Unknown"
+          value: `\`${oldEmoji.animated ? "Yes" : "No"}\` →\`${
+            newEmoji.animated ? "Yes" : "No"
           }\``,
           inline: false,
         });

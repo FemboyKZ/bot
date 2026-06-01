@@ -34,7 +34,7 @@ module.exports = {
           Rule: newAutoModerationRule.id,
           User: newAutoModerationRule.creatorId,
           Trigger: newAutoModerationRule.triggerType,
-          Action: newAutoModerationRule.actions[0].type,
+          Action: newAutoModerationRule.actions?.[0]?.type ?? null,
           Enabled: newAutoModerationRule.enabled,
         });
       }
@@ -42,9 +42,7 @@ module.exports = {
       if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
         embed.addFields({
           name: "Name",
-          value: `\`${
-            oldAutoModerationRule.name ? logData.Name : "None"
-          }\`  →  \`${newAutoModerationRule.name || "None"}\``,
+          value: `\`${oldAutoModerationRule.name || "None"}\`  →  \`${newAutoModerationRule.name || "None"}\``,
           inline: false,
         });
         if (logData) {
@@ -92,9 +90,7 @@ module.exports = {
       if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
         embed.addFields({
           name: "Enabled?",
-          value: `\`${
-            oldAutoModerationRule.enabled ? logData.Enabled : "Unknown"
-          }\`  →  \`${newAutoModerationRule.enabled || "Unknown"}\``,
+          value: `\`${oldAutoModerationRule.enabled}\`  →  \`${newAutoModerationRule.enabled}\``,
           inline: false,
         });
         if (logData) {
@@ -114,9 +110,7 @@ module.exports = {
       ) {
         embed.addFields({
           name: "Trigger",
-          value: `\`${
-            oldAutoModerationRule.triggerType ? logData.Trigger : "None"
-          }\`  →  \`${newAutoModerationRule.triggerType || "None"}\``,
+          value: `\`${oldAutoModerationRule.triggerType ?? "None"}\`  →  \`${newAutoModerationRule.triggerType ?? "None"}\``,
           inline: false,
         });
         if (logData) {

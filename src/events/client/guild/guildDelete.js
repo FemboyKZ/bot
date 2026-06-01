@@ -13,11 +13,11 @@ module.exports = {
     const channel = await client.channels.cache.get(auditlogData.Channel);
     if (!channel) return;
 
-    const owner = await client.users.cache.get(guild.ownerId);
+    const owner = await client.users.fetch(guild.ownerId).catch(() => null);
 
     const logData = await logs.findOne({
       Guild: guild.id,
-      User: owner.id,
+      User: guild.ownerId,
     });
 
     const embed = new EmbedBuilder()
@@ -34,7 +34,7 @@ module.exports = {
         },
         {
           name: "Server Owner",
-          value: `> ${owner.username} / ${guild.ownerId}`,
+          value: `> ${owner?.username || "Unknown"} / ${guild.ownerId}`,
         },
         {
           name: "Server Age",
@@ -46,7 +46,7 @@ module.exports = {
 
     try {
       if (logData) {
-        await logs.deleteMany({ Guild: guild.id, User: owner.id });
+        await logs.deleteMany({ Guild: guild.id, User: guild.ownerId });
       }
 
       await channel.send({ embeds: [embed] });
