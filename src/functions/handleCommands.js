@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const process = require("node:process");
 const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
+const { Routes } = require("discord-api-types/v10");
 
 module.exports = (client) => {
   client.loadCommands = async (commandsPath) => {
@@ -27,7 +27,7 @@ module.exports = (client) => {
 
           client.commands.set(command.data.name, command);
           client.commandArray.push(command.data.toJSON());
-          //console.log(`Loaded command: ${command.data.name}`);
+          // console.log(`Loaded command: ${command.data.name}`);
         }
       }
     };
@@ -48,7 +48,7 @@ module.exports = (client) => {
       throw new Error("Client user ID not available. Client not ready?");
     }
 
-    const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
+    const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
     try {
       console.log(
