@@ -5,7 +5,7 @@ const {
   MessageFlags,
 } = require("discord.js");
 const { spawn } = require("child_process");
-const path = require("path");
+const { GameDig } = require("gamedig");
 
 const config = require("./cs2-server-config.json")[0];
 require("dotenv").config();
@@ -15,13 +15,7 @@ const MANAGER_USERS = process.env.CS2_MANAGER_USERS
   ? process.env.CS2_MANAGER_USERS.split(",")
   : [];
 const EMBED_COLOR = "#ff00b3";
-const STATUS_SCRIPT = path.join(
-  __dirname,
-  "..",
-  "..",
-  "scripts",
-  "query_server.py",
-);
+const QUERY_TIMEOUT = 5000;
 
 function createEmbed(description, color = EMBED_COLOR) {
   return new EmbedBuilder()
@@ -67,29 +61,18 @@ const resolveServerConfig = (serverId) => {
 };
 
 const queryServerStatus = async (ip, port) => {
-  return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python3", [STATUS_SCRIPT, ip, String(port)]);
-    let dataBuffer = "";
-    let errBuffer = "";
-
-    pythonProcess.on("error", reject);
-    pythonProcess.stdout.on("data", (data) => (dataBuffer += data));
-    pythonProcess.stderr.on("data", (data) => (errBuffer += data));
-    pythonProcess.on("close", (code) => {
-      if (code !== 0) {
-        return reject(
-          new Error(
-            `Python script exited with code ${code}${errBuffer ? `: ${errBuffer.trim()}` : ""}`,
-          ),
-        );
-      }
-      try {
-        resolve(JSON.parse(dataBuffer).status);
-      } catch (_err) {
-        reject(new Error("Invalid JSON response from status script"));
-      }
+  try {
+    const state = await GameDig.query({
+      type: "counterstrike2",
+      host: ip,
+      port: Number(port),
+      socketTimeout: QUERY_TIMEOUT,
+      maxAttempts: 1,
     });
-  });
+    return state.players.length === 0 ? "EMPTY" : "ACTIVE";
+  } catch (_err) {
+    return "OFFLINE";
+  }
 };
 
 function spawnAsync(command, args) {

@@ -138,6 +138,3 @@ disabled_cmd/
 
 # configuration
 *server-config.json
-
-# python
-__pycache__/
