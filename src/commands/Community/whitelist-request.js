@@ -8,9 +8,10 @@ const {
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 const status = require("../../schemas/requestStatus.js");
+const { createCooldown } = require("../../utils/cooldown.js");
 
 const whitelistRole = process.env.WHITELIST_ROLE;
-const cooldowns = new Set();
+const cooldown = createCooldown(10000);
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,7 +22,7 @@ module.exports = {
       return;
     }
 
-    if (cooldowns.has(interaction.user.id))
+    if (cooldown.hit(interaction.user.id))
       return await interaction.reply({
         content: `You are on a cooldown! Try again in a few seconds.`,
         flags: MessageFlags.Ephemeral,
@@ -118,11 +119,6 @@ module.exports = {
         content: "An error occurred while processing your request.",
         flags: MessageFlags.Ephemeral,
       });
-    } finally {
-      cooldowns.add(interaction.user.id);
-      setTimeout(() => {
-        cooldowns.delete(interaction.user.id);
-      }, 10000);
     }
   },
 };

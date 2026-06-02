@@ -5,6 +5,7 @@ const {
   ChannelType,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 const https = require("https");
 const { parseStringPromise } = require("xml2js");
 const fs = require("fs");
@@ -40,14 +41,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
-    ) {
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+    if (!(await requireAdmin(interaction))) return;
 
     const channel = interaction.options.getChannel("channel");
     const groupUrl = interaction.options.getString("group-url");

@@ -4,6 +4,7 @@ const {
   PermissionFlagsBits,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 const antiLink = require("../../schemas/moderation/antiLink.js");
 
 module.exports = {
@@ -67,11 +68,7 @@ module.exports = {
   async execute(interaction) {
     const { options } = interaction;
 
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
+    if (!(await requireAdmin(interaction))) return;
 
     const sub = options.getSubcommand();
 

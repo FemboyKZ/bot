@@ -4,6 +4,7 @@ const {
   PermissionFlagsBits,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/autoRoles.js");
 
 module.exports = {
@@ -30,14 +31,7 @@ module.exports = {
       });
     }
 
-    if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
-    ) {
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+    if (!(await requireAdmin(interaction))) return;
 
     const roleIds = roles.map((role) => role.id);
 

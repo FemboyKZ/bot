@@ -7,6 +7,7 @@ const {
   StringSelectMenuBuilder,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/baseSystem.js");
 
 module.exports = {
@@ -65,11 +66,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
-      return await interaction.reply({
-        content: "You don't have the permissions to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
+    if (!(await requireAdmin(interaction))) return;
 
     const { guild, options } = interaction;
     const message = interaction.options.getString("message");

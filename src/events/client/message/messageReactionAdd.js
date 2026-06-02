@@ -1,5 +1,6 @@
 const { Events } = require("discord.js");
 const reactions = require("../../../schemas/reactionRoles.js");
+const { emojiKey } = require("../../../utils/emoji.js");
 
 module.exports = {
   name: Events.MessageReactionAdd,
@@ -17,12 +18,7 @@ module.exports = {
 
     if (!reaction.message.guildId) return;
 
-    // Rebuild the stored emoji key; keep the `a:` prefix for animated emojis so
-    // animated reaction roles match what the add command saved.
-    const emoji = reaction.emoji;
-    const cID = emoji.id
-      ? `<${emoji.animated ? "a" : ""}:${emoji.name}:${emoji.id}>`
-      : emoji.name;
+    const cID = emojiKey(reaction.emoji);
 
     const reactData = await reactions.findOne({
       Guild: reaction.message.guildId,

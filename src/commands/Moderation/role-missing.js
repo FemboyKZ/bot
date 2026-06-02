@@ -3,7 +3,9 @@ const {
   PermissionFlagsBits,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/reactionRoles.js");
+const { emojiKey } = require("../../utils/emoji.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,14 +22,7 @@ module.exports = {
       });
     }
 
-    if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
-    ) {
-      return await interaction.reply({
-        content: `You don't have perms to use this command.`,
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+    if (!(await requireAdmin(interaction))) return;
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
@@ -67,13 +62,9 @@ module.exports = {
         if (!message) continue;
 
         // Match the stored emoji key against the message's reactions.
-        const reaction = message.reactions.cache.find((r) => {
-          const e = r.emoji;
-          const key = e.id
-            ? `<${e.animated ? "a" : ""}:${e.name}:${e.id}>`
-            : e.name;
-          return key === data.Emoji;
-        });
+        const reaction = message.reactions.cache.find(
+          (r) => emojiKey(r.emoji) === data.Emoji,
+        );
         if (!reaction) continue;
 
         const users = await reaction.users.fetch().catch(() => null);

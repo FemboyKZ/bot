@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/emojis.js");
 
 module.exports = {
@@ -15,9 +16,7 @@ module.exports = {
 
     const image = newEmoji.imageURL({ size: 128 });
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setFooter({ text: `FKZ • ID: ${newEmoji.id}` })
       .setTitle("Emoji Edited")
       .addFields({

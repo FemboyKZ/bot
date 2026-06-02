@@ -4,6 +4,7 @@ const {
   PermissionFlagsBits,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/baseSystem.js");
 const count = require("../../schemas/moderation/actionCounts.js");
 
@@ -35,11 +36,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
+    if (!(await requireAdmin(interaction))) return;
 
     const { options } = interaction;
 

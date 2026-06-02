@@ -5,6 +5,7 @@ const {
   ChannelType,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -26,14 +27,7 @@ module.exports = {
     ),
 
   async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
-    ) {
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+    if (!(await requireAdmin(interaction))) return;
     const message = interaction.options.getString("message");
     const channel =
       interaction.options.getChannel("channel") || interaction.channel;

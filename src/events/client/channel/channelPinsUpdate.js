@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.ChannelPinsUpdate,
@@ -11,9 +12,7 @@ module.exports = {
     const auditChannel = await getAuditChannel(channel.guild, client);
     if (!auditChannel) return;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("Channel Pins Updated")
       .setFooter({ text: `FKZ • ID: ${channel.id}` })
       .addFields({

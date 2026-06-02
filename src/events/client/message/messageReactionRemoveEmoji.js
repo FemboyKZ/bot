@@ -1,5 +1,6 @@
 const { EmbedBuilder, Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { emojiKey } = require("../../../utils/emoji.js");
 
 module.exports = {
   // Fires when every reaction of a single emoji is removed from a message,
@@ -17,10 +18,7 @@ module.exports = {
     const channel = await getAuditChannel(reaction.message.guild, client);
     if (!channel) return;
 
-    const emoji = reaction.emoji;
-    const display = emoji.id
-      ? `<${emoji.animated ? "a" : ""}:${emoji.name}:${emoji.id}>`
-      : emoji.name;
+    const display = emojiKey(reaction.emoji);
 
     const embed = new EmbedBuilder()
       .setColor("#ff00b3")

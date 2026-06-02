@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/roles.js");
 
 module.exports = {
@@ -13,9 +14,7 @@ module.exports = {
       Role: role.id,
     });
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setFooter({ text: `FKZ • ID: ${role.id}` })
       .setTitle("Role Deleted")
       .addFields({ name: "Role", value: `<@&${role.id}>`, inline: false });

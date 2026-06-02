@@ -5,6 +5,7 @@ const {
   ChannelType,
   MessageFlags,
 } = require("discord.js");
+const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/baseSystem.js");
 
 module.exports = {
@@ -30,11 +31,7 @@ module.exports = {
         .setDescription("[Admin] Disable the report/suggestions system"),
     ),
   async execute(interaction, client) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
+    if (!(await requireAdmin(interaction))) return;
 
     const { guild, options } = interaction;
     const channel = options.getChannel("channel");
