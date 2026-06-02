@@ -1,6 +1,7 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/threads.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.ThreadUpdate,
@@ -13,10 +14,8 @@ module.exports = {
       Thread: newThread.id,
     });
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
+    const embed = fkzEmbed()
       .setFooter({ text: `FKZ • ID: ${newThread.id}` })
-      .setTimestamp()
       .setTitle("Thread Edited");
 
     try {

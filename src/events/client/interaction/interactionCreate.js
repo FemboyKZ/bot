@@ -1,6 +1,5 @@
 const {
   PermissionsBitField,
-  EmbedBuilder,
   Events,
   ActionRowBuilder,
   ButtonBuilder,
@@ -19,6 +18,7 @@ const {
   convertToSteamID64,
 } = require("../../../utils/validators.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 // Reply without risking InteractionAlreadyReplied:
 // follow up if we've already responded, otherwise reply.
@@ -257,8 +257,7 @@ module.exports = {
           });
         }
 
-        const embed = new EmbedBuilder()
-          .setColor("#ff00b3")
+        const embed = fkzEmbed()
           .setTitle("New Whitelist Request")
           .setImage("https://femboykz.com/images/wide.png?raw=1")
           .setDescription(
@@ -280,8 +279,7 @@ module.exports = {
               value: `${request}`,
               inline: false,
             },
-          )
-          .setTimestamp();
+          );
 
         const buttonAccept = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
@@ -374,8 +372,7 @@ module.exports = {
           });
         }
 
-        const embed = new EmbedBuilder()
-          .setColor("#ff00b3")
+        const embed = fkzEmbed()
           .setTitle("New Whitelist Request")
           .setImage("https://femboykz.com/images/wide.png?raw=1")
           .setDescription(
@@ -397,8 +394,7 @@ module.exports = {
               value: `${request}`,
               inline: false,
             },
-          )
-          .setTimestamp();
+          );
 
         const buttonAccept = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
@@ -473,8 +469,7 @@ module.exports = {
           });
         }
 
-        const embed = new EmbedBuilder()
-          .setColor("#ff00b3")
+        const embed = fkzEmbed()
           .setTitle("New Unban Request")
           .setImage("https://femboykz.com/images/wide.png?raw=1")
           .setDescription(
@@ -496,8 +491,7 @@ module.exports = {
               value: `${server}`,
               inline: false,
             },
-          )
-          .setTimestamp();
+          );
 
         const buttonAccept = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
@@ -559,7 +553,7 @@ module.exports = {
           });
         }
 
-        const embed = new EmbedBuilder()
+        const embed = fkzEmbed()
           .setColor("Red")
           .setTitle("New Report/Suggestion Request")
           .setImage("https://femboykz.com/images/wide.png?raw=1")
@@ -582,8 +576,7 @@ module.exports = {
               value: `${more}`,
               inline: false,
             },
-          )
-          .setTimestamp();
+          );
 
         const data = await schema.findOne({
           Guild: interaction.guild.id,
@@ -652,8 +645,7 @@ module.exports = {
           });
         }
 
-        const embed = new EmbedBuilder()
-          .setColor("#ff00b3")
+        const embed = fkzEmbed()
           .setTitle(`${interaction.user.username}'s Ticket`)
           .setDescription(
             `Thank you for opening a ticket. Please wait while the staff reviews your information. We will respond to you shortly.`,
@@ -676,7 +668,6 @@ module.exports = {
             },
           ])
           .setFooter({ text: `${interaction.guild.name} Tickets` })
-          .setTimestamp()
           .setImage("https://femboykz.com/images/wide.png?raw=1");
 
         const buttonClose = new ActionRowBuilder().addComponents(
@@ -788,11 +779,9 @@ module.exports = {
     const channel = await getAuditChannel(interaction.guild, client);
     if (!channel) return;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
+    const embed = fkzEmbed()
       .setTitle("Interaction Execution Logged.")
       .setFooter({ text: `FKZ` })
-      .setTimestamp()
       .addFields([
         {
           name: "User",

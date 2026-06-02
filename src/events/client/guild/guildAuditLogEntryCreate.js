@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events, AuditLogEvent } = require("discord.js");
+const { Events, AuditLogEvent } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 // Only actions that have NO dedicated event handler of their own.
 // This handler exists to add the "who did it" for ban/kick/prune/etc.
@@ -50,9 +51,7 @@ module.exports = {
     const { action, executorId, targetId, reason, changes, extra } =
       auditLogEntry;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setFooter({ text: `FKZ • Audit ID: ${auditLogEntry.id}` })
       .setTitle("Audit Log Entry")
       .addFields({

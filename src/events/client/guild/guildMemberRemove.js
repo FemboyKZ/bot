@@ -1,6 +1,7 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 const UNKNOWN_AVATAR =
   "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1";
@@ -20,10 +21,7 @@ module.exports = {
       User: member.user.id,
     });
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
-      .setFooter({ text: `FKZ • ID: ${member.user.id}` })
+    const embed = fkzEmbed()
       .setTitle(`${member.user.username} has left the server`)
       .setDescription(`<@${member.user.id}> has left the Server`);
 

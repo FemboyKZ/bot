@@ -1,5 +1,6 @@
-const { Collection, EmbedBuilder, Events } = require("discord.js");
+const { Collection, Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/invites.js");
 
 module.exports = {
@@ -13,9 +14,7 @@ module.exports = {
       Invite: invite.code,
     });
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setFooter({ text: `FKZ` })
       .setTitle("Invite Deleted")
       .addFields({

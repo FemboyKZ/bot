@@ -1,7 +1,8 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 require("dotenv").config();
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.GuildMemberUpdate,
@@ -95,13 +96,11 @@ module.exports = {
         );
       }
 
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
+      const embed = fkzEmbed()
         .setAuthor({
           name: `${newMember.user.tag} (${newMember.id})`,
         })
-        .setTitle("Member Profile Updated")
-        .setTimestamp();
+        .setTitle("Member Profile Updated");
 
       changes.forEach((change) => {
         if (change.field === "Roles") {

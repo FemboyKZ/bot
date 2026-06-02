@@ -1,9 +1,6 @@
-const {
-  EmbedBuilder,
-  Events,
-  AutoModerationActionType,
-} = require("discord.js");
+const { Events, AutoModerationActionType } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 const ACTION = {
   [AutoModerationActionType.BlockMessage]: "Block Message",
@@ -19,9 +16,7 @@ module.exports = {
     const channel = await getAuditChannel(execution.guild, client);
     if (!channel) return;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("AutoMod Action Executed")
       .setFooter({ text: `FKZ • Rule: ${execution.ruleId}` })
       .addFields(

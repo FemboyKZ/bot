@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/messages.js");
 
 module.exports = {
@@ -29,9 +30,7 @@ module.exports = {
     if (!breakdown) breakdown = "Unknown (uncached messages)";
     if (breakdown.length > 1024) breakdown = `${breakdown.slice(0, 1000)}\n…`;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setFooter({ text: "FKZ" })
       .setTitle("Bulk Messages Deleted")
       .addFields(

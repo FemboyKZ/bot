@@ -1,6 +1,7 @@
-const { EmbedBuilder, Events, DMChannel } = require("discord.js");
+const { Events, DMChannel } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/channels.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.ChannelUpdate,
@@ -19,9 +20,7 @@ module.exports = {
         Channel: oldChannel.id,
       });
 
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
+      const embed = fkzEmbed()
         .setTitle("Channel Updated")
         .setFooter({ text: `FKZ • ID: ${newChannel.id}` });
 

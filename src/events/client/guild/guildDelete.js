@@ -1,6 +1,7 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/guilds.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.GuildDelete,
@@ -15,7 +16,7 @@ module.exports = {
       User: guild.ownerId,
     });
 
-    const embed = new EmbedBuilder()
+    const embed = fkzEmbed()
       .setColor("Red")
       .setTitle("FKZ Bot has left a server.")
       .addFields([
@@ -36,7 +37,6 @@ module.exports = {
           value: `> <t:${parseInt(guild.createdTimestamp / 1000)}:R>`,
         },
       ])
-      .setTimestamp()
       .setFooter({ text: `Guild Left - ${guild.id}` });
 
     try {

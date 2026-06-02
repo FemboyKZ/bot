@@ -1,4 +1,4 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/messages.js");
 const {
@@ -10,6 +10,7 @@ const {
   replyField,
   prepareMediaUpload,
 } = require("../../../utils/messageLog.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.MessageUpdate,
@@ -62,9 +63,7 @@ module.exports = {
         newMessage.guild,
       );
 
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
+      const embed = fkzEmbed()
         .setFooter({ text: `FKZ • ID: ${newMessage.id}` })
         .setTitle("Message Edited")
         .addFields(

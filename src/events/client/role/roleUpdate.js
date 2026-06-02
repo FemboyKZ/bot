@@ -1,6 +1,7 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/roles.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.GuildRoleUpdate,
@@ -99,10 +100,8 @@ module.exports = {
         );
       }
 
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
-        .setTitle("🛠️ Role Updated")
+      const embed = fkzEmbed()
+        .setTitle("Role Updated")
         .setDescription(`Role: ${newRole}`)
         .addFields(changes)
         .setFooter({ text: `FKZ • Role ID: ${newRole.id}` });

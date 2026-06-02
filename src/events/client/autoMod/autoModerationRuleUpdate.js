@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/automodRules.js");
 
 // TODO: make this not shit
@@ -10,9 +11,7 @@ module.exports = {
     const channel = await getAuditChannel(newAutoModerationRule.guild, client);
     if (!channel) return;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("Automod Rule Updated")
       .setFooter({ text: `FKZ • ID: ${newAutoModerationRule.id}` });
 

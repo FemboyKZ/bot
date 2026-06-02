@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.ApplicationCommandPermissionsUpdate,
@@ -26,9 +27,7 @@ module.exports = {
       })
       .join("\n");
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("Command Permissions Updated")
       .setFooter({ text: `FKZ • ID: ${data.id}` })
       .addFields({

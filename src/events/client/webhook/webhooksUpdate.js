@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.WebhooksUpdate,
@@ -9,9 +10,7 @@ module.exports = {
     const channel = await getAuditChannel(webhookChannel.guild, client);
     if (!channel) return;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("Webhooks Updated")
       .setFooter({ text: `FKZ • ID: ${webhookChannel.id}` })
       .addFields({

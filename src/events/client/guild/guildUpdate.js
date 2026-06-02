@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/guilds.js");
 
 const VERIFICATION = ["None", "Low", "Medium", "High", "Very High"];
@@ -56,9 +57,7 @@ module.exports = {
       const channel = await getAuditChannel(newGuild, client);
       if (!channel) return;
 
-      const embed = new EmbedBuilder()
-        .setColor("#ff00b3")
-        .setTimestamp()
+      const embed = fkzEmbed()
         .setTitle("Server Updated")
         .setFooter({ text: `FKZ • ID: ${newGuild.id}` })
         .addFields(changes);

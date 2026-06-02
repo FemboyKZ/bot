@@ -1,5 +1,6 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   name: Events.GuildScheduledEventCreate,
@@ -14,9 +15,7 @@ module.exports = {
       ? `<t:${Math.floor(event.scheduledStartTimestamp / 1000)}:F>`
       : "Unknown";
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("Scheduled Event Created")
       .setFooter({ text: `FKZ • ID: ${event.id}` })
       .addFields(

@@ -1,6 +1,7 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const { emojiKey } = require("../../../utils/emoji.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
   // Fires when every reaction of a single emoji is removed from a message,
@@ -20,9 +21,7 @@ module.exports = {
 
     const display = emojiKey(reaction.emoji);
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("Reaction Emoji Cleared")
       .setFooter({ text: `FKZ • ID: ${reaction.message.id}` })
       .addFields(

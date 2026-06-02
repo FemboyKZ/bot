@@ -1,9 +1,6 @@
-const {
-  EmbedBuilder,
-  Events,
-  GuildScheduledEventStatus,
-} = require("discord.js");
+const { Events, GuildScheduledEventStatus } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 const STATUS = {
   [GuildScheduledEventStatus.Scheduled]: "Scheduled",
@@ -57,9 +54,7 @@ module.exports = {
     const channel = await getAuditChannel(newE.guild, client);
     if (!channel) return;
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle("Scheduled Event Updated")
       .setFooter({ text: `FKZ • ID: ${newE.id}` })
       .addFields(changes);

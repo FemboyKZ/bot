@@ -1,10 +1,11 @@
-const { Collection, EmbedBuilder, Events } = require("discord.js");
+const { Collection, Events } = require("discord.js");
 require("dotenv").config();
 const autoroles = require("../../../schemas/autoRoles.js");
 const mutes = require("../../../schemas/moderation/mutes.js");
 const muteRoles = require("../../../schemas/moderation/muteRoles.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 const UNKNOWN_AVATAR =
   "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1";
@@ -76,9 +77,7 @@ module.exports = {
 
     const date = new Date();
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTimestamp()
+    const embed = fkzEmbed()
       .setTitle(`${member.user.username} Has Joined the Server!`)
       .setFooter({ text: `FKZ • ID: ${member.user.id}` })
       .setAuthor({

@@ -1,6 +1,7 @@
-const { EmbedBuilder, Events } = require("discord.js");
+const { Events } = require("discord.js");
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
+const { fkzEmbed } = require("../../../utils/embeds.js");
 
 const UNKNOWN_AVATAR =
   "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1";
@@ -50,8 +51,7 @@ module.exports = {
         const channel = await getAuditChannel(guild, client);
         if (!channel) continue;
 
-        const embed = new EmbedBuilder()
-          .setColor("#ff00b3")
+        const embed = fkzEmbed()
           .setAuthor({ name: `${newUser.tag} (${newUser.id})` })
           .setTitle("User Profile Updated")
           .setTimestamp();
