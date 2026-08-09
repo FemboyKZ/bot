@@ -43,7 +43,7 @@ module.exports = {
     const csgoGLeu1 = "eu.femboykz.com:27030";
     const _csgoGLeu2 = "eu.femboykz.com:27035";
     const _csgoGLeu3 = "eu.femboykz.com:27040";
-    const csgo64eu = "eu.femboykz.com:27045";
+    const csgo64eu = "eu.femboykz.com:27035"; // 35 no 45
 
     const csgoWLna = "na.femboykz.com:27025";
     const csgoGLna = "na.femboykz.com:27030";
