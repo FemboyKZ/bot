@@ -98,7 +98,7 @@ module.exports = {
         {
           name: "Who can get Whitelisted and how?",
           value:
-            "To get Whitelisted, you have to be someone I or someone else on the whitelist knows well, such as a friend or acquaintance.\n \nYou can request to join the Whitelist by using the command **/whitelist-request** in any of this servers channls.\nYou can also request to join the Steam group: **<https://steamcommunity.com/groups/FemWL>**",
+            "To get Whitelisted, you have to be someone I or someone else on the whitelist knows well, such as a friend or acquaintance.\n \nYou can request to join the Whitelist by using the command `/whitelist-request` in any of this servers channls.\nYou can also request to join the Steam group: **<https://steamcommunity.com/groups/FemWL>**",
         },
       ]);
 
@@ -107,7 +107,7 @@ module.exports = {
       .setImage(embedImage)
       .setColor(embedColor)
       .setDescription(
-        "If you were banned from one of the servers, you can request for an unban by using the command **/unban-request** in any of this servers channels.",
+        "If you were banned from one of the servers, you can request for an unban by using the command `/unban-request` in any of this servers channels.",
       )
       .addFields([
         {
@@ -128,7 +128,7 @@ module.exports = {
         {
           name: "**How to buy VIP & VIP+**",
           value:
-            "If you wish to purchase VIP or VIP+, you can do so here:\n\n**<https://femboykz.com/shop>**\n\nAll the needed info can be found there.",
+            "If you wish to purchase VIP or VIP+, you can do so here:\n**[FemboyKZ.com/shop](<https://femboykz.com/shop>)**\nAll the needed info can be found there.",
         },
       ]);
 
@@ -143,7 +143,7 @@ module.exports = {
         },
         {
           name: "Reports / Suggestions",
-          value: `If you have anything to report or something to suggest as improvement, feel free to do so by using the command **/report-or-suggest** in any of this servers channls.\nIf you have something that doesn't fit the form of this command, or needs direct contact with staff, please open a ticket`,
+          value: `If you have anything to report or something to suggest as improvement, feel free to do so by using the command \`/report-or-suggest\` in any of this servers channls.\nIf you have something that doesn't fit the form of this command, or needs direct contact with staff, please open a ticket`,
         },
         {
           name: "Support / Help",
