@@ -8,7 +8,7 @@ const { spawn } = require("child_process");
 const { GameDig } = require("gamedig");
 
 const config = require("./cs2-server-config.json")[0];
-require("dotenv").config();
+require("dotenv").config({ quiet: true, debug: false });
 
 const MANAGER_ROLE = process.env.CS2_MANAGER_ROLE;
 const MANAGER_USERS = process.env.CS2_MANAGER_USERS

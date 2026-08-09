@@ -1,6 +1,6 @@
 const { Events } = require("discord.js");
 const mongoose = require("mongoose");
-require("dotenv").config();
+require("dotenv").config({ quiet: true, debug: false });
 
 const { MONGODB_URI } = process.env;
 

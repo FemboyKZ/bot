@@ -1,5 +1,5 @@
 const { Collection, Events } = require("discord.js");
-require("dotenv").config();
+require("dotenv").config({ quiet: true, debug: false });
 const autoroles = require("../../../schemas/autoRoles.js");
 const mutes = require("../../../schemas/moderation/mutes.js");
 const muteRoles = require("../../../schemas/moderation/muteRoles.js");

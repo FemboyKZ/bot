@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-require("dotenv").config();
+require("dotenv").config({ quiet: true, debug: false });
 const { getAuditChannel } = require("../../../utils/auditChannel.js");
 const logs = require("../../../schemas/events/members.js");
 const { fkzEmbed } = require("../../../utils/embeds.js");

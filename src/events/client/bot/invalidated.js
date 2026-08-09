@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-require("dotenv").config();
+require("dotenv").config({ quiet: true, debug: false });
 
 module.exports = {
   name: Events.Invalidated,

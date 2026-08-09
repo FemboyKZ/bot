@@ -9,7 +9,7 @@ const memberData = require("../schemas/events/members.js");
 const roleData = require("../schemas/events/roles.js");
 const stickerData = require("../schemas/events/stickers.js");
 const threadData = require("../schemas/events/threads.js");
-require("dotenv").config();
+require("dotenv").config({ quiet: true, debug: false });
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
