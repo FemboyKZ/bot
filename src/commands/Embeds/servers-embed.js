@@ -134,7 +134,7 @@ module.exports = {
     const embedCS2 = new EmbedBuilder()
       .setTitle("**CS2 Servers**")
       .setColor("#ff00b3")
-      .setImage("https://femboykz.com/images/wide.png?raw=1")
+      .setImage("https://files.femboykz.com/web/images/wide.png?raw=1")
       .addFields([
         {
           name: "Whitelist Servers",
