@@ -9,7 +9,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const process = require("node:process");
 
-require("dotenv").config();
+require("dotenv").config({ quiet: true, debug: false });
 
 const client = new Client({
   intents: [
