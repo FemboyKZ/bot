@@ -41,8 +41,8 @@ module.exports = {
 
     const csgoWLeu = "eu.femboykz.com:27025";
     const csgoGLeu1 = "eu.femboykz.com:27030";
-    const csgoGLeu2 = "eu.femboykz.com:27035";
-    const csgoGLeu3 = "eu.femboykz.com:27040";
+    const _csgoGLeu2 = "eu.femboykz.com:27035";
+    const _csgoGLeu3 = "eu.femboykz.com:27040";
     const csgo64eu = "eu.femboykz.com:27045";
 
     const csgoWLna = "na.femboykz.com:27025";
@@ -85,7 +85,7 @@ module.exports = {
           inline: false,
         },
         {
-          name: ":flag_eu:  **128t GLOBAL**",
+          name: ":flag_eu:  **128t #1**",
           value: `[*${csgoWLeu}*](<https://csgo.femboykz.com/connect.php?ip=${csgoWLeu}>)`,
           inline: true,
         },
@@ -95,17 +95,12 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **128t GLOBAL**",
+          name: ":flag_us:  **128t #1**",
           value: `[*${csgoWLna}*](<https://csgo.femboykz.com/connect.php?ip=${csgoWLna}>)`,
           inline: true,
         },
         {
-          name: "Public Servers",
-          value: "** **",
-          inline: false,
-        },
-        {
-          name: ":flag_eu:  **128t GLOBAL**",
+          name: ":flag_eu:  **128t #2**",
           value: `[*${csgoGLeu1}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLeu1}>)`,
           inline: true,
         },
@@ -115,22 +110,7 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_eu:  **128t GLOBAL 2**",
-          value: `[*${csgoGLeu2}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLeu2}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_eu:  **128t GLOBAL 3**",
-          value: `[*${csgoGLeu3}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLeu3}>)`,
-          inline: true,
-        },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **128t GLOBAL**",
+          name: ":flag_us:  **128t #2**",
           value: `[*${csgoGLna}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLna}>)`,
           inline: true,
         },
