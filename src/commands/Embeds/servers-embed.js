@@ -41,9 +41,9 @@ module.exports = {
 
     const csgoWLeu = "eu.femboykz.com:27025";
     const csgoGLeu1 = "eu.femboykz.com:27030";
-    const _csgoGLeu2 = "eu.femboykz.com:27035";
-    const _csgoGLeu3 = "eu.femboykz.com:27040";
-    const csgo64eu = "eu.femboykz.com:27035"; // 35 no 45
+    const csgoGLeu2 = "eu.femboykz.com:27035";
+    const csgoGLeu3 = "eu.femboykz.com:27040";
+    const csgo64eu = "eu.femboykz.com:27045";
 
     const csgoWLna = "na.femboykz.com:27025";
     const csgoGLna = "na.femboykz.com:27030";
@@ -85,7 +85,7 @@ module.exports = {
           inline: false,
         },
         {
-          name: ":flag_eu:  **128t #1**",
+          name: ":flag_eu:  **128t #1 Global**",
           value: `[*${csgoWLeu}*](<https://csgo.femboykz.com/connect.php?ip=${csgoWLeu}>)`,
           inline: true,
         },
@@ -95,28 +95,13 @@ module.exports = {
           inline: true,
         },
         {
-          name: ":flag_us:  **128t #1**",
+          name: ":flag_us:  **128t #1 Global**",
           value: `[*${csgoWLna}*](<https://csgo.femboykz.com/connect.php?ip=${csgoWLna}>)`,
           inline: true,
         },
         {
-          name: ":flag_eu:  **128t #2**",
+          name: ":flag_eu:  **128t #2 Global**",
           value: `[*${csgoGLeu1}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLeu1}>)`,
-          inline: true,
-        },
-        {
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        },
-        {
-          name: ":flag_us:  **128t #2**",
-          value: `[*${csgoGLna}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLna}>)`,
-          inline: true,
-        },
-        {
-          name: ":flag_eu:  **64t AutoBH**",
-          value: `[*${csgo64eu}*](<https://csgo.femboykz.com/connect.php?ip=${csgo64eu}>)`,
           inline: true,
         },
         {
@@ -127,6 +112,36 @@ module.exports = {
         {
           name: ":flag_us:  **64t AutoBH**",
           value: `[*${csgo64na}*](<https://csgo.femboykz.com/connect.php?ip=${csgo64na}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **64t AutoBH**",
+          value: `[*${csgo64eu}*](<https://csgo.femboykz.com/connect.php?ip=${csgo64eu}>)`,
+          inline: true,
+        },
+        {
+          name: "Public Servers",
+          value: "** **",
+          inline: false,
+        },
+        {
+          name: ":flag_eu:  **128t #1 Global**",
+          value: `[*${csgoGLeu2}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLeu2}>)`,
+          inline: true,
+        },
+        {
+          name: "\u200B",
+          value: "\u200B",
+          inline: true,
+        },
+        {
+          name: ":flag_us:  **128t #1 Global**",
+          value: `[*${csgoGLna}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLna}>)`,
+          inline: true,
+        },
+        {
+          name: ":flag_eu:  **128t #2 Global**",
+          value: `[*${csgoGLeu3}*](<https://csgo.femboykz.com/connect.php?ip=${csgoGLeu3}>)`,
           inline: true,
         },
       ]);
