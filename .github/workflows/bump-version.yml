@@ -2,14 +2,14 @@ name: Bump bot dev version
 
 on:
   push:
-    branches: [dev/main]
+    branches: [dev/master]
     paths-ignore:
       - LICENSE
       - README.md
       - .gitignore
       - ".github/*"
   pull_request:
-    branches: [dev/main]
+    branches: [dev/master]
     paths-ignore:
       - LICENSE
       - README.md
@@ -26,17 +26,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: 25
+          node-version: 26
           cache: npm
       - name: Bump version
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Actions"
           npm version patch
-          git push origin dev/main
+          git push origin dev/master
