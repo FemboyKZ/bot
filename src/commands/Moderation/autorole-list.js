@@ -1,32 +1,32 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	MessageFlags,
 } = require("discord.js");
 const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/autoRoles.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("autorole-list")
-    .setDescription("[Admin] List all autoroles")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-  async execute(interaction) {
-    if (!(await requireAdmin(interaction))) return;
+	data: new SlashCommandBuilder()
+		.setName("autorole-list")
+		.setDescription("[Admin] List all autoroles")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+	async execute(interaction) {
+		if (!(await requireAdmin(interaction))) return;
 
-    const autoroleData = await schema.findOne({
-      Guild: interaction.guild.id,
-    });
-    const autoroles = autoroleData ? autoroleData.Roles : [];
+		const autoroleData = await schema.findOne({
+			Guild: interaction.guild.id,
+		});
+		const autoroles = autoroleData ? autoroleData.Roles : [];
 
-    const embed = new EmbedBuilder()
-      .setColor("#ff00b3")
-      .setTitle("Autoroles")
-      .setDescription(
-        autoroles.map((role) => `<@&${role}>`).join("\n") || "None",
-      );
+		const embed = new EmbedBuilder()
+			.setColor("#ff00b3")
+			.setTitle("Autoroles")
+			.setDescription(
+				autoroles.map((role) => `<@&${role}>`).join("\n") || "None",
+			);
 
-    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-  },
+		await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+	},
 };

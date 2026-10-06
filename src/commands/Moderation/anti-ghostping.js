@@ -1,116 +1,116 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	MessageFlags,
 } = require("discord.js");
 const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/baseSystem.js");
 const count = require("../../schemas/moderation/actionCounts.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("anti-ghostping")
-    .setDescription("[Admin] Setup the anti-ghostping system")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addSubcommand((command) =>
-      command
-        .setName("setup")
-        .setDescription("[Admin] Set up the anti-ghostping system"),
-    )
-    .addSubcommand((command) =>
-      command
-        .setName("disable")
-        .setDescription("[Admin] Disable the anti-ghostping system"),
-    )
-    .addSubcommand((command) =>
-      command
-        .setName("number-reset")
-        .setDescription("[Admin] Reset a users ghost ping count")
-        .addUserOption((option) =>
-          option
-            .setName("user")
-            .setDescription("The user you want to reset the ghostpings of")
-            .setRequired(true),
-        ),
-    ),
+	data: new SlashCommandBuilder()
+		.setName("anti-ghostping")
+		.setDescription("[Admin] Setup the anti-ghostping system")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addSubcommand((command) =>
+			command
+				.setName("setup")
+				.setDescription("[Admin] Set up the anti-ghostping system"),
+		)
+		.addSubcommand((command) =>
+			command
+				.setName("disable")
+				.setDescription("[Admin] Disable the anti-ghostping system"),
+		)
+		.addSubcommand((command) =>
+			command
+				.setName("number-reset")
+				.setDescription("[Admin] Reset a users ghost ping count")
+				.addUserOption((option) =>
+					option
+						.setName("user")
+						.setDescription("The user you want to reset the ghostpings of")
+						.setRequired(true),
+				),
+		),
 
-  async execute(interaction) {
-    if (!(await requireAdmin(interaction))) return;
+	async execute(interaction) {
+		if (!(await requireAdmin(interaction))) return;
 
-    const { options } = interaction;
+		const { options } = interaction;
 
-    const sub = options.getSubcommand();
+		const sub = options.getSubcommand();
 
-    const Data = await schema.findOne({ Guild: interaction.guild.id });
+		const Data = await schema.findOne({ Guild: interaction.guild.id });
 
-    switch (sub) {
-      case "setup": {
-        if (Data)
-          return await interaction.reply({
-            content: "The anti-ghostping system is already set up.",
-            flags: MessageFlags.Ephemeral,
-          });
-        else {
-          await schema.create({
-            Guild: interaction.guild.id,
-            ID: "ghostping",
-          });
+		switch (sub) {
+			case "setup": {
+				if (Data)
+					return await interaction.reply({
+						content: "The anti-ghostping system is already set up.",
+						flags: MessageFlags.Ephemeral,
+					});
+				else {
+					await schema.create({
+						Guild: interaction.guild.id,
+						ID: "ghostping",
+					});
 
-          const embed = new EmbedBuilder()
-            .setColor("#ff00b3")
-            .setDescription("The anti-ghostping system has been set up.");
+					const embed = new EmbedBuilder()
+						.setColor("#ff00b3")
+						.setDescription("The anti-ghostping system has been set up.");
 
-          await interaction.reply({ embeds: [embed] });
-        }
-        break;
-      }
+					await interaction.reply({ embeds: [embed] });
+				}
+				break;
+			}
 
-      case "disable": {
-        if (!Data)
-          return await interaction.reply({
-            content: "The anti-ghostping system has not yet been set up.",
-            flags: MessageFlags.Ephemeral,
-          });
-        else {
-          await schema.deleteMany({
-            Guild: interaction.guild.id,
-            ID: "ghostping",
-          });
+			case "disable": {
+				if (!Data)
+					return await interaction.reply({
+						content: "The anti-ghostping system has not yet been set up.",
+						flags: MessageFlags.Ephemeral,
+					});
+				else {
+					await schema.deleteMany({
+						Guild: interaction.guild.id,
+						ID: "ghostping",
+					});
 
-          const embed = new EmbedBuilder()
-            .setColor("#ff00b3")
-            .setDescription("The anti-ghostping system has been disabled.");
+					const embed = new EmbedBuilder()
+						.setColor("#ff00b3")
+						.setDescription("The anti-ghostping system has been disabled.");
 
-          await interaction.reply({ embeds: [embed] });
-        }
-        break;
-      }
+					await interaction.reply({ embeds: [embed] });
+				}
+				break;
+			}
 
-      case "number-reset": {
-        const member = options.getUser("user");
-        const data = await count.findOne({
-          Guild: interaction.guild.id,
-          User: member.id,
-          Type: "ghostping",
-        });
+			case "number-reset": {
+				const member = options.getUser("user");
+				const data = await count.findOne({
+					Guild: interaction.guild.id,
+					User: member.id,
+					Type: "ghostping",
+				});
 
-        if (!data)
-          return await interaction.reply({
-            content: "This member does not have any past ghostpings",
-            flags: MessageFlags.Ephemeral,
-          });
-        else {
-          await data.deleteOne({
-            User: member.id,
-          });
+				if (!data)
+					return await interaction.reply({
+						content: "This member does not have any past ghostpings",
+						flags: MessageFlags.Ephemeral,
+					});
+				else {
+					await data.deleteOne({
+						User: member.id,
+					});
 
-          await interaction.reply({
-            content: `${member}'s ghostping count has been reset.`,
-          });
-        }
-        break;
-      }
-    }
-  },
+					await interaction.reply({
+						content: `${member}'s ghostping count has been reset.`,
+					});
+				}
+				break;
+			}
+		}
+	},
 };

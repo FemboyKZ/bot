@@ -4,32 +4,32 @@ const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/roles.js");
 
 module.exports = {
-  name: Events.GuildRoleDelete,
-  async execute(role, client) {
-    const channel = await getAuditChannel(role.guild, client);
-    if (!channel) return;
+	name: Events.GuildRoleDelete,
+	async execute(role, client) {
+		const channel = await getAuditChannel(role.guild, client);
+		if (!channel) return;
 
-    const logData = await logs.findOne({
-      Guild: role.guild.id,
-      Role: role.id,
-    });
+		const logData = await logs.findOne({
+			Guild: role.guild.id,
+			Role: role.id,
+		});
 
-    const embed = fkzEmbed()
-      .setFooter({ text: `FKZ • ID: ${role.id}` })
-      .setTitle("Role Deleted")
-      .addFields({ name: "Role", value: `<@&${role.id}>`, inline: false });
+		const embed = fkzEmbed()
+			.setFooter({ text: `FKZ • ID: ${role.id}` })
+			.setTitle("Role Deleted")
+			.addFields({ name: "Role", value: `<@&${role.id}>`, inline: false });
 
-    try {
-      if (logData) {
-        await logs.deleteMany({
-          Guild: role.guild.id,
-          Role: role.id,
-        });
-      }
+		try {
+			if (logData) {
+				await logs.deleteMany({
+					Guild: role.guild.id,
+					Role: role.id,
+				});
+			}
 
-      await channel.send({ embeds: [embed] });
-    } catch (error) {
-      console.log("Error in RoleDelete event:", error);
-    }
-  },
+			await channel.send({ embeds: [embed] });
+		} catch (error) {
+			console.log("Error in RoleDelete event:", error);
+		}
+	},
 };

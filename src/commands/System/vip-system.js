@@ -1,111 +1,111 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  ChannelType,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	ChannelType,
+	MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/baseSystem.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("vip-system")
-    .setDescription("[Admin] Setup the vip system")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addSubcommand((command) =>
-      command
-        .setName("setup")
-        .setDescription("[Admin] Setup the vip claim system")
-        .addChannelOption((option) =>
-          option
-            .setName("channel")
-            .setDescription("The channel for vip claims")
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText),
-        ),
-    )
-    .addSubcommand((command) =>
-      command
-        .setName("disable")
-        .setDescription("[Admin] Disable the vip claim system"),
-    ),
-  async execute(interaction, client) {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
-      return await interaction.reply({
-        content: "You don't have perms to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
+	data: new SlashCommandBuilder()
+		.setName("vip-system")
+		.setDescription("[Admin] Setup the vip system")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addSubcommand((command) =>
+			command
+				.setName("setup")
+				.setDescription("[Admin] Setup the vip claim system")
+				.addChannelOption((option) =>
+					option
+						.setName("channel")
+						.setDescription("The channel for vip claims")
+						.setRequired(true)
+						.addChannelTypes(ChannelType.GuildText),
+				),
+		)
+		.addSubcommand((command) =>
+			command
+				.setName("disable")
+				.setDescription("[Admin] Disable the vip claim system"),
+		),
+	async execute(interaction, client) {
+		if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator))
+			return await interaction.reply({
+				content: "You don't have perms to use this command.",
+				flags: MessageFlags.Ephemeral,
+			});
 
-    const { guild, options } = interaction;
-    const channel = options.getChannel("channel");
-    const sub = options.getSubcommand();
-    const data = await schema.findOne({
-      Guild: guild.id,
-      ID: "vip",
-    });
+		const { guild, options } = interaction;
+		const channel = options.getChannel("channel");
+		const sub = options.getSubcommand();
+		const data = await schema.findOne({
+			Guild: guild.id,
+			ID: "vip",
+		});
 
-    const embed = new EmbedBuilder()
-      .setTitle("Vip Claim System Setup")
-      .setColor("#ff00b3")
-      .setTimestamp();
+		const embed = new EmbedBuilder()
+			.setTitle("Vip Claim System Setup")
+			.setColor("#ff00b3")
+			.setTimestamp();
 
-    switch (sub) {
-      case "setup":
-        try {
-          if (!data) {
-            embed.setDescription(
-              `All submitted vip claims will be sent in ${channel}`,
-            );
-            await schema.create({
-              Guild: guild.id,
-              Channel: channel.id,
-              ID: "vip",
-            });
-          } else if (data) {
-            const existingChannel = client.channels.cache.get(data.Channel);
-            embed.setDescription(
-              `Your claim channel has already been set to ${existingChannel}`,
-            );
-          }
+		switch (sub) {
+			case "setup":
+				try {
+					if (!data) {
+						embed.setDescription(
+							`All submitted vip claims will be sent in ${channel}`,
+						);
+						await schema.create({
+							Guild: guild.id,
+							Channel: channel.id,
+							ID: "vip",
+						});
+					} else if (data) {
+						const existingChannel = client.channels.cache.get(data.Channel);
+						embed.setDescription(
+							`Your claim channel has already been set to ${existingChannel}`,
+						);
+					}
 
-          return await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
-          });
-        } catch (err) {
-          console.error("Error executing command:", err);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-        break;
+					return await interaction.reply({
+						embeds: [embed],
+						flags: MessageFlags.Ephemeral,
+					});
+				} catch (err) {
+					console.error("Error executing command:", err);
+					await interaction.reply({
+						content: "There was an error while executing this command!",
+						flags: MessageFlags.Ephemeral,
+					});
+				}
+				break;
 
-      case "disable":
-        try {
-          if (!data) {
-            embed.setDescription(
-              `The vip claim system is already disabled, or was never setup.`,
-            );
-          } else if (data) {
-            embed.setDescription(`The vip claim system has been disabled.`);
-            await schema.deleteMany({
-              Guild: guild.id,
-              ID: "vip",
-            });
-          }
+			case "disable":
+				try {
+					if (!data) {
+						embed.setDescription(
+							`The vip claim system is already disabled, or was never setup.`,
+						);
+					} else if (data) {
+						embed.setDescription(`The vip claim system has been disabled.`);
+						await schema.deleteMany({
+							Guild: guild.id,
+							ID: "vip",
+						});
+					}
 
-          return await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
-          });
-        } catch (err) {
-          console.error("Error executing command:", err);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-    }
-  },
+					return await interaction.reply({
+						embeds: [embed],
+						flags: MessageFlags.Ephemeral,
+					});
+				} catch (err) {
+					console.error("Error executing command:", err);
+					await interaction.reply({
+						content: "There was an error while executing this command!",
+						flags: MessageFlags.Ephemeral,
+					});
+				}
+		}
+	},
 };

@@ -1,135 +1,135 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	MessageFlags,
 } = require("discord.js");
 const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/reactionRoles.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("reaction-roles")
-    .setDescription("[Admin] Setup the reaction roles")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addSubcommand((command) =>
-      command
-        .setName("add")
-        .setDescription("Add a reaction role to a message")
-        .addStringOption((option) =>
-          option
-            .setName("message-id")
-            .setDescription("The message to react to")
-            .setRequired(true),
-        )
-        .addStringOption((option) =>
-          option
-            .setName("emoji")
-            .setDescription("Select the emoji to react with")
-            .setRequired(true),
-        )
-        .addRoleOption((option) =>
-          option
-            .setName("role")
-            .setDescription("Select the role for this emoji")
-            .setRequired(true),
-        ),
-    )
-    .addSubcommand((command) =>
-      command
-        .setName("remove")
-        .setDescription("Remove a reaction role from a message")
-        .addStringOption((option) =>
-          option
-            .setName("message-id")
-            .setDescription("The message to remove the react from")
-            .setRequired(true),
-        )
-        .addStringOption((option) =>
-          option
-            .setName("emoji")
-            .setDescription("Select the emoji to unreact with")
-            .setRequired(true),
-        ),
-    ),
-  async execute(interaction) {
-    const { options, guild, channel } = interaction;
-    const sub = options.getSubcommand();
-    const emoji = options.getString("emoji");
+	data: new SlashCommandBuilder()
+		.setName("reaction-roles")
+		.setDescription("[Admin] Setup the reaction roles")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addSubcommand((command) =>
+			command
+				.setName("add")
+				.setDescription("Add a reaction role to a message")
+				.addStringOption((option) =>
+					option
+						.setName("message-id")
+						.setDescription("The message to react to")
+						.setRequired(true),
+				)
+				.addStringOption((option) =>
+					option
+						.setName("emoji")
+						.setDescription("Select the emoji to react with")
+						.setRequired(true),
+				)
+				.addRoleOption((option) =>
+					option
+						.setName("role")
+						.setDescription("Select the role for this emoji")
+						.setRequired(true),
+				),
+		)
+		.addSubcommand((command) =>
+			command
+				.setName("remove")
+				.setDescription("Remove a reaction role from a message")
+				.addStringOption((option) =>
+					option
+						.setName("message-id")
+						.setDescription("The message to remove the react from")
+						.setRequired(true),
+				)
+				.addStringOption((option) =>
+					option
+						.setName("emoji")
+						.setDescription("Select the emoji to unreact with")
+						.setRequired(true),
+				),
+		),
+	async execute(interaction) {
+		const { options, guild, channel } = interaction;
+		const sub = options.getSubcommand();
+		const emoji = options.getString("emoji");
 
-    let e;
-    const message = await channel.messages
-      .fetch(options.getString("message-id"))
-      .catch((err) => {
-        e = err;
-      });
-    if (!(await requireAdmin(interaction))) return;
-    if (e)
-      return await interaction.reply({
-        content: `Be sure to get a message from ${channel}`,
-        flags: MessageFlags.Ephemeral,
-      });
+		let e;
+		const message = await channel.messages
+			.fetch(options.getString("message-id"))
+			.catch((err) => {
+				e = err;
+			});
+		if (!(await requireAdmin(interaction))) return;
+		if (e)
+			return await interaction.reply({
+				content: `Be sure to get a message from ${channel}`,
+				flags: MessageFlags.Ephemeral,
+			});
 
-    const data = await schema.findOne({
-      Guild: guild.id,
-      Message: message.id,
-      Emoji: emoji,
-    });
+		const data = await schema.findOne({
+			Guild: guild.id,
+			Message: message.id,
+			Emoji: emoji,
+		});
 
-    switch (sub) {
-      case "add":
-        if (data) {
-          return await interaction.reply({
-            content: `You already have this reaction setup, using ${emoji}, on this message.`,
-            flags: MessageFlags.Ephemeral,
-          });
-        } else {
-          const role = options.getRole("role");
-          await schema.create({
-            Guild: guild.id,
-            Message: message.id,
-            Emoji: emoji,
-            Role: role.id,
-          });
+		switch (sub) {
+			case "add":
+				if (data) {
+					return await interaction.reply({
+						content: `You already have this reaction setup, using ${emoji}, on this message.`,
+						flags: MessageFlags.Ephemeral,
+					});
+				} else {
+					const role = options.getRole("role");
+					await schema.create({
+						Guild: guild.id,
+						Message: message.id,
+						Emoji: emoji,
+						Role: role.id,
+					});
 
-          const embed = new EmbedBuilder()
-            .setColor("#ff00b3")
-            .setDescription(
-              `A Reaction role has been added to ${message.url} with ${emoji} and the role ${role}`,
-            );
+					const embed = new EmbedBuilder()
+						.setColor("#ff00b3")
+						.setDescription(
+							`A Reaction role has been added to ${message.url} with ${emoji} and the role ${role}`,
+						);
 
-          await message.react(emoji).catch((_err) => {});
-          await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-        break;
+					await message.react(emoji).catch((_err) => {});
+					await interaction.reply({
+						embeds: [embed],
+						flags: MessageFlags.Ephemeral,
+					});
+				}
+				break;
 
-      case "remove":
-        if (!data) {
-          return await interaction.reply({
-            content: `That reaction role doesn't exist`,
-            flags: MessageFlags.Ephemeral,
-          });
-        } else {
-          await schema.deleteMany({
-            Guild: guild.id,
-            Message: message.id,
-            Emoji: emoji,
-          });
+			case "remove":
+				if (!data) {
+					return await interaction.reply({
+						content: `That reaction role doesn't exist`,
+						flags: MessageFlags.Ephemeral,
+					});
+				} else {
+					await schema.deleteMany({
+						Guild: guild.id,
+						Message: message.id,
+						Emoji: emoji,
+					});
 
-          const embed = new EmbedBuilder()
-            .setColor("#ff00b3")
-            .setDescription(
-              `A Reaction role has been removed from ${message.url} with ${emoji}`,
-            );
+					const embed = new EmbedBuilder()
+						.setColor("#ff00b3")
+						.setDescription(
+							`A Reaction role has been removed from ${message.url} with ${emoji}`,
+						);
 
-          await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-    }
-  },
+					await interaction.reply({
+						embeds: [embed],
+						flags: MessageFlags.Ephemeral,
+					});
+				}
+		}
+	},
 };

@@ -1,66 +1,66 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	MessageFlags,
 } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config({ quiet: true, debug: false });
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("reload-commands")
-    .setDescription("[Owner] Reload all commands"),
+	data: new SlashCommandBuilder()
+		.setName("reload-commands")
+		.setDescription("[Owner] Reload all commands"),
 
-  async execute(interaction) {
-    const embed = new EmbedBuilder()
-      .setTitle("Reload Bot Commands")
-      .setColor("Red");
+	async execute(interaction) {
+		const embed = new EmbedBuilder()
+			.setTitle("Reload Bot Commands")
+			.setColor("Red");
 
-    if (interaction.user.id !== process.env.OWNER_ID) {
-      embed.setDescription("This command is restricted to the bot owner!");
-      return interaction.reply({
-        embeds: [embed],
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+		if (interaction.user.id !== process.env.OWNER_ID) {
+			embed.setDescription("This command is restricted to the bot owner!");
+			return interaction.reply({
+				embeds: [embed],
+				flags: MessageFlags.Ephemeral,
+			});
+		}
 
-    const client = interaction.client;
-    // This file lives in commands/system, so the commands root is two up.
-    const commandsPath = path.join(__dirname, "..");
+		const client = interaction.client;
+		// This file lives in commands/system, so the commands root is two up.
+		const commandsPath = path.join(__dirname, "..");
 
-    try {
-      const clearCache = (dir) => {
-        const files = fs.readdirSync(dir);
-        for (const file of files) {
-          const filePath = path.join(dir, file);
-          const stat = fs.statSync(filePath);
+		try {
+			const clearCache = (dir) => {
+				const files = fs.readdirSync(dir);
+				for (const file of files) {
+					const filePath = path.join(dir, file);
+					const stat = fs.statSync(filePath);
 
-          if (stat.isDirectory()) clearCache(filePath);
-          if (file.endsWith(".js")) {
-            delete require.cache[require.resolve(filePath)];
-          }
-        }
-      };
+					if (stat.isDirectory()) clearCache(filePath);
+					if (file.endsWith(".js")) {
+						delete require.cache[require.resolve(filePath)];
+					}
+				}
+			};
 
-      clearCache(commandsPath);
+			clearCache(commandsPath);
 
-      await client.loadCommands(commandsPath);
-      await client.registerCommands();
+			await client.loadCommands(commandsPath);
+			await client.registerCommands();
 
-      embed.setDescription("Commands reloaded successfully!").setColor("Green");
+			embed.setDescription("Commands reloaded successfully!").setColor("Green");
 
-      await interaction.reply({
-        embeds: [embed],
-        flags: MessageFlags.Ephemeral,
-      });
-    } catch (error) {
-      embed.setDescription(`Error reloading commands: ${error.message}`);
-      console.error("Reload error:", error);
-      await interaction.reply({
-        embeds: [embed],
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-  },
+			await interaction.reply({
+				embeds: [embed],
+				flags: MessageFlags.Ephemeral,
+			});
+		} catch (error) {
+			embed.setDescription(`Error reloading commands: ${error.message}`);
+			console.error("Reload error:", error);
+			await interaction.reply({
+				embeds: [embed],
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+	},
 };

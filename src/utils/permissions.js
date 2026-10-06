@@ -10,16 +10,16 @@ const { PermissionFlagsBits, MessageFlags } = require("discord.js");
  * @returns {Promise<boolean>}
  */
 async function requireAdmin(interaction) {
-  if (interaction.member?.permissions?.has(PermissionFlagsBits.Administrator)) {
-    return true;
-  }
-  await interaction
-    .reply({
-      content: "You don't have perms to use this command.",
-      flags: MessageFlags.Ephemeral,
-    })
-    .catch(() => {});
-  return false;
+	if (interaction.member?.permissions?.has(PermissionFlagsBits.Administrator)) {
+		return true;
+	}
+	await interaction
+		.reply({
+			content: "You don't have perms to use this command.",
+			flags: MessageFlags.Ephemeral,
+		})
+		.catch(() => {});
+	return false;
 }
 
 module.exports = { requireAdmin };

@@ -7,10 +7,10 @@
  * @returns {string|null}
  */
 function emojiKey(emoji) {
-  if (!emoji) return null;
-  return emoji.id
-    ? `<${emoji.animated ? "a" : ""}:${emoji.name}:${emoji.id}>`
-    : emoji.name;
+	if (!emoji) return null;
+	return emoji.id
+		? `<${emoji.animated ? "a" : ""}:${emoji.name}:${emoji.id}>`
+		: emoji.name;
 }
 
 module.exports = { emojiKey };

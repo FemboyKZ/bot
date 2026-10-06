@@ -1,53 +1,53 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	MessageFlags,
 } = require("discord.js");
 const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/autoRoles.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("autorole-add")
-    .setDescription("[Admin] Set the autoroles for this Server!")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addRoleOption((option) =>
-      option
-        .setName("role")
-        .setDescription("The Role you want to set for the Autoroles")
-        .setRequired(true),
-    ),
-  async execute(interaction) {
-    const roleOptions = ["role"];
-    const roles = roleOptions
-      .map((roleOption) => interaction.options.getRole(roleOption))
-      .filter((role) => role !== null);
+	data: new SlashCommandBuilder()
+		.setName("autorole-add")
+		.setDescription("[Admin] Set the autoroles for this Server!")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addRoleOption((option) =>
+			option
+				.setName("role")
+				.setDescription("The Role you want to set for the Autoroles")
+				.setRequired(true),
+		),
+	async execute(interaction) {
+		const roleOptions = ["role"];
+		const roles = roleOptions
+			.map((roleOption) => interaction.options.getRole(roleOption))
+			.filter((role) => role !== null);
 
-    if (roles.length === 0) {
-      return await interaction.reply({
-        content: "No valid roles provided.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+		if (roles.length === 0) {
+			return await interaction.reply({
+				content: "No valid roles provided.",
+				flags: MessageFlags.Ephemeral,
+			});
+		}
 
-    if (!(await requireAdmin(interaction))) return;
+		if (!(await requireAdmin(interaction))) return;
 
-    const roleIds = roles.map((role) => role.id);
+		const roleIds = roles.map((role) => role.id);
 
-    await schema.updateOne(
-      { Guild: interaction.guild.id },
-      { $addToSet: { Roles: { $each: roleIds } } },
-      { upsert: true },
-    );
+		await schema.updateOne(
+			{ Guild: interaction.guild.id },
+			{ $addToSet: { Roles: { $each: roleIds } } },
+			{ upsert: true },
+		);
 
-    const roleNames = roles.map((role) => role.name).join(", ");
-    const set = new EmbedBuilder()
-      .setColor("Green")
-      .setDescription(
-        `You have added the roles: ${roleNames}, to the autoroles.`,
-      );
+		const roleNames = roles.map((role) => role.name).join(", ");
+		const set = new EmbedBuilder()
+			.setColor("Green")
+			.setDescription(
+				`You have added the roles: ${roleNames}, to the autoroles.`,
+			);
 
-    await interaction.reply({ embeds: [set], flags: MessageFlags.Ephemeral });
-  },
+		await interaction.reply({ embeds: [set], flags: MessageFlags.Ephemeral });
+	},
 };

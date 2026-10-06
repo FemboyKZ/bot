@@ -10,7 +10,7 @@ const FKZ_COLOR = "#ff00b3";
  * @returns {EmbedBuilder}
  */
 function fkzEmbed() {
-  return new EmbedBuilder().setColor(FKZ_COLOR).setTimestamp();
+	return new EmbedBuilder().setColor(FKZ_COLOR).setTimestamp();
 }
 
 module.exports = { fkzEmbed, FKZ_COLOR };

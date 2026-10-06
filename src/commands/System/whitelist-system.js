@@ -1,103 +1,103 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  ChannelType,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	ChannelType,
+	MessageFlags,
 } = require("discord.js");
 const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/baseSystem.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("whitelist-system")
-    .setDescription("[Admin] Setup the whitelist system")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addSubcommand((command) =>
-      command
-        .setName("setup")
-        .setDescription("[Admin] Setup the whitelist system")
-        .addChannelOption((option) =>
-          option
-            .setName("channel")
-            .setDescription("The channel for whitelist requests")
-            .setRequired(true)
-            .addChannelTypes(ChannelType.GuildText),
-        ),
-    )
-    .addSubcommand((command) =>
-      command
-        .setName("disable")
-        .setDescription("[Admin] Disable the whitelist system"),
-    ),
-  async execute(interaction, client) {
-    if (!(await requireAdmin(interaction))) return;
+	data: new SlashCommandBuilder()
+		.setName("whitelist-system")
+		.setDescription("[Admin] Setup the whitelist system")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addSubcommand((command) =>
+			command
+				.setName("setup")
+				.setDescription("[Admin] Setup the whitelist system")
+				.addChannelOption((option) =>
+					option
+						.setName("channel")
+						.setDescription("The channel for whitelist requests")
+						.setRequired(true)
+						.addChannelTypes(ChannelType.GuildText),
+				),
+		)
+		.addSubcommand((command) =>
+			command
+				.setName("disable")
+				.setDescription("[Admin] Disable the whitelist system"),
+		),
+	async execute(interaction, client) {
+		if (!(await requireAdmin(interaction))) return;
 
-    const { guild, options } = interaction;
-    const channel = options.getChannel("channel");
-    const sub = options.getSubcommand();
-    const data = await schema.findOne({ Guild: guild.id, ID: "whitelist" });
+		const { guild, options } = interaction;
+		const channel = options.getChannel("channel");
+		const sub = options.getSubcommand();
+		const data = await schema.findOne({ Guild: guild.id, ID: "whitelist" });
 
-    const embed = new EmbedBuilder()
-      .setTitle("Whitelist System Setup")
-      .setColor("#ff00b3")
-      .setTimestamp();
+		const embed = new EmbedBuilder()
+			.setTitle("Whitelist System Setup")
+			.setColor("#ff00b3")
+			.setTimestamp();
 
-    switch (sub) {
-      case "setup":
-        try {
-          if (!data) {
-            embed.setDescription(
-              `All submitted wl requests will be sent in ${channel}`,
-            );
-            await schema.create({
-              Guild: guild.id,
-              Channel: channel.id,
-              ID: "whitelist",
-            });
-          } else if (data) {
-            const existingChannel = client.channels.cache.get(data.Channel);
-            embed.setDescription(
-              `Your wl channel has already been set to ${existingChannel}`,
-            );
-          }
+		switch (sub) {
+			case "setup":
+				try {
+					if (!data) {
+						embed.setDescription(
+							`All submitted wl requests will be sent in ${channel}`,
+						);
+						await schema.create({
+							Guild: guild.id,
+							Channel: channel.id,
+							ID: "whitelist",
+						});
+					} else if (data) {
+						const existingChannel = client.channels.cache.get(data.Channel);
+						embed.setDescription(
+							`Your wl channel has already been set to ${existingChannel}`,
+						);
+					}
 
-          return await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
-          });
-        } catch (err) {
-          console.error("Error executing command:", err);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-        break;
+					return await interaction.reply({
+						embeds: [embed],
+						flags: MessageFlags.Ephemeral,
+					});
+				} catch (err) {
+					console.error("Error executing command:", err);
+					await interaction.reply({
+						content: "There was an error while executing this command!",
+						flags: MessageFlags.Ephemeral,
+					});
+				}
+				break;
 
-      case "disable":
-        try {
-          if (!data) {
-            embed.setDescription(`The whitelist system is already disabled.`);
-          } else if (data) {
-            embed.setDescription(`The whitelist system has been disabled.`);
-            await schema.deleteMany({
-              Guild: guild.id,
-              ID: "whitelist",
-            });
-          }
+			case "disable":
+				try {
+					if (!data) {
+						embed.setDescription(`The whitelist system is already disabled.`);
+					} else if (data) {
+						embed.setDescription(`The whitelist system has been disabled.`);
+						await schema.deleteMany({
+							Guild: guild.id,
+							ID: "whitelist",
+						});
+					}
 
-          return await interaction.reply({
-            embeds: [embed],
-            flags: MessageFlags.Ephemeral,
-          });
-        } catch (err) {
-          console.error("Error executing command:", err);
-          await interaction.reply({
-            content: "There was an error while executing this command!",
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-    }
-  },
+					return await interaction.reply({
+						embeds: [embed],
+						flags: MessageFlags.Ephemeral,
+					});
+				} catch (err) {
+					console.error("Error executing command:", err);
+					await interaction.reply({
+						content: "There was an error while executing this command!",
+						flags: MessageFlags.Ephemeral,
+					});
+				}
+		}
+	},
 };

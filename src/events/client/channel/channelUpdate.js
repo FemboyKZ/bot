@@ -4,104 +4,104 @@ const logs = require("../../../schemas/events/channels.js");
 const { fkzEmbed } = require("../../../utils/embeds.js");
 
 module.exports = {
-  name: Events.ChannelUpdate,
-  async execute(oldChannel, newChannel, client) {
-    if (oldChannel instanceof DMChannel || newChannel instanceof DMChannel)
-      return;
+	name: Events.ChannelUpdate,
+	async execute(oldChannel, newChannel, client) {
+		if (oldChannel instanceof DMChannel || newChannel instanceof DMChannel)
+			return;
 
-    if (!oldChannel.guild || !newChannel.guild) return;
+		if (!oldChannel.guild || !newChannel.guild) return;
 
-    try {
-      const auditChannel = await getAuditChannel(oldChannel.guild, client);
-      if (!auditChannel) return;
+		try {
+			const auditChannel = await getAuditChannel(oldChannel.guild, client);
+			if (!auditChannel) return;
 
-      const logData = await logs.findOne({
-        Guild: oldChannel.guild.id,
-        Channel: oldChannel.id,
-      });
+			const logData = await logs.findOne({
+				Guild: oldChannel.guild.id,
+				Channel: oldChannel.id,
+			});
 
-      const embed = fkzEmbed()
-        .setTitle("Channel Updated")
-        .setFooter({ text: `FKZ • ID: ${newChannel.id}` });
+			const embed = fkzEmbed()
+				.setTitle("Channel Updated")
+				.setFooter({ text: `FKZ • ID: ${newChannel.id}` });
 
-      const changes = [];
-      const updateData = {};
+			const changes = [];
+			const updateData = {};
 
-      if (oldChannel.name !== newChannel.name) {
-        const oldName = logData?.Name || oldChannel.name || "none";
-        const newName = newChannel.name || "none";
+			if (oldChannel.name !== newChannel.name) {
+				const oldName = logData?.Name || oldChannel.name || "none";
+				const newName = newChannel.name || "none";
 
-        changes.push({
-          name: "Name",
-          value: `\`${oldName}\` → \`${newName}\``,
-          inline: false,
-        });
-        updateData.Name = newChannel.name;
-      }
+				changes.push({
+					name: "Name",
+					value: `\`${oldName}\` → \`${newName}\``,
+					inline: false,
+				});
+				updateData.Name = newChannel.name;
+			}
 
-      if (oldChannel.parentId !== newChannel.parentId) {
-        const oldParent = logData?.Parent || oldChannel.parentId || "none";
-        const newParent = newChannel.parentId || "none";
+			if (oldChannel.parentId !== newChannel.parentId) {
+				const oldParent = logData?.Parent || oldChannel.parentId || "none";
+				const newParent = newChannel.parentId || "none";
 
-        changes.push({
-          name: "Category",
-          value: `\`${oldParent}\` → \`${newParent}\``,
-          inline: false,
-        });
-        updateData.Parent = newChannel.parentId;
-      }
+				changes.push({
+					name: "Category",
+					value: `\`${oldParent}\` → \`${newParent}\``,
+					inline: false,
+				});
+				updateData.Parent = newChannel.parentId;
+			}
 
-      if (oldChannel.topic !== newChannel.topic) {
-        const oldTopic = (logData?.Topic || oldChannel.topic || "none").slice(
-          0,
-          480,
-        );
-        const newTopic = (newChannel.topic || "none").slice(0, 480);
+			if (oldChannel.topic !== newChannel.topic) {
+				const oldTopic = (logData?.Topic || oldChannel.topic || "none").slice(
+					0,
+					480,
+				);
+				const newTopic = (newChannel.topic || "none").slice(0, 480);
 
-        changes.push({
-          name: "Topic",
-          value: `\`${oldTopic}\` → \`${newTopic}\``,
-          inline: false,
-        });
-        updateData.Topic = newChannel.topic || null;
-      }
+				changes.push({
+					name: "Topic",
+					value: `\`${oldTopic}\` → \`${newTopic}\``,
+					inline: false,
+				});
+				updateData.Topic = newChannel.topic || null;
+			}
 
-      if (oldChannel.type !== newChannel.type) {
-        const oldType = logData?.Type || oldChannel.type || "none";
-        const newType = newChannel.type || "none";
+			if (oldChannel.type !== newChannel.type) {
+				const oldType = logData?.Type || oldChannel.type || "none";
+				const newType = newChannel.type || "none";
 
-        changes.push({
-          name: "Type",
-          value: `\`${oldType}\` → \`${newType}\``,
-          inline: false,
-        });
-        updateData.Type = newChannel.type;
-      }
+				changes.push({
+					name: "Type",
+					value: `\`${oldType}\` → \`${newType}\``,
+					inline: false,
+				});
+				updateData.Type = newChannel.type;
+			}
 
-      if (changes.length === 0) return;
+			if (changes.length === 0) return;
 
-      embed.addFields(changes);
+			embed.addFields(changes);
 
-      if (logData) {
-        await logs.findOneAndUpdate(
-          { Guild: newChannel.guild.id, Channel: newChannel.id },
-          updateData,
-        );
-      } else {
-        await logs.create({
-          Guild: newChannel.guild.id,
-          Channel: newChannel.id,
-          Name: newChannel.name,
-          Type: newChannel.type,
-          Parent: newChannel.parentId,
-          Topic: newChannel.topic,
-          ...updateData,
-        });
-      }
+			if (logData) {
+				await logs.findOneAndUpdate(
+					{ Guild: newChannel.guild.id, Channel: newChannel.id },
+					updateData,
+				);
+			} else {
+				await logs.create({
+					Guild: newChannel.guild.id,
+					Channel: newChannel.id,
+					Name: newChannel.name,
+					Type: newChannel.type,
+					Parent: newChannel.parentId,
+					Topic: newChannel.topic,
+					...updateData,
+				});
+			}
 
-      await auditChannel.send({ embeds: [embed] });
-    } catch (error) {
-      console.error("Error in ChannelUpdate event:", error);
-    }
-  },
+			await auditChannel.send({ embeds: [embed] });
+		} catch (error) {
+			console.error("Error in ChannelUpdate event:", error);
+		}
+	},
 };

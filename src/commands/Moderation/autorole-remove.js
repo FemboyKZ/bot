@@ -1,56 +1,56 @@
 const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionFlagsBits,
+	MessageFlags,
 } = require("discord.js");
 const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/autoRoles.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("autorole-remove")
-    .setDescription("[Admin] Remove a role from the autoroles")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addRoleOption((option) =>
-      option
-        .setName("role")
-        .setDescription("The Role you want to remove from the Autoroles")
-        .setRequired(true),
-    ),
-  async execute(interaction) {
-    if (!(await requireAdmin(interaction))) return;
+	data: new SlashCommandBuilder()
+		.setName("autorole-remove")
+		.setDescription("[Admin] Remove a role from the autoroles")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addRoleOption((option) =>
+			option
+				.setName("role")
+				.setDescription("The Role you want to remove from the Autoroles")
+				.setRequired(true),
+		),
+	async execute(interaction) {
+		if (!(await requireAdmin(interaction))) return;
 
-    const roleOptions = ["role"];
-    const roles = roleOptions
-      .map((roleOption) => interaction.options.getRole(roleOption))
-      .filter((role) => role !== null);
+		const roleOptions = ["role"];
+		const roles = roleOptions
+			.map((roleOption) => interaction.options.getRole(roleOption))
+			.filter((role) => role !== null);
 
-    if (roles.length === 0) {
-      return await interaction.reply({
-        content: "No valid roles provided.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+		if (roles.length === 0) {
+			return await interaction.reply({
+				content: "No valid roles provided.",
+				flags: MessageFlags.Ephemeral,
+			});
+		}
 
-    const roleIds = roles.map((role) => role.id);
+		const roleIds = roles.map((role) => role.id);
 
-    await schema.updateOne(
-      { Guild: interaction.guild.id },
-      { $pull: { Roles: { $each: roleIds } } },
-      { upsert: true },
-    );
+		await schema.updateOne(
+			{ Guild: interaction.guild.id },
+			{ $pull: { Roles: { $each: roleIds } } },
+			{ upsert: true },
+		);
 
-    const roleNames = roles.map((role) => role.name).join(", ");
-    const removed = new EmbedBuilder()
-      .setColor("Green")
-      .setDescription(
-        `The role ${roleNames} has been removed from the autoroles`,
-      );
+		const roleNames = roles.map((role) => role.name).join(", ");
+		const removed = new EmbedBuilder()
+			.setColor("Green")
+			.setDescription(
+				`The role ${roleNames} has been removed from the autoroles`,
+			);
 
-    await interaction.reply({
-      embeds: [removed],
-      flags: MessageFlags.Ephemeral,
-    });
-  },
+		await interaction.reply({
+			embeds: [removed],
+			flags: MessageFlags.Ephemeral,
+		});
+	},
 };

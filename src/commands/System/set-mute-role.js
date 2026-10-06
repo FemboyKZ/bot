@@ -1,60 +1,60 @@
 const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
+	SlashCommandBuilder,
+	PermissionFlagsBits,
+	MessageFlags,
 } = require("discord.js");
 const { requireAdmin } = require("../../utils/permissions.js");
 const schema = require("../../schemas/moderation/muteRoles.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("set-mute-role")
-    .setDescription("[Admin] Set or update the mute role")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addStringOption((option) =>
-      option
-        .setName("role")
-        .setDescription("Select the role")
-        .setRequired(true),
-    ),
+	data: new SlashCommandBuilder()
+		.setName("set-mute-role")
+		.setDescription("[Admin] Set or update the mute role")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addStringOption((option) =>
+			option
+				.setName("role")
+				.setDescription("Select the role")
+				.setRequired(true),
+		),
 
-  async execute(interaction) {
-    if (!(await requireAdmin(interaction))) return;
+	async execute(interaction) {
+		if (!(await requireAdmin(interaction))) return;
 
-    try {
-      const guild = interaction.guild;
-      const role = interaction.options.getString("role");
+		try {
+			const guild = interaction.guild;
+			const role = interaction.options.getString("role");
 
-      if (!role) {
-        return interaction.reply({
-          content: "Please provide a role to set.",
-          flags: MessageFlags.Ephemeral,
-        });
-      }
+			if (!role) {
+				return interaction.reply({
+					content: "Please provide a role to set.",
+					flags: MessageFlags.Ephemeral,
+				});
+			}
 
-      const operations = [];
-      if (role) {
-        operations.push(
-          schema.findOneAndUpdate(
-            { Guild: guild.id },
-            { $set: { Role: role } },
-            { upsert: true, new: true },
-          ),
-        );
-      }
+			const operations = [];
+			if (role) {
+				operations.push(
+					schema.findOneAndUpdate(
+						{ Guild: guild.id },
+						{ $set: { Role: role } },
+						{ upsert: true, new: true },
+					),
+				);
+			}
 
-      await Promise.all(operations);
+			await Promise.all(operations);
 
-      return interaction.reply({
-        content: "Roles have been successfully updated!",
-        flags: MessageFlags.Ephemeral,
-      });
-    } catch (error) {
-      console.error("Error in set-mute-role:", error);
-      return interaction.reply({
-        content: "There was an error while executing this command!",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-  },
+			return interaction.reply({
+				content: "Roles have been successfully updated!",
+				flags: MessageFlags.Ephemeral,
+			});
+		} catch (error) {
+			console.error("Error in set-mute-role:", error);
+			return interaction.reply({
+				content: "There was an error while executing this command!",
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+	},
 };

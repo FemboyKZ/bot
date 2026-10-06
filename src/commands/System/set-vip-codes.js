@@ -1,90 +1,90 @@
 const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  MessageFlags,
+	SlashCommandBuilder,
+	PermissionFlagsBits,
+	MessageFlags,
 } = require("discord.js");
 const schema = require("../../schemas/vip/vipCodes.js");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("set-vip-codes")
-    .setDescription("[Admin] Set or Update the VIP codes")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addStringOption((option) =>
-      option
-        .setName("code-vip")
-        .setDescription("Set or update the VIP Code")
-        .setRequired(false),
-    )
-    .addStringOption((option) =>
-      option
-        .setName("code-vip-plus")
-        .setDescription("Set or update the VIP+ Code")
-        .setRequired(false),
-    )
-    .addStringOption((option) =>
-      option
-        .setName("code-contributor")
-        .setDescription("Set or update the Contributor Code")
-        .setRequired(false),
-    ),
+	data: new SlashCommandBuilder()
+		.setName("set-vip-codes")
+		.setDescription("[Admin] Set or Update the VIP codes")
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+		.addStringOption((option) =>
+			option
+				.setName("code-vip")
+				.setDescription("Set or update the VIP Code")
+				.setRequired(false),
+		)
+		.addStringOption((option) =>
+			option
+				.setName("code-vip-plus")
+				.setDescription("Set or update the VIP+ Code")
+				.setRequired(false),
+		)
+		.addStringOption((option) =>
+			option
+				.setName("code-contributor")
+				.setDescription("Set or update the Contributor Code")
+				.setRequired(false),
+		),
 
-  async execute(interaction) {
-    if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
-    ) {
-      return interaction.reply({
-        content: "You don't have permissions to use this command.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+	async execute(interaction) {
+		if (
+			!interaction.member.permissions.has(PermissionFlagsBits.Administrator)
+		) {
+			return interaction.reply({
+				content: "You don't have permissions to use this command.",
+				flags: MessageFlags.Ephemeral,
+			});
+		}
 
-    try {
-      const guild = interaction.guild;
-      const codes = {
-        vip: interaction.options.getString("code-vip"),
-        vipPlus: interaction.options.getString("code-vip-plus"),
-        contributor: interaction.options.getString("code-contributor"),
-      };
+		try {
+			const guild = interaction.guild;
+			const codes = {
+				vip: interaction.options.getString("code-vip"),
+				vipPlus: interaction.options.getString("code-vip-plus"),
+				contributor: interaction.options.getString("code-contributor"),
+			};
 
-      if (!Object.values(codes).some((code) => code)) {
-        return interaction.reply({
-          content: "Please provide at least one code to set.",
-          flags: MessageFlags.Ephemeral,
-        });
-      }
+			if (!Object.values(codes).some((code) => code)) {
+				return interaction.reply({
+					content: "Please provide at least one code to set.",
+					flags: MessageFlags.Ephemeral,
+				});
+			}
 
-      const operations = [];
-      const codeTypes = [
-        { type: "vip", code: codes.vip },
-        { type: "vip+", code: codes.vipPlus },
-        { type: "contributor", code: codes.contributor },
-      ];
+			const operations = [];
+			const codeTypes = [
+				{ type: "vip", code: codes.vip },
+				{ type: "vip+", code: codes.vipPlus },
+				{ type: "contributor", code: codes.contributor },
+			];
 
-      for (const { type, code } of codeTypes) {
-        if (code) {
-          operations.push(
-            schema.findOneAndUpdate(
-              { Guild: guild.id, Type: type },
-              { $set: { Code: code, Uses: 0 } },
-              { upsert: true, new: true },
-            ),
-          );
-        }
-      }
+			for (const { type, code } of codeTypes) {
+				if (code) {
+					operations.push(
+						schema.findOneAndUpdate(
+							{ Guild: guild.id, Type: type },
+							{ $set: { Code: code, Uses: 0 } },
+							{ upsert: true, new: true },
+						),
+					);
+				}
+			}
 
-      await Promise.all(operations);
+			await Promise.all(operations);
 
-      return interaction.reply({
-        content: "Codes have been successfully updated!",
-        flags: MessageFlags.Ephemeral,
-      });
-    } catch (error) {
-      console.error("Error in set-vip-codes:", error);
-      return interaction.reply({
-        content: "There was an error while executing this command!",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-  },
+			return interaction.reply({
+				content: "Codes have been successfully updated!",
+				flags: MessageFlags.Ephemeral,
+			});
+		} catch (error) {
+			console.error("Error in set-vip-codes:", error);
+			return interaction.reply({
+				content: "There was an error while executing this command!",
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+	},
 };

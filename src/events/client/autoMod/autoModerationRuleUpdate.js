@@ -6,52 +6,52 @@ const logs = require("../../../schemas/events/automodRules.js");
 // TODO: make this not shit
 
 module.exports = {
-  name: Events.AutoModerationRuleUpdate,
-  async execute(oldAutoModerationRule, newAutoModerationRule, client) {
-    const channel = await getAuditChannel(newAutoModerationRule.guild, client);
-    if (!channel) return;
+	name: Events.AutoModerationRuleUpdate,
+	async execute(oldAutoModerationRule, newAutoModerationRule, client) {
+		const channel = await getAuditChannel(newAutoModerationRule.guild, client);
+		if (!channel) return;
 
-    const embed = fkzEmbed()
-      .setTitle("Automod Rule Updated")
-      .setFooter({ text: `FKZ • ID: ${newAutoModerationRule.id}` });
+		const embed = fkzEmbed()
+			.setTitle("Automod Rule Updated")
+			.setFooter({ text: `FKZ • ID: ${newAutoModerationRule.id}` });
 
-    const logData = await logs.findOne({
-      Guild: newAutoModerationRule.guild.id,
-      Rule: newAutoModerationRule.id,
-    });
+		const logData = await logs.findOne({
+			Guild: newAutoModerationRule.guild.id,
+			Rule: newAutoModerationRule.id,
+		});
 
-    try {
-      if (!logData) {
-        await logs.create({
-          Guild: newAutoModerationRule.guild.id,
-          Name: newAutoModerationRule.name,
-          Rule: newAutoModerationRule.id,
-          User: newAutoModerationRule.creatorId,
-          Trigger: newAutoModerationRule.triggerType,
-          Action: newAutoModerationRule.actions?.[0]?.type ?? null,
-          Enabled: newAutoModerationRule.enabled,
-        });
-      }
+		try {
+			if (!logData) {
+				await logs.create({
+					Guild: newAutoModerationRule.guild.id,
+					Name: newAutoModerationRule.name,
+					Rule: newAutoModerationRule.id,
+					User: newAutoModerationRule.creatorId,
+					Trigger: newAutoModerationRule.triggerType,
+					Action: newAutoModerationRule.actions?.[0]?.type ?? null,
+					Enabled: newAutoModerationRule.enabled,
+				});
+			}
 
-      if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
-        embed.addFields({
-          name: "Name",
-          value: `\`${oldAutoModerationRule.name || "None"}\`  →  \`${newAutoModerationRule.name || "None"}\``,
-          inline: false,
-        });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            {
-              Guild: newAutoModerationRule.guild?.id,
-              Rule: newAutoModerationRule.id,
-            },
-            { Name: newAutoModerationRule.name },
-          );
-        }
-        await channel.send({ embeds: [embed] });
-      }
+			if (oldAutoModerationRule.name !== newAutoModerationRule.name) {
+				embed.addFields({
+					name: "Name",
+					value: `\`${oldAutoModerationRule.name || "None"}\`  →  \`${newAutoModerationRule.name || "None"}\``,
+					inline: false,
+				});
+				if (logData) {
+					await logs.findOneAndUpdate(
+						{
+							Guild: newAutoModerationRule.guild?.id,
+							Rule: newAutoModerationRule.id,
+						},
+						{ Name: newAutoModerationRule.name },
+					);
+				}
+				await channel.send({ embeds: [embed] });
+			}
 
-      /*
+			/*
       if (oldAutoModerationRule.actions !== newAutoModerationRule.actions) {
         embed.addFields(
           {
@@ -81,45 +81,45 @@ module.exports = {
       }
       */
 
-      if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
-        embed.addFields({
-          name: "Enabled?",
-          value: `\`${oldAutoModerationRule.enabled}\`  →  \`${newAutoModerationRule.enabled}\``,
-          inline: false,
-        });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            {
-              Guild: newAutoModerationRule.guild?.id,
-              Rule: newAutoModerationRule.id,
-            },
-            { Enabled: newAutoModerationRule.enabled },
-          );
-        }
-        await channel.send({ embeds: [embed] });
-      }
+			if (oldAutoModerationRule.enabled !== newAutoModerationRule.enabled) {
+				embed.addFields({
+					name: "Enabled?",
+					value: `\`${oldAutoModerationRule.enabled}\`  →  \`${newAutoModerationRule.enabled}\``,
+					inline: false,
+				});
+				if (logData) {
+					await logs.findOneAndUpdate(
+						{
+							Guild: newAutoModerationRule.guild?.id,
+							Rule: newAutoModerationRule.id,
+						},
+						{ Enabled: newAutoModerationRule.enabled },
+					);
+				}
+				await channel.send({ embeds: [embed] });
+			}
 
-      if (
-        oldAutoModerationRule.triggerType !== newAutoModerationRule.triggerType
-      ) {
-        embed.addFields({
-          name: "Trigger",
-          value: `\`${oldAutoModerationRule.triggerType ?? "None"}\`  →  \`${newAutoModerationRule.triggerType ?? "None"}\``,
-          inline: false,
-        });
-        if (logData) {
-          await logs.findOneAndUpdate(
-            {
-              Guild: newAutoModerationRule.guild?.id,
-              Rule: newAutoModerationRule.id,
-            },
-            { Trigger: newAutoModerationRule.triggerType },
-          );
-        }
-        await channel.send({ embeds: [embed] });
-      }
-    } catch (error) {
-      console.error("Error in AutoModRuleUpdate event:", error);
-    }
-  },
+			if (
+				oldAutoModerationRule.triggerType !== newAutoModerationRule.triggerType
+			) {
+				embed.addFields({
+					name: "Trigger",
+					value: `\`${oldAutoModerationRule.triggerType ?? "None"}\`  →  \`${newAutoModerationRule.triggerType ?? "None"}\``,
+					inline: false,
+				});
+				if (logData) {
+					await logs.findOneAndUpdate(
+						{
+							Guild: newAutoModerationRule.guild?.id,
+							Rule: newAutoModerationRule.id,
+						},
+						{ Trigger: newAutoModerationRule.triggerType },
+					);
+				}
+				await channel.send({ embeds: [embed] });
+			}
+		} catch (error) {
+			console.error("Error in AutoModRuleUpdate event:", error);
+		}
+	},
 };

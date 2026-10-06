@@ -4,67 +4,67 @@ const { fkzEmbed } = require("../../../utils/embeds.js");
 const logs = require("../../../schemas/events/channels.js");
 
 module.exports = {
-  name: Events.ChannelCreate,
-  async execute(channel, client) {
-    if (channel instanceof DMChannel || !channel.guild) return;
-    const auditChannel = await getAuditChannel(channel.guild, client);
-    if (!auditChannel) return;
+	name: Events.ChannelCreate,
+	async execute(channel, client) {
+		if (channel instanceof DMChannel || !channel.guild) return;
+		const auditChannel = await getAuditChannel(channel.guild, client);
+		if (!auditChannel) return;
 
-    const logData = await logs.findOne({
-      Guild: channel.guild.id,
-      Channel: channel.id,
-    });
+		const logData = await logs.findOne({
+			Guild: channel.guild.id,
+			Channel: channel.id,
+		});
 
-    const embed = fkzEmbed()
-      .setFooter({ text: `FKZ • ID: ${channel.id}` })
-      .setTitle("Channel Created")
-      .addFields(
-        {
-          name: "Name",
-          value: `${channel.name}`,
-          inline: false,
-        },
-        {
-          name: "Type",
-          value: `${channel.type}`,
-          inline: false,
-        },
-        {
-          name: "Topic",
-          value: channel.topic ? channel.topic.slice(0, 1024) : "None",
-          inline: false,
-        },
-        {
-          name: "Category",
-          value: channel.parent ? `${channel.parent.name}` : "None",
-          inline: false,
-        },
-      );
-    try {
-      if (logData) {
-        await logs.findOneAndUpdate(
-          { Guild: channel.guild.id, Channel: channel.id },
-          {
-            Name: channel.name,
-            Topic: channel.topic,
-            Parent: channel.parentId,
-            Type: channel.type,
-          },
-        );
-      }
-      if (!logData) {
-        await logs.create({
-          Guild: channel.guild.id,
-          Name: channel.name,
-          Type: channel.type,
-          Parent: channel.parentId,
-          Channel: channel.id,
-        });
-      }
+		const embed = fkzEmbed()
+			.setFooter({ text: `FKZ • ID: ${channel.id}` })
+			.setTitle("Channel Created")
+			.addFields(
+				{
+					name: "Name",
+					value: `${channel.name}`,
+					inline: false,
+				},
+				{
+					name: "Type",
+					value: `${channel.type}`,
+					inline: false,
+				},
+				{
+					name: "Topic",
+					value: channel.topic ? channel.topic.slice(0, 1024) : "None",
+					inline: false,
+				},
+				{
+					name: "Category",
+					value: channel.parent ? `${channel.parent.name}` : "None",
+					inline: false,
+				},
+			);
+		try {
+			if (logData) {
+				await logs.findOneAndUpdate(
+					{ Guild: channel.guild.id, Channel: channel.id },
+					{
+						Name: channel.name,
+						Topic: channel.topic,
+						Parent: channel.parentId,
+						Type: channel.type,
+					},
+				);
+			}
+			if (!logData) {
+				await logs.create({
+					Guild: channel.guild.id,
+					Name: channel.name,
+					Type: channel.type,
+					Parent: channel.parentId,
+					Channel: channel.id,
+				});
+			}
 
-      await auditChannel.send({ embeds: [embed] });
-    } catch (error) {
-      console.log("Error in ChannelCreate event:", error);
-    }
-  },
+			await auditChannel.send({ embeds: [embed] });
+		} catch (error) {
+			console.log("Error in ChannelCreate event:", error);
+		}
+	},
 };

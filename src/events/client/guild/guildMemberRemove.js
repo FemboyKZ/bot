@@ -4,46 +4,46 @@ const logs = require("../../../schemas/events/members.js");
 const { fkzEmbed } = require("../../../utils/embeds.js");
 
 const UNKNOWN_AVATAR =
-  "https://files.femboykz.com/web/images/avatars/unknown.png?raw=1";
+	"https://files.femboykz.com/web/images/avatars/unknown.png?raw=1";
 
 module.exports = {
-  name: Events.GuildMemberRemove,
-  async execute(member, client) {
-    if (!member || !client) {
-      return;
-    }
+	name: Events.GuildMemberRemove,
+	async execute(member, client) {
+		if (!member || !client) {
+			return;
+		}
 
-    const channel = await getAuditChannel(member.guild, client);
-    if (!channel) return;
+		const channel = await getAuditChannel(member.guild, client);
+		if (!channel) return;
 
-    const logData = await logs.findOne({
-      Guild: member.guild.id,
-      User: member.user.id,
-    });
+		const logData = await logs.findOne({
+			Guild: member.guild.id,
+			User: member.user.id,
+		});
 
-    const embed = fkzEmbed()
-      .setTitle(`${member.user.username} has left the server`)
-      .setDescription(`<@${member.user.id}> has left the Server`);
+		const embed = fkzEmbed()
+			.setTitle(`${member.user.username} has left the server`)
+			.setDescription(`<@${member.user.id}> has left the Server`);
 
-    embed.setAuthor({
-      name: `Member Left`,
-      iconURL:
-        member.user.avatarURL({ size: 256 }) ||
-        logData?.Avatar ||
-        UNKNOWN_AVATAR,
-    });
+		embed.setAuthor({
+			name: `Member Left`,
+			iconURL:
+				member.user.avatarURL({ size: 256 }) ||
+				logData?.Avatar ||
+				UNKNOWN_AVATAR,
+		});
 
-    try {
-      if (logData) {
-        // Flag as left instead of deleting the record.
-        await logs.updateOne(
-          { Guild: member.guild.id, User: member.user.id },
-          { Left: true, LeftAt: new Date() },
-        );
-      }
-      await channel.send({ embeds: [embed] });
-    } catch (error) {
-      console.error(`Error in guildMemberRemove event:`, error);
-    }
-  },
+		try {
+			if (logData) {
+				// Flag as left instead of deleting the record.
+				await logs.updateOne(
+					{ Guild: member.guild.id, User: member.user.id },
+					{ Left: true, LeftAt: new Date() },
+				);
+			}
+			await channel.send({ embeds: [embed] });
+		} catch (error) {
+			console.error(`Error in guildMemberRemove event:`, error);
+		}
+	},
 };

@@ -10,10 +10,10 @@ const schema = require("../schemas/baseSystem.js");
  * @returns {Promise<import("discord.js").GuildTextBasedChannel|null>}
  */
 async function getAuditChannel(guild, client) {
-  if (!guild) return null;
-  const data = await schema.findOne({ Guild: guild.id, ID: "audit-logs" });
-  if (!data || !data.Channel) return null;
-  return client.channels.cache.get(data.Channel) || null;
+	if (!guild) return null;
+	const data = await schema.findOne({ Guild: guild.id, ID: "audit-logs" });
+	if (!data || !data.Channel) return null;
+	return client.channels.cache.get(data.Channel) || null;
 }
 
 module.exports = { getAuditChannel };
